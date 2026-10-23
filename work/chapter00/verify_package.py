@@ -7,9 +7,9 @@ out = Path(__file__).resolve().parents[2] / 'outputs'
 html = (out / 'Chapter00-review.html').read_text(encoding='utf-8')
 raw = re.search(r'<script id="study-data" type="application/json">(.*?)</script>', html, re.S).group(1)
 library = json.loads(raw)
-assert len(library['chapters']) == 8
+assert len(library['chapters']) == 9
 available=[c for c in library['chapters'] if c['data']]
-assert len(available)==8
+assert len(available)==9
 chapter03 = next(c['data'] for c in available if c['id'] == 'chapter03')
 assert len(chapter03['topics']) == 30
 assert len(chapter03['figures']) == 99
@@ -40,6 +40,12 @@ assert len(chapter07['figures']) == 36
 assert len(chapter07['flashcards']) == 43
 assert all(len(t['questions']) == 3 for t in chapter07['topics'])
 assert all(chapter07['source'] in f['caption'] and 'หน้า' in f['caption'] for f in chapter07['figures'])
+chapter08 = next(c['data'] for c in available if c['id'] == 'chapter08')
+assert len(chapter08['topics']) == 29
+assert len(chapter08['figures']) == 17
+assert len(chapter08['flashcards']) == 48
+assert all(len(t['questions']) == 3 for t in chapter08['topics'])
+assert all(chapter08['source'] in f['caption'] and 'หน้า' in f['caption'] for f in chapter08['figures'])
 assert 'id="chapter-side"' in html and 'id="side-topics"' in html and 'id="side-chapters"' in html
 assert all(f['src'].startswith('data:image/webp;base64,') for c in available for f in c['data']['figures'])
 assert not re.search(r'<script[^>]+src=|@import|https?://', html)

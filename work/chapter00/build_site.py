@@ -14,7 +14,7 @@ IMAGES = SITE / 'images'
 IMAGES.mkdir(parents=True, exist_ok=True)
 template = (WORK / 'site-template.html').read_text(encoding='utf-8')
 library = {'chapters': []}
-for number in range(8):
+for number in range(9):
     chapter_id = f'chapter{number:02d}'
     chapter_work = WORK.parent / chapter_id
     content_path = chapter_work / 'content.json'
@@ -60,7 +60,7 @@ with zipfile.ZipFile(OUT / 'Chapter00-review.zip', 'w', zipfile.ZIP_DEFLATED) as
                 z.write(SITE / f['src'], Path('chapter00-review') / f['src'])
 
 # Check portable asset references, data coverage, and JavaScript parse independently.
-assert len(library['chapters']) == 8
+assert len(library["chapters"]) == 9
 for entry in library['chapters']:
     if entry['data']:
         data = entry['data']

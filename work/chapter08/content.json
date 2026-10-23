@@ -1,0 +1,2322 @@
+{
+  "source": "itds-211_comp_arch_Chapter08.pdf",
+  "sourcePageCount": 41,
+  "course": "ITDS-211 · Computer Architecture & Operating System",
+  "instructor": "W. Suntiamorntut, Ph.D.",
+  "chapter": "Chapter08 · Parallel Processors from Client to Cloud",
+  "description": "multiprocessors, SIMD/vector, multithreading, shared memory, GPUs, clusters และ network topologies",
+  "notice": "เลขหน้าเป็นหน้า PDF 1–41; หัวสไลด์พิมพ์ “Chapter 6 — Parallel Processors from Client to Cloud — 2–56” ซึ่งเป็นเลขอีกชุด; หน้า 3 เป็นภาพจาก Pearson และหน้า 30 ตัวอักษรเล็กต้องตรวจสอบจากต้นฉบับ",
+  "purpose": "บทนี้เรียนเพื่อเข้าใจว่าการใช้หลาย processor เพิ่มประสิทธิภาพได้อย่างไร: จำแนกสถาปัตยกรรมแบบ SISD/SIMD/MIMD, เทียบ vector/SIMD, multithreading, shared memory, GPU, clusters และ network topologies พร้อมความยากของ parallel software และวิธีวัดประสิทธิภาพ",
+  "purposePages": "หน้า 4–40",
+  "objectiveNote": "วัตถุประสงค์รายบทที่ระบุโดยตรง: ต้องตรวจสอบจากต้นฉบับ; เป้าหมายต่อไปนี้สรุปจาก Chapter Overview หน้า 4 และ Concluding Remarks หน้า 40",
+  "flashcardNote": "Flashcards ใช้ศัพท์ ตัวเลข และการจำแนกจากสไลด์เท่านั้น",
+  "goals": [
+    {
+      "text": "อธิบายเป้าหมาย multiprocessors และความยากของ parallel programming",
+      "pages": "หน้า 5–8"
+    },
+    {
+      "text": "จำแนก SISD/SIMD/MISD/MIMD/SPMD และเทียบ vector กับ SIMD/multimedia extensions",
+      "pages": "หน้า 3, 9–14"
+    },
+    {
+      "text": "แยก fine-grain, coarse-grain และ simultaneous multithreading",
+      "pages": "หน้า 15–18"
+    },
+    {
+      "text": "อธิบาย shared memory (UMA/NUMA) และไล่ตัวอย่าง sum reduction",
+      "pages": "หน้า 19–21"
+    },
+    {
+      "text": "อธิบายสถาปัตยกรรม GPU, Fermi, memory structures และการจำแนก GPU",
+      "pages": "หน้า 22–30"
+    },
+    {
+      "text": "เทียบ message passing, clusters, grid และ network topologies/characteristics",
+      "pages": "หน้า 31–36"
+    },
+    {
+      "text": "รู้จัก parallel benchmarks และ arithmetic intensity",
+      "pages": "หน้า 37–39"
+    }
+  ],
+  "limits": [
+    "อ่านและตรวจภาพครบ 41 หน้า: หน้า 1 ปก, หน้า 2 course outline, หน้า 4 chapter overview, หน้า 41 Q&A",
+    "สไลด์ไม่มีรายการ Chapter Objectives โดยตรงหรือข้อสอบเก่า: ต้องตรวจสอบจากต้นฉบับ; ระดับสีเป็นลำดับเวลาอ่าน ไม่ใช่สถิติการออกสอบ",
+    "หน้า 3 เป็น Figure 17.1 จาก Pearson (ต่างจากตำรา MK ส่วนอื่นของบท)",
+    "หน้า 30 Guide to GPU Terms ตัวอักษรเล็กเกินกว่าจะสรุปรายละเอียดได้: ต้องตรวจสอบจากต้นฉบับ",
+    "ภาพหน้า 21 แสดงต้นไม้ half = 4, 2, 1 (8 processors) ขณะที่โค้ดเริ่ม half = 64",
+    "ภาพหน้า 14 ถูกตัดขอบบางส่วน; ตัวเลขตารางหน้า 29 เป็นค่าตามสไลด์ ไม่ใช่สเปกปัจจุบัน",
+    "คำถามคำนวณใช้เฉพาะตัวเลขและนิยามในสไลด์; ไม่มีการอ้างว่าเป็นข้อสอบจริง"
+  ],
+  "figures": [
+    {
+      "id": "fig-3",
+      "page": 3,
+      "file": "slide-03.png",
+      "title": "A Taxonomy of Parallel Processor Architectures · หน้า 3",
+      "caption": "ต้นไม้ SISD/SIMD/MISD/MIMD, SMP, NUMA, clusters (Figure 17.1, Pearson) (itds-211_comp_arch_Chapter08.pdf, หน้า 3)"
+    },
+    {
+      "id": "fig-9",
+      "page": 9,
+      "file": "slide-09.png",
+      "title": "Instruction and Data Streams · หน้า 9",
+      "caption": "ตาราง SISD/SIMD/MISD/MIMD และ SPMD (itds-211_comp_arch_Chapter08.pdf, หน้า 9)"
+    },
+    {
+      "id": "fig-11",
+      "page": 11,
+      "file": "slide-11.png",
+      "title": "Example: DAXPY · หน้า 11",
+      "caption": "โค้ด RISC-V แบบ loop เทียบ vector code และคำอธิบาย DAXPY (itds-211_comp_arch_Chapter08.pdf, หน้า 11)"
+    },
+    {
+      "id": "fig-14",
+      "page": 14,
+      "file": "slide-14.png",
+      "title": "Vector vs. Multimedia Extensions · หน้า 14",
+      "caption": "vector unit แบบ lanes ผสม pipelined/arrayed (itds-211_comp_arch_Chapter08.pdf, หน้า 14)"
+    },
+    {
+      "id": "fig-17",
+      "page": 17,
+      "file": "slide-17.png",
+      "title": "Multithreading Example · หน้า 17",
+      "caption": "issue slots ของ Coarse MT, Fine MT และ SMT (itds-211_comp_arch_Chapter08.pdf, หน้า 17)"
+    },
+    {
+      "id": "fig-19",
+      "page": 19,
+      "file": "slide-19.png",
+      "title": "Shared Memory · หน้า 19",
+      "caption": "processor/cache ต่อ interconnection network ไป memory และ I/O (itds-211_comp_arch_Chapter08.pdf, หน้า 19)"
+    },
+    {
+      "id": "fig-20",
+      "page": 20,
+      "file": "slide-20.png",
+      "title": "Example: Sum Reduction · หน้า 20",
+      "caption": "แบ่ง 64,000 ตัวให้ 64 processors และโค้ดรวมผลขั้นแรก (itds-211_comp_arch_Chapter08.pdf, หน้า 20)"
+    },
+    {
+      "id": "fig-21",
+      "page": 21,
+      "file": "slide-21.png",
+      "title": "Example: Sum Reduction · หน้า 21",
+      "caption": "โค้ด reduction และต้นไม้ half = 4, 2, 1 (itds-211_comp_arch_Chapter08.pdf, หน้า 21)"
+    },
+    {
+      "id": "fig-23",
+      "page": 23,
+      "file": "slide-23.png",
+      "title": "Graphics in the System · หน้า 23",
+      "caption": "ตำแหน่ง GPU, North Bridge และ GPU memory ในระบบ (itds-211_comp_arch_Chapter08.pdf, หน้า 23)"
+    },
+    {
+      "id": "fig-25",
+      "page": 25,
+      "file": "slide-25.png",
+      "title": "Example: NVIDIA Fermi · หน้า 25",
+      "caption": "SIMD processor 16 lanes, registers, load/store units, local memory 64 KiB (itds-211_comp_arch_Chapter08.pdf, หน้า 25)"
+    },
+    {
+      "id": "fig-27",
+      "page": 27,
+      "file": "slide-27.png",
+      "title": "GPU Memory Structures · หน้า 27",
+      "caption": "CUDA thread, thread block, grid และ memory แต่ละระดับ (itds-211_comp_arch_Chapter08.pdf, หน้า 27)"
+    },
+    {
+      "id": "fig-28",
+      "page": 28,
+      "file": "slide-28.png",
+      "title": "Classifying GPUs · หน้า 28",
+      "caption": "ตาราง ILP/DLP × static/dynamic (itds-211_comp_arch_Chapter08.pdf, หน้า 28)"
+    },
+    {
+      "id": "fig-29",
+      "page": 29,
+      "file": "slide-29.png",
+      "title": "Putting GPUs into Perspective · หน้า 29",
+      "caption": "ตารางเทียบ multicore with SIMD กับ GPU (itds-211_comp_arch_Chapter08.pdf, หน้า 29)"
+    },
+    {
+      "id": "fig-30",
+      "page": 30,
+      "file": "slide-30.png",
+      "title": "Guide to GPU Terms · หน้า 30",
+      "caption": "ตารางศัพท์ GPU (ตัวอักษรเล็ก ต้องตรวจสอบจากต้นฉบับ) (itds-211_comp_arch_Chapter08.pdf, หน้า 30)"
+    },
+    {
+      "id": "fig-31",
+      "page": 31,
+      "file": "slide-31.png",
+      "title": "Message Passing · หน้า 31",
+      "caption": "processor/cache/memory ของแต่ละตัวต่อ interconnection network (itds-211_comp_arch_Chapter08.pdf, หน้า 31)"
+    },
+    {
+      "id": "fig-34",
+      "page": 34,
+      "file": "slide-34.png",
+      "title": "Interconnection Networks · หน้า 34",
+      "caption": "bus, ring, 2D mesh, N-cube (N = 3), fully connected (itds-211_comp_arch_Chapter08.pdf, หน้า 34)"
+    },
+    {
+      "id": "fig-35",
+      "page": 35,
+      "file": "slide-35.png",
+      "title": "Multistage Networks · หน้า 35",
+      "caption": "crossbar, Omega network, Omega switch box (itds-211_comp_arch_Chapter08.pdf, หน้า 35)"
+    }
+  ],
+  "topics": [
+    {
+      "id": "processor-taxonomy",
+      "title": "Taxonomy ของ parallel processor architectures",
+      "level": "important",
+      "pages": "หน้า 3",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "ภาพหน้า 3 (Figure 17.1 จาก Pearson) แบ่ง processor organizations เป็น SISD, SIMD, MISD และ MIMD. SISD คือ uniprocessor; SIMD แตกเป็น vector processor และ array processor; MIMD แตกเป็น shared memory (tightly coupled) ซึ่งมี SMP และ NUMA กับ distributed memory (loosely coupled) ซึ่งคือ clusters.",
+      "remember": [
+        "SISD → Uniprocessor (หน้า 3)",
+        "SIMD → Vector processor, Array processor (หน้า 3)",
+        "MIMD → Shared memory (tightly coupled): SMP, NUMA (หน้า 3)",
+        "MIMD → Distributed memory (loosely coupled): Clusters (หน้า 3)"
+      ],
+      "terms": [
+        "SISD",
+        "SIMD",
+        "MISD",
+        "MIMD",
+        "SMP",
+        "NUMA",
+        "clusters",
+        "tightly coupled",
+        "loosely coupled"
+      ],
+      "example": "ใช้ต้นไม้หน้า 3 เป็นแผนที่ของบท: SIMD/vector (หน้า 9–14), shared memory (หน้า 19–21), clusters (หน้า 31–33)",
+      "confusion": "Tightly coupled = shared memory; loosely coupled = distributed memory/clusters อย่าสลับกัน",
+      "mnemonic": "MIMD แยกสองทาง: แชร์ memory (แน่น) หรือแยก memory (หลวม)",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ในภาพหน้า 3 clusters อยู่ภายใต้กลุ่มใด?",
+          "options": [
+            "MIMD → Distributed memory (loosely coupled)",
+            "SIMD → Array processor",
+            "MIMD → Shared memory",
+            "SISD"
+          ],
+          "correct": 0,
+          "answer": "Distributed memory (loosely coupled) ของ MIMD (หน้า 3)",
+          "pages": "หน้า 3"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "SIMD แตกเป็นอะไรบ้างตามภาพ?",
+          "answer": "Vector processor และ Array processor (หน้า 3)",
+          "pages": "หน้า 3"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ SMP กับ clusters ตามตำแหน่งในต้นไม้หน้า 3",
+          "answer": "SMP อยู่ใต้ shared memory (tightly coupled) ส่วน clusters อยู่ใต้ distributed memory (loosely coupled) ทั้งคู่เป็น MIMD",
+          "pages": "หน้า 3"
+        }
+      ],
+      "figures": [
+        "fig-3"
+      ]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction: เป้าหมายของ multiprocessors",
+      "level": "core",
+      "pages": "หน้า 4–5",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "เป้าหมายคือเชื่อมหลายคอมพิวเตอร์เพื่อให้ได้ประสิทธิภาพสูงขึ้น. Multiprocessors ให้ scalability, availability และ power efficiency. Task-level (process-level) parallelism ให้ throughput สูงสำหรับงานอิสระ; parallel processing program คือโปรแกรมเดียวที่รันบนหลาย processor; multicore microprocessor คือชิปที่มีหลาย processor (cores).",
+      "remember": [
+        "Goal: connecting multiple computers to get higher performance (หน้า 5)",
+        "Multiprocessors: scalability, availability, power efficiency (หน้า 5)",
+        "Task-level parallelism: high throughput for independent jobs (หน้า 5)",
+        "Parallel processing program: single program on multiple processors (หน้า 5)",
+        "Multicore: chips with multiple processors (cores) (หน้า 5)"
+      ],
+      "terms": [
+        "multiprocessor",
+        "task-level (process-level) parallelism",
+        "parallel processing program",
+        "multicore",
+        "scalability",
+        "availability"
+      ],
+      "example": "Chapter overview หน้า 4 เรียงหัวข้อ: difficulty → SISD/MIMD/SIMD/SPMD/Vector → multithreading → shared memory → GPUs → clusters → network topologies",
+      "confusion": "Task-level parallelism คือหลายงานอิสระ; parallel processing program คือโปรแกรมเดียวแบ่งไปหลาย processor",
+      "mnemonic": "หลายงานอิสระ = task-level; งานเดียวแบ่งช่วย = parallel program",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดคือ multicore microprocessor ตามสไลด์?",
+          "options": [
+            "ชิปที่มีหลาย processor (cores)",
+            "โปรแกรมเดียวบนหลายเครื่อง",
+            "เครือข่าย Internet",
+            "GPU เท่านั้น"
+          ],
+          "correct": 0,
+          "answer": "Chips with multiple processors (cores) (หน้า 5)",
+          "pages": "หน้า 4–5"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ข้อดีของ multiprocessors 3 ข้อตามสไลด์คืออะไร?",
+          "answer": "Scalability, availability, power efficiency (หน้า 5)",
+          "pages": "หน้า 4–5"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เว็บเซิร์ฟเวอร์ที่รับคำขออิสระจำนวนมากใช้ parallelism แบบใดตามหน้า 5?",
+          "answer": "Task-level (process-level) parallelism เพราะให้ high throughput สำหรับ independent jobs",
+          "pages": "หน้า 4–5"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "hardware-software",
+      "title": "Hardware และ software: serial/parallel, sequential/concurrent",
+      "level": "important",
+      "pages": "หน้า 6–7",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Hardware แบ่งเป็น serial (เช่น Pentium 4) และ parallel (เช่น quad-core Xeon e5345). Software แบ่งเป็น sequential (เช่น matrix multiplication) และ concurrent (เช่น operating system). software ทั้งสองแบบรันได้บน hardware ทั้งสองแบบ ความท้าทายคือใช้ parallel hardware ให้มีประสิทธิภาพ. หน้า 7 ทบทวนหัวข้อ parallelism ที่เคยเรียน: synchronization, subword parallelism, ILP และ cache coherence.",
+      "remember": [
+        "Serial HW: Pentium 4; Parallel HW: quad-core Xeon e5345 (หน้า 6)",
+        "Sequential SW: matrix multiplication; Concurrent SW: operating system (หน้า 6)",
+        "Challenge: making effective use of parallel hardware (หน้า 6)",
+        "Covered: synchronization, subword parallelism, ILP, cache coherence (หน้า 7)"
+      ],
+      "terms": [
+        "serial hardware",
+        "parallel hardware",
+        "sequential software",
+        "concurrent software",
+        "cache coherence",
+        "subword parallelism"
+      ],
+      "example": "matrix multiplication เป็น sequential software ได้ แต่ก็รันบน parallel hardware ได้ตามหน้า 6",
+      "confusion": "Sequential/concurrent อธิบาย software; serial/parallel อธิบาย hardware",
+      "mnemonic": "Hardware: serial/parallel · Software: sequential/concurrent",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตัวอย่าง concurrent software ในสไลด์คืออะไร?",
+          "options": [
+            "Operating system",
+            "Matrix multiplication",
+            "Pentium 4",
+            "Xeon e5345"
+          ],
+          "correct": 0,
+          "answer": "Operating system (หน้า 6)",
+          "pages": "หน้า 6–7"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ความท้าทายหลักตามหน้า 6 คืออะไร?",
+          "answer": "การใช้ parallel hardware ให้มีประสิทธิภาพ",
+          "pages": "หน้า 6–7"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "จัดหมวด “matrix multiplication บน quad-core Xeon e5345” ตามตาราง hardware/software หน้า 6",
+          "answer": "Software: sequential, Hardware: parallel — สไลด์ระบุว่า sequential software รันบน parallel hardware ได้",
+          "pages": "หน้า 6–7"
+        }
+      ],
+      "figures": [],
+      "comparison": {
+        "headers": [
+          "",
+          "Serial HW",
+          "Parallel HW"
+        ],
+        "rows": [
+          [
+            "Sequential SW",
+            "matrix multiply บน Pentium 4",
+            "matrix multiply บน Xeon e5345"
+          ],
+          [
+            "Concurrent SW",
+            "OS บน Pentium 4",
+            "OS บน Xeon e5345"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "parallel-programming",
+      "title": "ความยากของการเขียน parallel program",
+      "level": "core",
+      "pages": "หน้า 8",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "ปัญหาอยู่ที่ parallel software: ต้องได้ performance improvement อย่างมีนัยสำคัญ ไม่เช่นนั้นใช้ uniprocessor ที่เร็วขึ้นจะง่ายกว่า. ความยากหลักคือ partitioning, coordination และ communications overhead.",
+      "remember": [
+        "Parallel software is the problem (หน้า 8)",
+        "ต้องได้ significant performance improvement มิฉะนั้นใช้ faster uniprocessor (หน้า 8)",
+        "Difficulties: partitioning, coordination, communications overhead (หน้า 8)"
+      ],
+      "terms": [
+        "partitioning",
+        "coordination",
+        "communications overhead",
+        "uniprocessor"
+      ],
+      "example": "ตัวอย่าง sum reduction หน้า 20–21 ต้อง partition ข้อมูล, synch() เพื่อ coordination และรวมผลระหว่าง processor",
+      "confusion": "ปัญหาที่สไลด์เน้นคือ software ไม่ใช่การหา hardware",
+      "mnemonic": "แบ่ง–ประสาน–สื่อสาร (P-C-C)",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดไม่ใช่ difficulty ตามหน้า 8?",
+          "options": [
+            "Cache size",
+            "Partitioning",
+            "Coordination",
+            "Communications overhead"
+          ],
+          "correct": 0,
+          "answer": "Cache size ไม่อยู่ในรายการ (หน้า 8)",
+          "pages": "หน้า 8"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไมถ้า parallel program ไม่เร็วขึ้นมาก ควรใช้ uniprocessor ที่เร็วกว่า?",
+          "answer": "เพราะง่ายกว่า (สไลด์: “since it’s easier!”)",
+          "pages": "หน้า 8"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ว่า synch() ในหน้า 21 ตรงกับ difficulty ใดในหน้า 8",
+          "answer": "Coordination — ต้องประสานจังหวะระหว่าง processor ก่อนแต่ละขั้น reduction",
+          "pages": "หน้า 8"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "instruction-data-streams",
+      "title": "Instruction/data streams และ SPMD",
+      "level": "core",
+      "pages": "หน้า 9",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "จำแนกตามจำนวน instruction stream และ data stream: SISD (Intel Pentium 4), SIMD (SSE instructions ของ x86), MISD (ไม่มีตัวอย่างในปัจจุบัน) และ MIMD (Intel Xeon e5345). SPMD (Single Program Multiple Data) คือ parallel program บน MIMD computer ที่ใช้ conditional code ให้ processor ต่างกันทำงานต่างกัน.",
+      "remember": [
+        "SISD: Intel Pentium 4; SIMD: SSE of x86 (หน้า 9)",
+        "MISD: no examples today; MIMD: Intel Xeon e5345 (หน้า 9)",
+        "SPMD: parallel program on a MIMD computer (หน้า 9)",
+        "SPMD ใช้ conditional code for different processors (หน้า 9)"
+      ],
+      "terms": [
+        "SISD",
+        "SIMD",
+        "MISD",
+        "MIMD",
+        "SPMD",
+        "instruction stream",
+        "data stream"
+      ],
+      "example": "โค้ด sum reduction หน้า 21 ใช้ if (Pn < half) แยกงานตาม processor — ตรงกับลักษณะ SPMD",
+      "confusion": "SPMD ไม่ใช่ประเภทฮาร์ดแวร์ในตาราง 2×2 แต่เป็นรูปแบบโปรแกรมบน MIMD",
+      "mnemonic": "S/M ตัวแรก = instruction, S/M ตัวหลัง = data",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ประเภทใดที่สไลด์ระบุว่า “No examples today”?",
+          "options": [
+            "MISD",
+            "SIMD",
+            "MIMD",
+            "SISD"
+          ],
+          "correct": 0,
+          "answer": "MISD (หน้า 9)",
+          "pages": "หน้า 9"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "SPMD คืออะไร?",
+          "answer": "Single Program Multiple Data: parallel program บน MIMD ที่ใช้ conditional code ต่อ processor (หน้า 9)",
+          "pages": "หน้า 9"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Intel Xeon e5345 จัดอยู่ประเภทใด และสอดคล้องกับหน้า 6 อย่างไร?",
+          "answer": "MIMD (หน้า 9) สอดคล้องกับหน้า 6 ที่ยกเป็น parallel hardware (quad-core)",
+          "pages": "หน้า 9"
+        }
+      ],
+      "figures": [
+        "fig-9"
+      ],
+      "comparison": {
+        "headers": [
+          "Instruction \\ Data",
+          "Single",
+          "Multiple"
+        ],
+        "rows": [
+          [
+            "Single",
+            "SISD: Intel Pentium 4",
+            "SIMD: SSE instructions of x86"
+          ],
+          [
+            "Multiple",
+            "MISD: No examples today",
+            "MIMD: Intel Xeon e5345"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "vector-processors",
+      "title": "Vector processors และ vector extension ของ RISC-V",
+      "level": "core",
+      "pages": "หน้า 10",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "Vector processor ใช้ function units ที่ pipeline สูง และ stream ข้อมูลระหว่าง vector registers กับ units: ดึงข้อมูลจาก memory เข้า registers แล้วเก็บผลจาก registers กลับ memory. ตัวอย่าง vector extension ของ RISC-V มี v0–v31 เป็น 32 registers แต่ละตัวมี 64 elements (element ละ 64 บิต) และคำสั่ง fld.v/fsd.v, fadd.d.v, fadd.d.vs ซึ่งลด instruction-fetch bandwidth อย่างมาก.",
+      "remember": [
+        "Highly pipelined function units (หน้า 10)",
+        "v0–v31: 32 × 64-element registers, 64-bit elements (หน้า 10)",
+        "fld.v, fsd.v: load/store vector; fadd.d.v: add vectors; fadd.d.vs: add scalar to each element (หน้า 10)",
+        "Significantly reduces instruction-fetch bandwidth (หน้า 10)"
+      ],
+      "terms": [
+        "vector register",
+        "fld.v",
+        "fsd.v",
+        "fadd.d.v",
+        "fadd.d.vs",
+        "instruction-fetch bandwidth"
+      ],
+      "example": "fadd.d.vs บวก scalar เข้ากับทุก element ของ vector; fadd.d.v บวก vector กับ vector",
+      "confusion": "v0–v31 คือ 32 registers ไม่ใช่ 32 elements; แต่ละ register มี 64 elements",
+      "mnemonic": ".v = vector กับ vector, .vs = vector กับ scalar",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "คำสั่งใดบวก scalar เข้ากับทุก element ของ vector?",
+          "options": [
+            "fadd.d.vs",
+            "fadd.d.v",
+            "fld.v",
+            "fsd.v"
+          ],
+          "correct": 0,
+          "answer": "fadd.d.vs (หน้า 10)",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Vector processor ช่วยลดอะไรอย่างมีนัยสำคัญตามสไลด์?",
+          "answer": "Instruction-fetch bandwidth (หน้า 10)",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณจำนวนบิตทั้งหมดใน vector register หนึ่งตัวของ RISC-V vector extension ตามหน้า 10",
+          "answer": "64 elements × 64 บิต = 4096 บิต (คำนวณจากตัวเลขในสไลด์)",
+          "pages": "หน้า 10"
+        }
+      ],
+      "figures": [],
+      "formulas": [
+        {
+          "expr": "1 vector register = 64 elements × 64 bits = 4096 bits\nv0–v31 = 32 registers",
+          "description": "คำนวณจากข้อกำหนดหน้า 10",
+          "pages": "หน้า 10"
+        }
+      ]
+    },
+    {
+      "id": "daxpy",
+      "title": "ตัวอย่าง DAXPY: scalar loop เทียบ vector code",
+      "level": "core",
+      "pages": "หน้า 11",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "DAXPY (Y = a × X + Y) คือคำสั่ง linear algebra ใน library BLAS (double-precision A*X Plus Y). โค้ด RISC-V แบบปกติใช้ loop ที่ load x[i], คูณ a, load y[i], บวก, store y[i] และเพิ่ม index ทีละ 8 จนถึง x19+512. โค้ด vector ทำงานเดียวกันด้วย 6 คำสั่ง: fld, fld.v, fmul.d.vs, fld.v, fadd.d.v, fsd.v โดยไม่มี loop.",
+      "remember": [
+        "DAXPY = double-precision A*X Plus Y ใน BLAS (หน้า 11)",
+        "Conventional: loop 8 คำสั่ง (fld, fmul.d, fld, fadd.d, fsd, addi, addi, bltu) (หน้า 11)",
+        "Vector: 6 คำสั่ง ไม่มี loop (หน้า 11)",
+        "addi x5,x19,512 = end of array X; index เพิ่มทีละ 8 (หน้า 11)"
+      ],
+      "terms": [
+        "DAXPY",
+        "BLAS",
+        "fmul.d.vs",
+        "fadd.d.v",
+        "loop"
+      ],
+      "example": "C: for (i = 0; i < n; i++) y[i] = a * x[i] + y[i];",
+      "confusion": "fmul.d.vs คูณ vector กับ scalar a; fadd.d.v บวก vector กับ vector",
+      "mnemonic": "scalar วนทีละตัว, vector ทำทีเดียวทั้งแถว",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "โค้ด vector ของ DAXPY มีกี่คำสั่ง?",
+          "options": [
+            "6",
+            "8",
+            "10",
+            "64"
+          ],
+          "correct": 0,
+          "answer": "6 คำสั่ง (หน้า 11)",
+          "pages": "หน้า 11"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "อธิบาย DAXPY ทำอะไร",
+          "answer": "นำเวกเตอร์ X คูณด้วยสเกลาร์ a แล้วบวกกับ vector Y เก็บกลับใน Y (Y = aX + Y) (หน้า 11)",
+          "pages": "หน้า 11"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "จงหาจำนวนรอบ loop ของโค้ด scalar จาก addi x5,x19,512 และ addi x19,x19,8",
+          "answer": "512 / 8 = 64 รอบ (ตรงกับ 64 elements ต่อ vector register หน้า 10)",
+          "pages": "หน้า 11"
+        }
+      ],
+      "figures": [
+        "fig-11"
+      ],
+      "worked": [
+        {
+          "title": "นับรอบ loop ของ DAXPY แบบ scalar (หน้า 11)",
+          "steps": [
+            "x5 = x19 + 512 คือจุดสิ้นสุดของ array X",
+            "ทุกรอบ addi x19,x19,8 เลื่อน index ไป 8 ไบต์ (double หนึ่งตัว)",
+            "bltu x19,x5,loop วนจนกว่า x19 ถึง x5"
+          ],
+          "answer": "512 / 8 = 64 รอบ; vector code แทนด้วย 6 คำสั่งไม่มี loop",
+          "pages": "หน้า 10–11"
+        }
+      ]
+    },
+    {
+      "id": "vector-vs-scalar",
+      "title": "Vector vs. scalar",
+      "level": "important",
+      "pages": "หน้า 12",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Vector architecture และ compiler ทำให้เขียน data-parallel program ง่ายขึ้น: ระบุชัดว่าไม่มี loop-carried dependence จึงลดการตรวจใน hardware, access pattern ที่สม่ำเสมอได้ประโยชน์จาก interleaved และ burst memory, และหลีกเลี่ยง control hazard เพราะไม่มี loop. vector ยังทั่วไปกว่า media extension เฉพาะกิจ (MMX, SSE) และเข้ากับ compiler technology ได้ดีกว่า.",
+      "remember": [
+        "Explicit absence of loop-carried dependences → reduced checking in hardware (หน้า 12)",
+        "Regular access patterns benefit from interleaved and burst memory (หน้า 12)",
+        "Avoid control hazards by avoiding loops (หน้า 12)",
+        "More general than MMX, SSE; better match with compiler technology (หน้า 12)"
+      ],
+      "terms": [
+        "loop-carried dependence",
+        "interleaved memory",
+        "burst memory",
+        "control hazard",
+        "MMX",
+        "SSE"
+      ],
+      "example": "เชื่อมกับ Chapter07: ไม่มี loop = ไม่มี branch ของ loop = ไม่มี control hazard จาก loop",
+      "confusion": "ข้อดีเรื่อง control hazard มาจากการไม่มี loop ไม่ใช่จาก branch prediction",
+      "mnemonic": "ไม่มี loop: ไม่มี dependence ข้ามรอบ ไม่มี branch",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Vector หลีกเลี่ยง control hazard ได้อย่างไร?",
+          "options": [
+            "หลีกเลี่ยง loop",
+            "ใช้ cache ใหญ่",
+            "เพิ่ม register",
+            "ใช้ MISD"
+          ],
+          "correct": 0,
+          "answer": "Avoid control hazards by avoiding loops (หน้า 12)",
+          "pages": "หน้า 12"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "การระบุว่าไม่มี loop-carried dependence ช่วยอะไร?",
+          "answer": "ลดการตรวจสอบใน hardware (reduced checking) (หน้า 12)",
+          "pages": "หน้า 12"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ vector กับ MMX/SSE ตามหน้า 12",
+          "answer": "vector ทั่วไปกว่า ad-hoc media extensions และเข้ากับ compiler technology ได้ดีกว่า",
+          "pages": "หน้า 12"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "simd",
+      "title": "SIMD",
+      "level": "core",
+      "pages": "หน้า 13",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "SIMD ทำงานแบบ elementwise บน vector ของข้อมูล เช่น MMX และ SSE ใน x86 ที่มีหลาย data elements ใน register กว้าง 128 บิต. processor ทุกตัวทำคำสั่งเดียวกันในเวลาเดียวกันแต่ใช้ data address ต่างกัน ทำให้ synchronization ง่ายขึ้น ใช้ instruction control hardware น้อยลง และเหมาะกับงานที่ data-parallel สูง.",
+      "remember": [
+        "Operate elementwise on vectors of data (หน้า 13)",
+        "MMX/SSE: multiple data elements in 128-bit registers (หน้า 13)",
+        "All processors execute same instruction at same time, different data address (หน้า 13)",
+        "Simplifies synchronization; reduced instruction control hardware (หน้า 13)",
+        "Works best for highly data-parallel applications (หน้า 13)"
+      ],
+      "terms": [
+        "SIMD",
+        "elementwise",
+        "MMX",
+        "SSE",
+        "128-bit register",
+        "data-parallel"
+      ],
+      "example": "MMX/SSE ใส่หลาย data elements ลงใน register 128 บิต แล้วคำสั่งเดียวทำกับทุก element พร้อมกัน",
+      "confusion": "SIMD ทุก processor ทำคำสั่งเดียวกัน; ถ้าต้องการคำสั่งต่างกันคือ MIMD",
+      "mnemonic": "คำสั่งเดียว ข้อมูลหลายชุด เดินพร้อมกัน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "MMX/SSE ใน x86 ใช้ register กว้างเท่าใดตามสไลด์?",
+          "options": [
+            "128 บิต",
+            "64 บิต",
+            "32 บิต",
+            "512 บิต"
+          ],
+          "correct": 0,
+          "answer": "128-bit wide registers (หน้า 13)",
+          "pages": "หน้า 13"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "SIMD ช่วยเรื่อง synchronization อย่างไร?",
+          "answer": "ทุก processor ทำคำสั่งเดียวกันในเวลาเดียวกัน จึง synchronize ง่าย (หน้า 13)",
+          "pages": "หน้า 13"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ SIMD (หน้า 13) กับ SPMD บน MIMD (หน้า 9) ในด้านคำสั่งที่ processor ทำ",
+          "answer": "SIMD: ทุก processor ทำคำสั่งเดียวกันพร้อมกัน; SPMD: โปรแกรมเดียวแต่ใช้ conditional code ให้แต่ละ processor ทำต่างกันได้",
+          "pages": "หน้า 13"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "vector-vs-multimedia",
+      "title": "Vector vs. multimedia extensions",
+      "level": "important",
+      "pages": "หน้า 14",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Vector instructions มีความกว้าง vector ที่เปลี่ยนได้ (variable) ส่วน multimedia extensions มีความกว้างคงที่ (fixed). vector รองรับ strided access แต่ multimedia extensions ไม่รองรับ. vector unit อาจเป็นการผสมระหว่าง pipelined และ arrayed functional units ตามภาพที่แบ่งเป็น lanes.",
+      "remember": [
+        "Vector: variable width; multimedia: fixed width (หน้า 14)",
+        "Vector supports strided access; multimedia does not (หน้า 14)",
+        "Vector units = pipelined + arrayed functional units (หน้า 14)"
+      ],
+      "terms": [
+        "variable vector width",
+        "fixed width",
+        "strided access",
+        "lane",
+        "arrayed functional units"
+      ],
+      "example": "ภาพหน้า 14 แสดง vector unit แบบ 4 lanes แต่ละ lane มี FP add/FP mul pipe และ vector registers ส่วนหนึ่ง",
+      "confusion": "ภาพขวาหน้า 14 ถูกตัดขอบบางส่วน รายละเอียดเลข lane: ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "Vector ยืดได้ กระโดดได้; multimedia คงที่",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดที่ vector รองรับแต่ multimedia extensions ไม่รองรับ?",
+          "options": [
+            "Strided access",
+            "Fixed width",
+            "128-bit register",
+            "SIMD instruction"
+          ],
+          "correct": 0,
+          "answer": "Strided access (หน้า 14)",
+          "pages": "หน้า 14"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ความกว้างของ vector instruction กับ multimedia extension ต่างกันอย่างไร?",
+          "answer": "Vector: variable width; multimedia: fixed width (หน้า 14)",
+          "pages": "หน้า 14"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ว่าทำไม vector unit จึงเรียกว่า “combination of pipelined and arrayed functional units” จากภาพหน้า 14",
+          "answer": "มีหลาย lanes วางขนานกัน (arrayed) และแต่ละ lane มี functional unit แบบ pipeline (FP add/mul pipe)",
+          "pages": "หน้า 14"
+        }
+      ],
+      "figures": [
+        "fig-14"
+      ],
+      "comparison": {
+        "headers": [
+          "คุณสมบัติ",
+          "Vector",
+          "Multimedia extensions"
+        ],
+        "rows": [
+          [
+            "ความกว้าง",
+            "variable",
+            "fixed"
+          ],
+          [
+            "Strided access",
+            "รองรับ",
+            "ไม่รองรับ"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "multithreading",
+      "title": "Hardware multithreading: fine-grain และ coarse-grain",
+      "level": "core",
+      "pages": "หน้า 15",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "Multithreading คือทำหลาย thread ขนานกันโดย replicate registers, PC ฯลฯ และสลับ thread ได้เร็ว. Fine-grain สลับ thread ทุก cycle (interleave) ถ้า thread หนึ่ง stall ก็ทำ thread อื่น. Coarse-grain สลับเฉพาะ stall ยาว (เช่น L2-cache miss) ทำให้ hardware ง่ายแต่ซ่อน stall สั้น (เช่น data hazard) ไม่ได้.",
+      "remember": [
+        "Replicate registers, PC; fast switching (หน้า 15)",
+        "Fine-grain: switch after each cycle; interleave; if one stalls, others execute (หน้า 15)",
+        "Coarse-grain: switch only on long stall เช่น L2-cache miss (หน้า 15)",
+        "Coarse-grain: simpler HW แต่ไม่ซ่อน short stalls (data hazards) (หน้า 15)"
+      ],
+      "terms": [
+        "multithreading",
+        "fine-grain multithreading",
+        "coarse-grain multithreading",
+        "thread switching",
+        "L2-cache miss",
+        "stall"
+      ],
+      "example": "ภาพหน้า 17 แถว Fine MT สลับสีทุกแถว (cycle) ส่วน Coarse MT ทำ thread เดียวนานจนเกิด stall ยาวจึงเปลี่ยน",
+      "confusion": "Coarse-grain ไม่ซ่อน data hazard สั้น ๆ เพราะสลับเฉพาะ stall ยาว",
+      "mnemonic": "Fine ละเอียด สลับทุกจังหวะ; Coarse หยาบ สลับตอนรอนาน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Coarse-grain multithreading สลับ thread เมื่อใด?",
+          "options": [
+            "เมื่อ stall ยาว เช่น L2-cache miss",
+            "ทุก cycle",
+            "ไม่เคยสลับ",
+            "เมื่อ branch"
+          ],
+          "correct": 0,
+          "answer": "Only switch on long stall (หน้า 15)",
+          "pages": "หน้า 15"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ข้อเสียของ coarse-grain ตามสไลด์คืออะไร?",
+          "answer": "ไม่ซ่อน short stalls เช่น data hazards (หน้า 15)",
+          "pages": "หน้า 15"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ fine-grain และ coarse-grain ในด้าน hardware และการซ่อน stall",
+          "answer": "Fine-grain สลับทุก cycle ซ่อน stall ได้ทั้งสั้นยาว; coarse-grain hardware ง่ายกว่าแต่ซ่อนได้เฉพาะ stall ยาว",
+          "pages": "หน้า 15"
+        }
+      ],
+      "figures": [],
+      "comparison": {
+        "headers": [
+          "แบบ",
+          "สลับ thread เมื่อ",
+          "ข้อดี/ข้อจำกัด"
+        ],
+        "rows": [
+          [
+            "Fine-grain",
+            "ทุก cycle",
+            "thread อื่นทำงานเมื่อ thread หนึ่ง stall"
+          ],
+          [
+            "Coarse-grain",
+            "stall ยาว (L2 miss)",
+            "hardware ง่าย แต่ไม่ซ่อน short stall"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "smt",
+      "title": "Simultaneous multithreading (SMT) และตัวอย่าง",
+      "level": "core",
+      "pages": "หน้า 16–17",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "SMT ใช้ใน multiple-issue dynamically scheduled processor: schedule คำสั่งจากหลาย thread พร้อมกัน คำสั่งจาก thread อิสระทำงานเมื่อ function unit ว่าง ภายใน thread ใช้ scheduling และ register renaming จัดการ dependency. ตัวอย่าง Intel Pentium-4 HT มี 2 threads ที่ duplicate registers แต่แชร์ function units และ caches. ภาพหน้า 17 เทียบ issue slots ของ Coarse MT, Fine MT และ SMT.",
+      "remember": [
+        "SMT ใน multiple-issue dynamically scheduled processor (หน้า 16)",
+        "Schedule instructions from multiple threads; execute when function units available (หน้า 16)",
+        "Within threads: scheduling and register renaming (หน้า 16)",
+        "Pentium-4 HT: 2 threads, duplicated registers, shared function units and caches (หน้า 16)",
+        "ภาพ issue slots: Coarse MT, Fine MT, SMT (หน้า 17)"
+      ],
+      "terms": [
+        "simultaneous multithreading (SMT)",
+        "multiple-issue",
+        "dynamic scheduling",
+        "register renaming",
+        "issue slot",
+        "Hyper-Threading (HT)"
+      ],
+      "example": "ภาพหน้า 17: SMT เติม issue slots ในแถวเดียวกันด้วยคำสั่งจากหลาย thread ขณะที่ fine/coarse MT ใช้ thread เดียวต่อแถว",
+      "confusion": "SMT ต่างจาก fine-grain ที่ fine-grain สลับ thread ระหว่าง cycle แต่ SMT ผสมหลาย thread ใน cycle เดียว",
+      "mnemonic": "SMT = หลาย thread ใน cycle เดียว",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Pentium-4 HT แชร์อะไรระหว่าง 2 threads?",
+          "options": [
+            "Function units และ caches",
+            "Registers",
+            "PC",
+            "ไม่แชร์อะไร"
+          ],
+          "correct": 0,
+          "answer": "Shared function units and caches (หน้า 16)",
+          "pages": "หน้า 16–17"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ภายใน thread เดียว SMT จัดการ dependency อย่างไร?",
+          "answer": "ด้วย scheduling และ register renaming (หน้า 16)",
+          "pages": "หน้า 16–17"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ภาพหน้า 17 ว่าทำไม SMT ใช้ issue slots ได้เต็มกว่า fine MT",
+          "answer": "SMT นำคำสั่งจากหลาย thread มาใส่ slot ใน cycle เดียวกัน ส่วน fine MT ใช้ thread เดียวต่อ cycle จึงเหลือ slot ว่าง",
+          "pages": "หน้า 16–17"
+        }
+      ],
+      "figures": [
+        "fig-17"
+      ]
+    },
+    {
+      "id": "future-multithreading",
+      "title": "Future of multithreading",
+      "level": "extra",
+      "pages": "หน้า 18",
+      "reason": "เป็นภาพรวม ประวัติ หรือข้อสรุปประกอบ",
+      "summary": "สไลด์ตั้งคำถามว่า multithreading จะอยู่รอดหรือไม่และในรูปแบบใด. ข้อพิจารณาเรื่อง power ทำให้ microarchitecture เรียบง่ายขึ้น จึงใช้ multithreading แบบง่ายขึ้น; การทน cache-miss latency อาจใช้ thread switch ได้ดีที่สุด; และ multiple simple cores อาจแชร์ทรัพยากรได้มีประสิทธิภาพกว่า.",
+      "remember": [
+        "Power considerations ⇒ simplified microarchitectures (หน้า 18)",
+        "Simpler forms of multithreading (หน้า 18)",
+        "Tolerating cache-miss latency: thread switch may be most effective (หน้า 18)",
+        "Multiple simple cores might share resources more effectively (หน้า 18)"
+      ],
+      "terms": [
+        "power considerations",
+        "cache-miss latency",
+        "thread switch",
+        "simple cores"
+      ],
+      "example": "เชื่อมกับหน้า 15: thread switch เมื่อ cache miss คือแนวคิดของ coarse-grain",
+      "confusion": "หน้านี้เป็นแนวโน้มเชิงความเห็น ไม่ใช่นิยาม",
+      "mnemonic": "พลังงานบีบให้ง่าย — สลับ thread ตอน miss",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "อะไรผลักให้ microarchitecture ง่ายขึ้นตามหน้า 18?",
+          "options": [
+            "Power considerations",
+            "Moore’s Law",
+            "Clusters",
+            "Grid computing"
+          ],
+          "correct": 0,
+          "answer": "Power considerations (หน้า 18)",
+          "pages": "หน้า 18"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "วิธีใดอาจมีประสิทธิภาพที่สุดในการทน cache-miss latency?",
+          "answer": "Thread switch (หน้า 18)",
+          "pages": "หน้า 18"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ความเชื่อมโยงระหว่างหน้า 18 กับ multicore ในหน้า 5",
+          "answer": "หน้า 18 เสนอว่า multiple simple cores อาจแชร์ทรัพยากรได้ดีกว่า ซึ่งตรงกับ multicore = ชิปที่มีหลาย cores (หน้า 5)",
+          "pages": "หน้า 18"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "shared-memory",
+      "title": "Shared memory multiprocessor (SMP), UMA และ NUMA",
+      "level": "core",
+      "pages": "หน้า 19",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "SMP (shared memory multiprocessor) คือ hardware ให้ single physical address space แก่ทุก processor และ synchronize shared variables ด้วย locks. ด้าน memory access time แบ่งเป็น UMA (uniform) และ NUMA (nonuniform). ภาพแสดงแต่ละ processor มี cache ต่อเข้ากับ interconnection network ไปยัง memory และ I/O ร่วม.",
+      "remember": [
+        "SMP: single physical address space for all processors (หน้า 19)",
+        "Synchronize shared variables using locks (หน้า 19)",
+        "UMA (uniform) vs. NUMA (nonuniform) memory access time (หน้า 19)",
+        "Processor → Cache → Interconnection Network → Memory, I/O (ภาพหน้า 19)"
+      ],
+      "terms": [
+        "SMP",
+        "single physical address space",
+        "lock",
+        "UMA",
+        "NUMA",
+        "interconnection network"
+      ],
+      "example": "ตัวอย่าง sum reduction หน้า 20 ใช้ 64-processor UMA",
+      "confusion": "SMP แชร์ address space; message passing (หน้า 31) แต่ละ processor มี private address space",
+      "mnemonic": "SMP: ที่อยู่เดียว แชร์กัน ล็อกกัน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "SMP ใช้อะไร synchronize shared variables?",
+          "options": [
+            "Locks",
+            "Messages",
+            "Interrupts",
+            "Branch prediction"
+          ],
+          "correct": 0,
+          "answer": "Locks (หน้า 19)",
+          "pages": "หน้า 19"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "UMA กับ NUMA ต่างกันอย่างไร?",
+          "answer": "ต่างกันที่ memory access time: UMA uniform, NUMA nonuniform (หน้า 19)",
+          "pages": "หน้า 19"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ address space ของ SMP (หน้า 19) กับ message passing (หน้า 31)",
+          "answer": "SMP: single physical address space ร่วมกัน; message passing: แต่ละ processor มี private physical address space และส่ง/รับ messages",
+          "pages": "หน้า 19"
+        }
+      ],
+      "figures": [
+        "fig-19"
+      ],
+      "comparison": {
+        "headers": [
+          "",
+          "Shared memory (SMP)",
+          "Message passing"
+        ],
+        "rows": [
+          [
+            "Address space",
+            "single physical, ร่วมกัน",
+            "private ต่อ processor"
+          ],
+          [
+            "การประสาน",
+            "locks",
+            "send/receive messages"
+          ],
+          [
+            "หน้า",
+            "19",
+            "31"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sum-reduction",
+      "title": "ตัวอย่าง sum reduction บน 64-processor UMA",
+      "level": "core",
+      "pages": "หน้า 20–21",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "รวมเลข 64,000 ตัวบน UMA 64 processors: processor มี ID 0 ≤ Pn ≤ 63 แบ่งให้ตัวละ 1000 ตัว แต่ละตัวรวม sum[Pn] ของช่วงตัวเอง. จากนั้นรวม partial sums แบบ divide and conquer: ครึ่งหนึ่งของ processors บวกเป็นคู่ แล้วเหลือหนึ่งในสี่ ... และต้อง synch() ระหว่างแต่ละขั้น. ถ้า half เป็นเลขคี่ processor 0 รับ element ที่ขาด.",
+      "remember": [
+        "64,000 numbers / 64 processors = 1000 per processor (หน้า 20)",
+        "sum[Pn] รวม A[1000*Pn] ถึง A[1000*(Pn+1)−1] (หน้า 20)",
+        "Reduction: divide and conquer; synchronize between steps (หน้า 20)",
+        "if (half%2 != 0 && Pn == 0) sum[0] += sum[half-1] (หน้า 21)",
+        "if (Pn < half) sum[Pn] += sum[Pn+half] (หน้า 21)"
+      ],
+      "terms": [
+        "sum reduction",
+        "partial sum",
+        "divide and conquer",
+        "synch()",
+        "UMA"
+      ],
+      "example": "โค้ดหน้า 21 เริ่ม half = 64 แล้วหารครึ่ง 32, 16, 8, 4, 2, 1 → 6 รอบของ loop",
+      "confusion": "ภาพต้นไม้หน้า 21 แสดงเพียง half = 4, 2, 1 (8 processors) เพื่อสาธิต ขณะที่โค้ดเริ่มที่ half = 64",
+      "mnemonic": "แบ่งก่อนรวมเอง แล้วครึ่งต่อครึ่งจนเหลือหนึ่ง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แต่ละ processor ได้ตัวเลขกี่ตัวในตัวอย่างหน้า 20?",
+          "options": [
+            "1000",
+            "64",
+            "64,000",
+            "100"
+          ],
+          "correct": 0,
+          "answer": "1000 (หน้า 20)",
+          "pages": "หน้า 20–21"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไมต้องมี synch() ในแต่ละรอบ reduction?",
+          "answer": "เพื่อให้ partial sums ของรอบก่อนเสร็จก่อนจะนำไปบวกต่อ (Need to synchronize between reduction steps, หน้า 20–21)",
+          "pages": "หน้า 20–21"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "จงหาจำนวนรอบของ do–while ในโค้ดหน้า 21 เมื่อ half เริ่มที่ 64",
+          "answer": "6 รอบ: half = 32, 16, 8, 4, 2, 1 แล้วหยุดเมื่อ half > 1 เป็นเท็จ",
+          "pages": "หน้า 20–21"
+        }
+      ],
+      "figures": [
+        "fig-20",
+        "fig-21"
+      ],
+      "formulas": [
+        {
+          "expr": "64,000 / 64 = 1000 numbers per processor\nsum[Pn] = Σ A[i], i = 1000·Pn … 1000·(Pn+1) − 1",
+          "description": "การแบ่งงานขั้นแรกตามหน้า 20",
+          "pages": "หน้า 20"
+        }
+      ],
+      "worked": [
+        {
+          "title": "ไล่ loop reduction (หน้า 21)",
+          "steps": [
+            "เริ่ม half = 64",
+            "แต่ละรอบ: synch() → ถ้า half คี่และ Pn = 0 ให้ sum[0] += sum[half−1] → half = half/2 → ถ้า Pn < half ให้ sum[Pn] += sum[Pn+half]",
+            "half หลังหาร: 32 → 16 → 8 → 4 → 2 → 1",
+            "เมื่อ half = 1 เงื่อนไข while (half > 1) เป็นเท็จ"
+          ],
+          "answer": "6 รอบ ผลรวมทั้งหมดอยู่ใน sum[0]",
+          "pages": "หน้า 21"
+        }
+      ]
+    },
+    {
+      "id": "gpu-history",
+      "title": "ประวัติ GPU และกราฟิกในระบบ",
+      "level": "extra",
+      "pages": "หน้า 22–23",
+      "reason": "เป็นภาพรวม ประวัติ หรือข้อสรุปประกอบ",
+      "summary": "เริ่มจาก video card ยุคแรกที่มี frame buffer memory กับ address generation สำหรับ video output. 3D graphics processing เดิมอยู่ในคอมพิวเตอร์ระดับสูง (เช่น SGI) แล้ว Moore’s Law ทำให้ราคาต่ำลงและหนาแน่นขึ้นจนมี 3D graphics card สำหรับ PC และเครื่องเกม. GPU คือ processor ที่มุ่งงาน 3D graphics เช่น vertex/pixel processing, shading, texture mapping, rasterization. หน้า 23 แสดงตำแหน่ง GPU ในระบบ (ต่อผ่าน PCI-Express กับ North Bridge/chipset และมี GPU memory).",
+      "remember": [
+        "Early video cards: frame buffer memory + address generation (หน้า 22)",
+        "Moore’s Law ⇒ lower cost, higher density (หน้า 22)",
+        "GPU tasks: vertex/pixel processing, shading, texture mapping, rasterization (หน้า 22)",
+        "GPU ต่อผ่าน x16 PCI-Express link และมี GPU memory ของตัวเอง (ภาพหน้า 23)"
+      ],
+      "terms": [
+        "frame buffer",
+        "3D graphics",
+        "Moore’s Law",
+        "vertex/pixel processing",
+        "shading",
+        "texture mapping",
+        "rasterization",
+        "PCI-Express"
+      ],
+      "example": "ภาพหน้า 23 เทียบระบบ VGA controller เก่า กับ Intel CPU + North Bridge + GPU และ AMD CPU ที่มี North Bridge ในชิป",
+      "confusion": "GPU memory ในภาพแยกจาก system DDR2 memory",
+      "mnemonic": "Video card → 3D card → GPU",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "งานใดเป็นงานของ GPU ตามหน้า 22?",
+          "options": [
+            "Rasterization",
+            "Linpack",
+            "Message passing",
+            "Grid computing"
+          ],
+          "correct": 0,
+          "answer": "Rasterization (หน้า 22)",
+          "pages": "หน้า 22–23"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Moore’s Law ส่งผลต่อ 3D graphics อย่างไรตามสไลด์?",
+          "answer": "ทำให้ราคาต่ำลงและความหนาแน่นสูงขึ้น จน 3D graphics cards ใช้ใน PC และเครื่องเกมได้ (หน้า 22)",
+          "pages": "หน้า 22–23"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "จากภาพหน้า 23 GPU เชื่อมกับระบบผ่านอะไรในฝั่ง Intel CPU?",
+          "answer": "x16 PCI-Express link ไปยัง North Bridge และมี GPU Memory แยก (ภาพหน้า 23)",
+          "pages": "หน้า 22–23"
+        }
+      ],
+      "figures": [
+        "fig-23"
+      ]
+    },
+    {
+      "id": "gpu-architectures",
+      "title": "GPU architectures",
+      "level": "core",
+      "pages": "หน้า 24",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "งานของ GPU เป็น data-parallel สูง. GPU เป็น highly multithreaded ใช้ thread switching ซ่อน memory latency จึงพึ่ง multi-level caches น้อยลง และ graphics memory กว้างและ bandwidth สูง. มีแนวโน้มไปสู่ general purpose GPU ในระบบ heterogeneous: CPU ทำ sequential code, GPU ทำ parallel code. ภาษา/API ได้แก่ DirectX, OpenGL, Cg, HLSL และ CUDA.",
+      "remember": [
+        "Processing is highly data-parallel (หน้า 24)",
+        "Highly multithreaded; thread switching to hide memory latency; less reliance on multi-level caches (หน้า 24)",
+        "Graphics memory is wide and high-bandwidth (หน้า 24)",
+        "Heterogeneous: CPU for sequential code, GPU for parallel code (หน้า 24)",
+        "APIs: DirectX, OpenGL, Cg, HLSL, CUDA (หน้า 24)"
+      ],
+      "terms": [
+        "GPU",
+        "data-parallel",
+        "thread switching",
+        "memory latency",
+        "heterogeneous CPU/GPU",
+        "CUDA",
+        "DirectX",
+        "OpenGL",
+        "HLSL",
+        "Cg"
+      ],
+      "example": "เทียบกับ multithreading หน้า 15: GPU ใช้ thread switching แบบเดียวกันเพื่อซ่อน latency",
+      "confusion": "GPU ไม่ได้ซ่อน latency ด้วย cache ใหญ่ แต่ด้วยการสลับ thread",
+      "mnemonic": "GPU ซ่อนการรอด้วยการสลับ thread ไม่ใช่ด้วย cache",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "GPU ซ่อน memory latency ด้วยวิธีใด?",
+          "options": [
+            "Thread switching",
+            "Multi-level caches ใหญ่",
+            "Branch prediction",
+            "Locks"
+          ],
+          "correct": 0,
+          "answer": "Thread switching (หน้า 24)",
+          "pages": "หน้า 24"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ในระบบ heterogeneous CPU/GPU แบ่งงานอย่างไร?",
+          "answer": "CPU ทำ sequential code, GPU ทำ parallel code (หน้า 24)",
+          "pages": "หน้า 24"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบการพึ่ง cache ของ GPU กับ multicore โดยใช้ข้อมูลหน้า 24 และ 29",
+          "answer": "GPU พึ่ง multi-level caches น้อย (หน้า 24) สอดคล้องกับ largest cache 0.75 MB ของ GPU เทียบ 8 MB ของ multicore (หน้า 29)",
+          "pages": "หน้า 24"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "nvidia-fermi",
+      "title": "ตัวอย่าง NVIDIA Fermi",
+      "level": "important",
+      "pages": "หน้า 25–26",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Fermi ประกอบด้วย SIMD processors หลายตัว แต่ละตัวมี 16 SIMD lanes (thread processors). SIMD instruction ทำงานบน thread กว้าง 32 elements และถูก schedule แบบ dynamic บน processor กว้าง 16 ใน 2 cycles. มี registers 32K × 32-bit กระจายทั่ว lanes และ 64 registers ต่อ thread context. ภาพหน้า 25 แสดง instruction register, lanes ที่มี Reg 1K×32 และ load/store unit, address coalescing unit, interconnection network และ local memory 64 KiB.",
+      "remember": [
+        "SIMD Processor: 16 SIMD lanes (หน้า 26)",
+        "SIMD instruction: 32 element wide threads, 16-wide processor over 2 cycles (หน้า 26)",
+        "32K × 32-bit registers; 64 registers per thread context (หน้า 26)",
+        "ภาพ: Reg 1K×32 ต่อ lane, Local Memory 64 KiB (หน้า 25)"
+      ],
+      "terms": [
+        "SIMD lane",
+        "thread processor",
+        "thread context",
+        "address coalescing unit",
+        "local memory"
+      ],
+      "example": "32 elements / 16 lanes = 2 cycles ต่อ SIMD instruction",
+      "confusion": "32 คือความกว้าง thread ส่วน 16 คือจำนวน lanes จึงใช้ 2 cycles",
+      "mnemonic": "32 งาน 16 มือ = 2 รอบ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "SIMD processor ของ Fermi มีกี่ SIMD lanes?",
+          "options": [
+            "16",
+            "32",
+            "64",
+            "8"
+          ],
+          "correct": 0,
+          "answer": "16 SIMD lanes (หน้า 26)",
+          "pages": "หน้า 25–26"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Register ต่อ thread context มีกี่ตัว?",
+          "answer": "64 registers per thread context (หน้า 26)",
+          "pages": "หน้า 25–26"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณจำนวน cycles ที่ SIMD instruction กว้าง 32 elements ใช้บน processor กว้าง 16",
+          "answer": "32 / 16 = 2 cycles (ตรงกับ “over 2 cycles” หน้า 26)",
+          "pages": "หน้า 25–26"
+        }
+      ],
+      "figures": [
+        "fig-25"
+      ],
+      "formulas": [
+        {
+          "expr": "32 elements / 16 lanes = 2 cycles\n32K × 32-bit registers; 64 registers per thread context",
+          "description": "ตัวเลขจากหน้า 26",
+          "pages": "หน้า 26"
+        }
+      ]
+    },
+    {
+      "id": "gpu-memory",
+      "title": "GPU memory structures",
+      "level": "important",
+      "pages": "หน้า 27",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "ภาพหน้า 27 แสดงลำดับชั้น memory ของ GPU: CUDA thread แต่ละตัวมี per-CUDA thread private memory, thread block ใช้ per-block local memory ร่วมกัน และ grid (Grid 0, Grid 1 ตามลำดับเวลา) ใช้ GPU memory โดยมี inter-grid synchronization ระหว่าง grid.",
+      "remember": [
+        "CUDA thread ↔ per-CUDA thread private memory (หน้า 27)",
+        "Thread block ↔ per-block local memory (หน้า 27)",
+        "Grid 0, Grid 1 ↔ GPU memory; inter-grid synchronization (หน้า 27)"
+      ],
+      "terms": [
+        "CUDA thread",
+        "thread block",
+        "grid",
+        "private memory",
+        "local memory",
+        "GPU memory",
+        "inter-grid synchronization"
+      ],
+      "example": "ไล่จากเล็กไปใหญ่: thread → block → grid และ memory ก็ขยายตาม private → local → GPU memory",
+      "confusion": "Local memory ในภาพนี้คือ per-block (แชร์ใน block) ไม่ใช่ private ของ thread เดียว",
+      "mnemonic": "thread ส่วนตัว · block แชร์กลุ่ม · grid ใช้ GPU memory",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Thread block ใช้ memory ระดับใดในภาพหน้า 27?",
+          "options": [
+            "Per-block local memory",
+            "Per-thread private memory",
+            "Disk",
+            "L2 cache"
+          ],
+          "correct": 0,
+          "answer": "Per-Block Local Memory (หน้า 27)",
+          "pages": "หน้า 27"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ระหว่าง Grid 0 กับ Grid 1 มีอะไรตามภาพ?",
+          "answer": "Inter-grid synchronization (หน้า 27)",
+          "pages": "หน้า 27"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ความสัมพันธ์ระหว่างระดับการทำงานกับระดับ memory ในภาพหน้า 27",
+          "answer": "ยิ่งกลุ่มใหญ่ขึ้น (thread → block → grid) memory ที่ใช้ก็กว้างขึ้น (private → per-block local → GPU memory)",
+          "pages": "หน้า 27"
+        }
+      ],
+      "figures": [
+        "fig-27"
+      ]
+    },
+    {
+      "id": "classifying-gpus",
+      "title": "Classifying GPUs",
+      "level": "core",
+      "pages": "หน้า 28",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "GPU ไม่เข้ากับโมเดล SIMD/MIMD อย่างลงตัว: conditional execution ใน thread ทำให้ดูเหมือน MIMD แต่ประสิทธิภาพลดลง จึงต้องเขียน general purpose code อย่างระวัง. ตารางแบ่ง parallelism ตามระดับและเวลาที่ค้นพบ: ILP แบบ static = VLIW, dynamic = Superscalar; DLP แบบ static = SIMD or Vector, dynamic = Tesla Multiprocessor.",
+      "remember": [
+        "Don’t fit nicely into SIMD/MIMD model (หน้า 28)",
+        "Conditional execution → illusion of MIMD but performance degradation (หน้า 28)",
+        "ILP: static VLIW, dynamic Superscalar (หน้า 28)",
+        "DLP: static SIMD or Vector, dynamic Tesla Multiprocessor (หน้า 28)"
+      ],
+      "terms": [
+        "VLIW",
+        "superscalar",
+        "SIMD",
+        "vector",
+        "Tesla multiprocessor",
+        "instruction-level parallelism",
+        "data-level parallelism"
+      ],
+      "example": "Static = discovered at compile time; Dynamic = discovered at runtime",
+      "confusion": "Tesla multiprocessor อยู่ช่อง data-level + dynamic ไม่ใช่ instruction-level",
+      "mnemonic": "Compile time = Static (VLIW, SIMD/Vector); Runtime = Dynamic (Superscalar, Tesla)",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ช่อง Data-Level Parallelism + Dynamic ในตารางหน้า 28 คืออะไร?",
+          "options": [
+            "Tesla Multiprocessor",
+            "VLIW",
+            "Superscalar",
+            "SIMD or Vector"
+          ],
+          "correct": 0,
+          "answer": "Tesla Multiprocessor (หน้า 28)",
+          "pages": "หน้า 28"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไม conditional execution ใน GPU จึงเรียกว่า “illusion of MIMD”?",
+          "answer": "ทำให้ thread ดูเหมือนทำคำสั่งต่างกันได้เหมือน MIMD แต่แลกกับ performance degradation (หน้า 28)",
+          "pages": "หน้า 28"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "จัด VLIW และ Superscalar ตามตารางหน้า 28 และอธิบายเกณฑ์",
+          "answer": "ทั้งคู่เป็น instruction-level parallelism; VLIW ค้นพบที่ compile time (static), Superscalar ค้นพบที่ runtime (dynamic)",
+          "pages": "หน้า 28"
+        }
+      ],
+      "figures": [
+        "fig-28"
+      ],
+      "comparison": {
+        "headers": [
+          "",
+          "Static (compile time)",
+          "Dynamic (runtime)"
+        ],
+        "rows": [
+          [
+            "Instruction-Level Parallelism",
+            "VLIW",
+            "Superscalar"
+          ],
+          [
+            "Data-Level Parallelism",
+            "SIMD or Vector",
+            "Tesla Multiprocessor"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "gpu-perspective",
+      "title": "Putting GPUs into perspective",
+      "level": "important",
+      "pages": "หน้า 29–30",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "ตารางหน้า 29 เทียบ multicore with SIMD กับ GPU: SIMD processors 4–8 vs 8–16, SIMD lanes/processor 2–4 vs 8–16, multithreading support 2–4 vs 16–32, single:double precision 2:1 ทั้งคู่, largest cache 8 MB vs 0.75 MB, memory address 64-bit ทั้งคู่, main memory 8–256 GB vs 4–6 GB, page protection Yes ทั้งคู่, demand paging Yes vs No, integrated scalar/SIMD processor Yes vs No, cache coherent Yes vs No. หน้า 30 เป็นตาราง Guide to GPU Terms.",
+      "remember": [
+        "GPU: SIMD processors 8–16, lanes 8–16, MT support 16–32 (หน้า 29)",
+        "Largest cache: multicore 8 MB vs GPU 0.75 MB (หน้า 29)",
+        "GPU: No demand paging, not cache coherent, no integrated scalar processor (หน้า 29)",
+        "Guide to GPU Terms (หน้า 30): ตัวอักษรเล็ก รายละเอียดต้องตรวจสอบจากต้นฉบับ"
+      ],
+      "terms": [
+        "multicore with SIMD",
+        "demand paging",
+        "cache coherent",
+        "SIMD lanes",
+        "memory protection"
+      ],
+      "example": "ใช้ตารางด้านล่างจำว่า GPU “มากกว่า” ที่ lanes/threads แต่ “น้อยกว่า/ไม่มี” ที่ cache, memory, paging, coherence",
+      "confusion": "ทั้งคู่มี memory address 64-bit และ page-level protection เหมือนกัน",
+      "mnemonic": "GPU: thread เยอะ cache เล็ก ไม่ coherent",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดที่ GPU ไม่มีตามตารางหน้า 29?",
+          "options": [
+            "Demand paging",
+            "64-bit memory address",
+            "Memory protection at page level",
+            "SIMD lanes"
+          ],
+          "correct": 0,
+          "answer": "Demand paging: GPU = No (หน้า 29)",
+          "pages": "หน้า 29–30"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ขนาด largest cache ของ multicore และ GPU ต่างกันเท่าใด?",
+          "answer": "Multicore 8 MB, GPU 0.75 MB (หน้า 29)",
+          "pages": "หน้า 29–30"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณว่า largest cache ของ multicore ใหญ่กว่า GPU กี่เท่าตามตารางหน้า 29",
+          "answer": "8 / 0.75 ≈ 10.7 เท่า",
+          "pages": "หน้า 29–30"
+        }
+      ],
+      "figures": [
+        "fig-29",
+        "fig-30"
+      ],
+      "comparison": {
+        "headers": [
+          "Feature",
+          "Multicore with SIMD",
+          "GPU"
+        ],
+        "rows": [
+          [
+            "SIMD processors",
+            "4 to 8",
+            "8 to 16"
+          ],
+          [
+            "SIMD lanes/processor",
+            "2 to 4",
+            "8 to 16"
+          ],
+          [
+            "MT support for SIMD threads",
+            "2 to 4",
+            "16 to 32"
+          ],
+          [
+            "Single:double precision",
+            "2:1",
+            "2:1"
+          ],
+          [
+            "Largest cache",
+            "8 MB",
+            "0.75 MB"
+          ],
+          [
+            "Memory address",
+            "64-bit",
+            "64-bit"
+          ],
+          [
+            "Main memory",
+            "8–256 GB",
+            "4–6 GB"
+          ],
+          [
+            "Page-level protection",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "Demand paging",
+            "Yes",
+            "No"
+          ],
+          [
+            "Integrated scalar/SIMD",
+            "Yes",
+            "No"
+          ],
+          [
+            "Cache coherent",
+            "Yes",
+            "No"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "message-passing",
+      "title": "Message passing",
+      "level": "core",
+      "pages": "หน้า 31",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "ใน message-passing multiprocessor แต่ละ processor มี private physical address space และ hardware ส่ง/รับ messages ระหว่าง processors. ภาพแสดงแต่ละ processor มี cache และ memory ของตัวเองเชื่อมกันผ่าน interconnection network.",
+      "remember": [
+        "Each processor has private physical address space (หน้า 31)",
+        "Hardware sends/receives messages between processors (หน้า 31)",
+        "Processor → Cache → Memory ของตัวเอง → Interconnection Network (ภาพหน้า 31)"
+      ],
+      "terms": [
+        "message passing",
+        "private physical address space",
+        "send/receive",
+        "interconnection network"
+      ],
+      "example": "เทียบภาพหน้า 19 (memory ร่วมหลัง network) กับหน้า 31 (memory อยู่กับแต่ละ processor ก่อน network)",
+      "confusion": "ตำแหน่ง memory ในภาพคือจุดต่าง: shared memory อยู่หลัง network, message passing อยู่ติด processor",
+      "mnemonic": "ไม่มีที่อยู่ร่วม ต้องส่งจดหมาย (message)",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ใน message passing processor แต่ละตัวมี address space แบบใด?",
+          "options": [
+            "Private physical address space",
+            "Single shared address space",
+            "ไม่มี address space",
+            "Virtual เท่านั้น"
+          ],
+          "correct": 0,
+          "answer": "Private physical address space (หน้า 31)",
+          "pages": "หน้า 31"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Processor สื่อสารกันอย่างไรใน message passing?",
+          "answer": "Hardware ส่งและรับ messages ระหว่าง processors (หน้า 31)",
+          "pages": "หน้า 31"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "วิเคราะห์ความต่างของตำแหน่ง memory ในภาพหน้า 19 และ 31",
+          "answer": "หน้า 19 memory ร่วมอยู่หลัง interconnection network; หน้า 31 memory แยกอยู่กับ processor แต่ละตัวก่อนต่อ network",
+          "pages": "หน้า 31"
+        }
+      ],
+      "figures": [
+        "fig-31"
+      ]
+    },
+    {
+      "id": "clusters",
+      "title": "Loosely coupled clusters",
+      "level": "core",
+      "pages": "หน้า 32",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "Cluster คือเครือข่ายของคอมพิวเตอร์อิสระ แต่ละเครื่องมี private memory และ OS เชื่อมกันผ่าน I/O system (เช่น Ethernet/switch, Internet). เหมาะกับงานที่เป็น independent tasks เช่น web servers, databases, simulations และให้ high availability, scalable, affordable. ปัญหาคือ administration cost (นิยมใช้ virtual machines) และ interconnect bandwidth ต่ำเมื่อเทียบ processor/memory bandwidth ของ SMP.",
+      "remember": [
+        "Network of independent computers; private memory and OS (หน้า 32)",
+        "Connected using I/O system: Ethernet/switch, Internet (หน้า 32)",
+        "Suitable for independent tasks: web servers, databases, simulations (หน้า 32)",
+        "High availability, scalable, affordable (หน้า 32)",
+        "Problems: administration cost (prefer VMs), low interconnect bandwidth (หน้า 32)"
+      ],
+      "terms": [
+        "cluster",
+        "loosely coupled",
+        "private memory and OS",
+        "I/O system",
+        "virtual machine",
+        "interconnect bandwidth"
+      ],
+      "example": "Concluding remarks หน้า 40: SaaS สำคัญขึ้นและ clusters เข้ากันได้ดี",
+      "confusion": "Cluster ต่อกันผ่าน I/O system ไม่ใช่ memory bus จึง bandwidth ต่ำกว่า SMP",
+      "mnemonic": "แยกเครื่อง แยก OS ต่อผ่าน network — ถูก ทนทาน แต่ช้าตอนคุยกัน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Cluster เชื่อมคอมพิวเตอร์ด้วยอะไรตามสไลด์?",
+          "options": [
+            "I/O system เช่น Ethernet/switch",
+            "Shared memory bus",
+            "PCI-Express GPU",
+            "Register file"
+          ],
+          "correct": 0,
+          "answer": "I/O system: Ethernet/switch, Internet (หน้า 32)",
+          "pages": "หน้า 32"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ปัญหาของ cluster 2 ข้อตามหน้า 32 คืออะไร?",
+          "answer": "Administration cost (ใช้ VMs ช่วย) และ low interconnect bandwidth",
+          "pages": "หน้า 32"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไม web server จึงเหมาะกับ cluster ตามหน้า 32?",
+          "answer": "เพราะเป็นงาน independent tasks และ cluster ให้ high availability, scalable, affordable",
+          "pages": "หน้า 32"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "grid-computing",
+      "title": "Grid computing",
+      "level": "important",
+      "pages": "หน้า 33",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Grid computing คือคอมพิวเตอร์แยกกันที่เชื่อมด้วย long-haul networks เช่น Internet. งานถูกแบ่งเป็น work units ส่งออกไปแล้วส่งผลกลับ และใช้ประโยชน์จากเวลาว่างของ PC ได้ เช่น SETI@home และ World Community Grid.",
+      "remember": [
+        "Separate computers interconnected by long-haul networks (หน้า 33)",
+        "Work units farmed out, results sent back (หน้า 33)",
+        "Use idle time on PCs: SETI@home, World Community Grid (หน้า 33)"
+      ],
+      "terms": [
+        "grid computing",
+        "long-haul network",
+        "work unit",
+        "idle time"
+      ],
+      "example": "SETI@home ส่ง work unit ให้ PC ที่ว่างประมวลผลแล้วส่งผลกลับ",
+      "confusion": "Grid ต่างจาก cluster ตรงที่เชื่อมด้วย long-haul network และใช้ PC ที่ว่าง",
+      "mnemonic": "แจกงานไปไกล ทำตอนเครื่องว่าง ส่งผลกลับ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตัวอย่าง grid computing ตามสไลด์คือข้อใด?",
+          "options": [
+            "SETI@home",
+            "Linpack",
+            "CUDA",
+            "Pentium-4 HT"
+          ],
+          "correct": 0,
+          "answer": "SETI@home, World Community Grid (หน้า 33)",
+          "pages": "หน้า 33"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Grid computing ใช้ทรัพยากรใดที่ปกติถูกปล่อยว่าง?",
+          "answer": "Idle time on PCs (หน้า 33)",
+          "pages": "หน้า 33"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบการเชื่อมต่อของ grid (หน้า 33) กับ cluster (หน้า 32)",
+          "answer": "Grid ใช้ long-haul networks เช่น Internet; cluster ใช้ I/O system เช่น Ethernet/switch (Internet ก็ยกเป็นตัวอย่างได้)",
+          "pages": "หน้า 33"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "network-topologies",
+      "title": "Interconnection network topologies และ multistage networks",
+      "level": "core",
+      "pages": "หน้า 34–35",
+      "reason": "เป็นนิยาม การจำแนก หรือกลไกหลักของ parallel processor ที่สไลด์ใช้ต่อยอด",
+      "summary": "Network topology คือการจัดวาง processors, switches และ links. หน้า 34 แสดง bus, ring, 2D mesh, N-cube (N = 3) และ fully connected. หน้า 35 แสดง multistage networks: crossbar, Omega network และ Omega network switch box (อินพุต A, B ไป C, D).",
+      "remember": [
+        "Topology = arrangements of processors, switches, and links (หน้า 34)",
+        "Bus, Ring, 2D Mesh, N-cube (N = 3), Fully connected (หน้า 34)",
+        "Multistage: a. Crossbar, b. Omega network, c. Omega switch box (หน้า 35)"
+      ],
+      "terms": [
+        "network topology",
+        "bus",
+        "ring",
+        "2D mesh",
+        "N-cube",
+        "fully connected",
+        "crossbar",
+        "Omega network",
+        "switch box"
+      ],
+      "example": "N-cube (N = 3) ในภาพคือ cube มี 8 nodes (2³) — นับจากภาพ",
+      "confusion": "Crossbar กับ Omega เป็น multistage/switch network ไม่ใช่ topology ของ node แบบ bus/ring",
+      "mnemonic": "B-R-M-C-F: Bus, Ring, Mesh, Cube, Fully connected",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Topology ใดในหน้า 34 ที่ทุก node ต่อกันโดยตรง?",
+          "options": [
+            "Fully connected",
+            "Bus",
+            "Ring",
+            "2D Mesh"
+          ],
+          "correct": 0,
+          "answer": "Fully connected (หน้า 34)",
+          "pages": "หน้า 34–35"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Multistage networks ในหน้า 35 มีอะไรบ้าง?",
+          "answer": "Crossbar, Omega network และ Omega network switch box",
+          "pages": "หน้า 34–35"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณจำนวน nodes ของ N-cube เมื่อ N = 3 ตามภาพหน้า 34",
+          "answer": "2³ = 8 nodes",
+          "pages": "หน้า 34–35"
+        }
+      ],
+      "figures": [
+        "fig-34",
+        "fig-35"
+      ]
+    },
+    {
+      "id": "network-characteristics",
+      "title": "Network characteristics",
+      "level": "important",
+      "pages": "หน้า 36",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "คุณลักษณะของ network ได้แก่ performance (latency per message บน unloaded network; throughput ซึ่งแยกเป็น link bandwidth, total network bandwidth และ bisection bandwidth; congestion delays ที่ขึ้นกับ traffic), cost, power และ routability in silicon.",
+      "remember": [
+        "Latency per message (unloaded network) (หน้า 36)",
+        "Throughput: link, total network, bisection bandwidth (หน้า 36)",
+        "Congestion delays (depending on traffic) (หน้า 36)",
+        "Cost, power, routability in silicon (หน้า 36)"
+      ],
+      "terms": [
+        "latency",
+        "throughput",
+        "link bandwidth",
+        "total network bandwidth",
+        "bisection bandwidth",
+        "congestion delay",
+        "routability"
+      ],
+      "example": "จัดเป็น 4 กลุ่ม: performance, cost, power, routability",
+      "confusion": "Latency วัดบน unloaded network; congestion delay ขึ้นกับ traffic",
+      "mnemonic": "Performance-Cost-Power-Route",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดอยู่ในกลุ่ม throughput ตามหน้า 36?",
+          "options": [
+            "Bisection bandwidth",
+            "Latency per message",
+            "Cost",
+            "Power"
+          ],
+          "correct": 0,
+          "answer": "Bisection bandwidth (หน้า 36)",
+          "pages": "หน้า 36"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Throughput แบ่งเป็นอะไรบ้าง?",
+          "answer": "Link bandwidth, total network bandwidth, bisection bandwidth (หน้า 36)",
+          "pages": "หน้า 36"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เปรียบเทียบ latency per message กับ congestion delays ตามหน้า 36",
+          "answer": "Latency วัดบน unloaded network; congestion delays เกิดเพิ่มตาม traffic",
+          "pages": "หน้า 36"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "benchmarks",
+      "title": "Parallel benchmarks และ code or applications",
+      "level": "important",
+      "pages": "หน้า 37–38",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "Benchmarks: Linpack (matrix linear algebra), SPECrate (parallel run ของ SPEC CPU, job-level parallelism), SPLASH (Stanford, mix of kernels/applications, strong scaling), NAS (NASA, CFD kernels) และ PARSEC (Princeton, multithreaded apps ด้วย Pthreads และ OpenMP). หน้า 38: benchmark ดั้งเดิมใช้ code และ data คงที่ แต่ parallel programming เปลี่ยนเร็ว จึงเสนอเทียบระบบที่ implement application ที่กำหนด (เช่น Linpack, Berkeley Design Patterns) เพื่อส่งเสริมนวัตกรรม.",
+      "remember": [
+        "Linpack: matrix linear algebra; SPECrate: job-level parallelism (หน้า 37)",
+        "SPLASH: strong scaling; NAS: CFD kernels (หน้า 37)",
+        "PARSEC: Pthreads and OpenMP (หน้า 37)",
+        "Traditional: fixed code and data sets (หน้า 38)",
+        "Compare systems implementing a given application → foster innovation (หน้า 38)"
+      ],
+      "terms": [
+        "Linpack",
+        "SPECrate",
+        "SPLASH",
+        "NAS",
+        "PARSEC",
+        "Pthreads",
+        "OpenMP",
+        "Berkeley Design Patterns",
+        "strong scaling"
+      ],
+      "example": "ถ้าต้องการวัด job-level parallelism ให้ใช้ SPECrate",
+      "confusion": "Linpack ถูกยกทั้งในหน้า 37 (benchmark) และหน้า 38 (ตัวอย่างการเทียบตาม application)",
+      "mnemonic": "L-S-S-N-P: Linpack, SPECrate, SPLASH, NAS, PARSEC",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Benchmark ใดใช้ Pthreads และ OpenMP?",
+          "options": [
+            "PARSEC",
+            "Linpack",
+            "NAS",
+            "SPECrate"
+          ],
+          "correct": 0,
+          "answer": "PARSEC (หน้า 37)",
+          "pages": "หน้า 37–38"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ปัญหาของ traditional benchmarks ตามหน้า 38 คืออะไร?",
+          "answer": "ใช้ code และ data sets คงที่ ขณะที่ parallel programming กำลังพัฒนา",
+          "pages": "หน้า 37–38"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้าต้องการวัด computational fluid dynamics kernels ควรเลือก benchmark ใด?",
+          "answer": "NAS (NASA Advanced Supercomputing) suite (หน้า 37)",
+          "pages": "หน้า 37–38"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "modeling-performance",
+      "title": "Modeling performance และ arithmetic intensity",
+      "level": "important",
+      "pages": "หน้า 39",
+      "reason": "เป็นตัวอย่าง การเปรียบเทียบ หรือการประยุกต์แนวคิดหลัก",
+      "summary": "สมมติ metric ที่สนใจคือ achievable GFLOPs/sec วัดด้วย computational kernels จาก Berkeley Design Patterns. Arithmetic intensity ของ kernel คือ FLOPs ต่อ byte ของ memory ที่เข้าถึง. สำหรับคอมพิวเตอร์หนึ่งเครื่องให้หา peak GFLOPS (จาก data sheet) และ peak memory bytes/sec (ด้วย Stream benchmark).",
+      "remember": [
+        "Metric: achievable GFLOPs/sec (หน้า 39)",
+        "Arithmetic intensity = FLOPs per byte of memory accessed (หน้า 39)",
+        "Peak GFLOPS from data sheet (หน้า 39)",
+        "Peak memory bytes/sec using Stream benchmark (หน้า 39)"
+      ],
+      "terms": [
+        "GFLOPs/sec",
+        "arithmetic intensity",
+        "Berkeley Design Patterns",
+        "peak GFLOPS",
+        "Stream benchmark"
+      ],
+      "example": "ขั้นตอนตามสไลด์: หา arithmetic intensity ของ kernel แล้วหา peak GFLOPS (data sheet) และ peak memory bytes/sec (Stream) ของเครื่อง",
+      "confusion": "Peak GFLOPS มาจาก data sheet ส่วน peak memory bandwidth วัดด้วย Stream benchmark อย่าสลับ",
+      "mnemonic": "งานคำนวณ ÷ ไบต์ที่อ่าน = arithmetic intensity",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Peak memory bytes/sec วัดด้วยอะไรตามสไลด์?",
+          "options": [
+            "Stream benchmark",
+            "Data sheet",
+            "Linpack",
+            "SPECrate"
+          ],
+          "correct": 0,
+          "answer": "Stream benchmark (หน้า 39)",
+          "pages": "หน้า 39"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ให้นิยาม arithmetic intensity",
+          "answer": "FLOPs per byte of memory accessed (หน้า 39)",
+          "pages": "หน้า 39"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "สำหรับคอมพิวเตอร์หนึ่งเครื่อง ต้องหาค่าอะไร 2 ค่า และได้มาจากแหล่งใด?",
+          "answer": "Peak GFLOPS จาก data sheet และ peak memory bytes/sec จาก Stream benchmark (หน้า 39)",
+          "pages": "หน้า 39"
+        }
+      ],
+      "figures": [],
+      "formulas": [
+        {
+          "expr": "Arithmetic intensity = FLOPs / bytes of memory accessed",
+          "description": "นิยามจากหน้า 39",
+          "pages": "หน้า 39"
+        }
+      ]
+    },
+    {
+      "id": "concluding-remarks",
+      "title": "Concluding remarks",
+      "level": "extra",
+      "pages": "หน้า 40",
+      "reason": "เป็นภาพรวม ประวัติ หรือข้อสรุปประกอบ",
+      "summary": "เป้าหมายคือประสิทธิภาพสูงขึ้นด้วยการใช้หลาย processor. ความยากคือการพัฒนา parallel software และออกแบบ architecture ที่เหมาะสม. SaaS มีความสำคัญมากขึ้นและ clusters เข้ากันได้ดี. performance per dollar และ performance per Joule เป็นตัวขับเคลื่อนทั้ง mobile และ WSC.",
+      "remember": [
+        "Goal: higher performance using multiple processors (หน้า 40)",
+        "Difficulties: parallel software, appropriate architectures (หน้า 40)",
+        "SaaS growing; clusters are a good match (หน้า 40)",
+        "Performance per dollar and per Joule drive mobile and WSC (หน้า 40)"
+      ],
+      "terms": [
+        "SaaS",
+        "WSC",
+        "performance per dollar",
+        "performance per Joule"
+      ],
+      "example": "เชื่อมกับหน้า 8: ความยากด้าน software ยังเป็นประเด็นหลักจนจบบท",
+      "confusion": "สไลด์ไม่ได้ขยายความ WSC ในเนื้อหาส่วนอื่นของบท: ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "เร็วขึ้นด้วยหลายตัว แต่ software ยาก; เงินและพลังงานเป็นตัวตัดสิน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "อะไรขับเคลื่อนทั้ง mobile และ WSC ตามหน้า 40?",
+          "options": [
+            "Performance per dollar และ per Joule",
+            "จำนวน register",
+            "ขนาด cache",
+            "Clock rate"
+          ],
+          "correct": 0,
+          "answer": "Performance per dollar and performance per Joule (หน้า 40)",
+          "pages": "หน้า 40"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ความยาก 2 ข้อตามหน้า 40 คืออะไร?",
+          "answer": "Developing parallel software และ devising appropriate architectures",
+          "pages": "หน้า 40"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไม clusters จึงเข้ากับ SaaS ตามหน้า 32 และ 40?",
+          "answer": "SaaS สำคัญขึ้น (หน้า 40) และ clusters เหมาะกับ independent tasks เช่น web servers พร้อม high availability, scalable, affordable (หน้า 32)",
+          "pages": "หน้า 40"
+        }
+      ],
+      "figures": []
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "1 · ภาพรวมและความยาก",
+      "text": "taxonomy → goal/multicore → HW/SW → partitioning/coordination/communication",
+      "pages": "หน้า 3–8",
+      "topic": "processor-taxonomy"
+    },
+    {
+      "title": "2 · SIMD และ vector",
+      "text": "ตาราง SISD–MIMD/SPMD → vector registers → DAXPY → vector vs scalar/SIMD/multimedia",
+      "pages": "หน้า 9–14",
+      "topic": "instruction-data-streams"
+    },
+    {
+      "title": "3 · Multithreading",
+      "text": "fine vs coarse → SMT และภาพ issue slots → แนวโน้ม",
+      "pages": "หน้า 15–18",
+      "topic": "multithreading"
+    },
+    {
+      "title": "4 · Shared memory และ GPU",
+      "text": "SMP/UMA/NUMA → sum reduction → GPU architecture, Fermi, memory, classification, perspective",
+      "pages": "หน้า 19–30",
+      "topic": "shared-memory"
+    },
+    {
+      "title": "5 · Message passing และการวัดผล",
+      "text": "message passing → clusters/grid → topologies/characteristics → benchmarks/arithmetic intensity",
+      "pages": "หน้า 31–40",
+      "topic": "message-passing"
+    }
+  ],
+  "plan": [
+    {
+      "title": "รอบ 1 · แผนที่บท",
+      "task": "วาดต้นไม้หน้า 3 และตาราง 2×2 หน้า 9 จากความจำ; จำ 3 difficulties หน้า 8",
+      "check": "จับคู่ SISD/SIMD/MISD/MIMD กับตัวอย่างและบอกนิยาม SPMD ได้",
+      "pages": "หน้า 3–9"
+    },
+    {
+      "title": "รอบ 2 · Vector/SIMD",
+      "task": "อ่าน DAXPY ทั้งสองแบบ นับคำสั่งและรอบ loop; ทำตาราง vector vs multimedia",
+      "check": "อธิบาย .v/.vs และคิด 512/8 = 64 ได้",
+      "pages": "หน้า 10–14"
+    },
+    {
+      "title": "รอบ 3 · Multithreading และ shared memory",
+      "task": "เทียบ fine/coarse/SMT ด้วยภาพหน้า 17; ไล่โค้ด sum reduction ทีละรอบ",
+      "check": "บอกว่า coarse-grain ไม่ซ่อน short stalls และ reduction ใช้ 6 รอบ",
+      "pages": "หน้า 15–21"
+    },
+    {
+      "title": "รอบ 4 · GPU",
+      "task": "ท่องตัวเลข Fermi, ตาราง classifying GPUs และ perspective",
+      "check": "ตอบ 16 lanes/32-wide/2 cycles และเทียบ cache/paging/coherence ได้",
+      "pages": "หน้า 22–30"
+    },
+    {
+      "title": "รอบ 5 · Clusters, networks และ Quiz",
+      "task": "เทียบ SMP vs message passing vs cluster vs grid; จำ topologies และ benchmarks; ทำ Quiz ทุกหัวข้อ",
+      "check": "ตอบหัวข้อแดงครบและอธิบาย arithmetic intensity ได้",
+      "pages": "หน้า 31–40"
+    }
+  ],
+  "cram": [
+    {
+      "title": "ถ้าเหลือ 3 วัน",
+      "text": "วัน 1 หน้า 3–14 (taxonomy, SIMD, vector); วัน 2 หน้า 15–30 (multithreading, shared memory, GPU); วัน 3 หน้า 31–40 และทำ Quiz"
+    },
+    {
+      "title": "ถ้าเหลือ 1 วัน",
+      "text": "ตารางหน้า 9 → vector/DAXPY หน้า 10–11 → multithreading หน้า 15–16 → SMP/reduction หน้า 19–21 → GPU หน้า 24–29 → message passing/clusters/topologies หน้า 31–36"
+    },
+    {
+      "title": "ถ้าเหลือ 3 ชั่วโมง",
+      "text": "0–40 นาที หน้า 3–14; 40–80 นาที หน้า 15–21; 80–130 นาที หน้า 22–30; 130–165 นาที หน้า 31–39; 165–180 นาทีสุ่ม Quiz"
+    }
+  ],
+  "strategyIntro": "เน้นหัวข้อที่สไลด์ให้นิยาม ตารางจำแนก และตัวเลข เช่น SISD–MIMD, vector registers, multithreading, SMP/UMA/NUMA, Fermi, classifying GPUs และ topologies; ไม่มีข้อสอบเก่าจึงไม่ยืนยันโอกาสออกจริง",
+  "strategy": [
+    {
+      "title": "ควรท่องจำ",
+      "text": "ตาราง SISD/SIMD/MISD/MIMD, SPMD, fine/coarse/SMT, UMA/NUMA, VLIW/Superscalar/SIMD/Tesla, topologies 5 แบบ, benchmarks 5 ชุด (หน้า 9, 15–19, 28, 34, 37)"
+    },
+    {
+      "title": "ควรฝึกโจทย์",
+      "text": "64,000/64 = 1000 และรอบ reduction; DAXPY 512/8 = 64; Fermi 32/16 = 2 cycles; arithmetic intensity FLOPs/byte (หน้า 11, 20–21, 26, 39)"
+    },
+    {
+      "title": "ควรเข้าใจแนวคิด",
+      "text": "ทำไม parallel software ยาก, vector หลบ control hazard, GPU ซ่อน latency ด้วย thread switching, shared memory vs message passing (หน้า 8, 12, 24, 19, 31)"
+    },
+    {
+      "title": "เตรียมข้อสอบแบบผสม",
+      "text": "เลือกตอบจับคู่ศัพท์/ตัวอย่าง; อัตนัยเทียบสถาปัตยกรรม; คำนวณจากตัวเลขสไลด์; วิเคราะห์ภาพ multithreading, memory และ topologies (หน้า 3–40)"
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "Taxonomy ของ parallel processor architectures",
+      "back": "SISD → Uniprocessor (หน้า 3)",
+      "pages": "หน้า 3"
+    },
+    {
+      "front": "Introduction: เป้าหมายของ multiprocessors",
+      "back": "Goal: connecting multiple computers to get higher performance (หน้า 5)",
+      "pages": "หน้า 4–5"
+    },
+    {
+      "front": "Hardware และ software: serial/parallel, sequential/concurrent",
+      "back": "Serial HW: Pentium 4; Parallel HW: quad-core Xeon e5345 (หน้า 6)",
+      "pages": "หน้า 6–7"
+    },
+    {
+      "front": "ความยากของการเขียน parallel program",
+      "back": "Parallel software is the problem (หน้า 8)",
+      "pages": "หน้า 8"
+    },
+    {
+      "front": "Instruction/data streams และ SPMD",
+      "back": "SISD: Intel Pentium 4; SIMD: SSE of x86 (หน้า 9)",
+      "pages": "หน้า 9"
+    },
+    {
+      "front": "Vector processors และ vector extension ของ RISC-V",
+      "back": "Highly pipelined function units (หน้า 10)",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "ตัวอย่าง DAXPY: scalar loop เทียบ vector code",
+      "back": "DAXPY = double-precision A*X Plus Y ใน BLAS (หน้า 11)",
+      "pages": "หน้า 11"
+    },
+    {
+      "front": "Vector vs. scalar",
+      "back": "Explicit absence of loop-carried dependences → reduced checking in hardware (หน้า 12)",
+      "pages": "หน้า 12"
+    },
+    {
+      "front": "SIMD",
+      "back": "Operate elementwise on vectors of data (หน้า 13)",
+      "pages": "หน้า 13"
+    },
+    {
+      "front": "Vector vs. multimedia extensions",
+      "back": "Vector: variable width; multimedia: fixed width (หน้า 14)",
+      "pages": "หน้า 14"
+    },
+    {
+      "front": "Hardware multithreading: fine-grain และ coarse-grain",
+      "back": "Replicate registers, PC; fast switching (หน้า 15)",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "Simultaneous multithreading (SMT) และตัวอย่าง",
+      "back": "SMT ใน multiple-issue dynamically scheduled processor (หน้า 16)",
+      "pages": "หน้า 16–17"
+    },
+    {
+      "front": "Future of multithreading",
+      "back": "Power considerations ⇒ simplified microarchitectures (หน้า 18)",
+      "pages": "หน้า 18"
+    },
+    {
+      "front": "Shared memory multiprocessor (SMP), UMA และ NUMA",
+      "back": "SMP: single physical address space for all processors (หน้า 19)",
+      "pages": "หน้า 19"
+    },
+    {
+      "front": "ตัวอย่าง sum reduction บน 64-processor UMA",
+      "back": "64,000 numbers / 64 processors = 1000 per processor (หน้า 20)",
+      "pages": "หน้า 20–21"
+    },
+    {
+      "front": "ประวัติ GPU และกราฟิกในระบบ",
+      "back": "Early video cards: frame buffer memory + address generation (หน้า 22)",
+      "pages": "หน้า 22–23"
+    },
+    {
+      "front": "GPU architectures",
+      "back": "Processing is highly data-parallel (หน้า 24)",
+      "pages": "หน้า 24"
+    },
+    {
+      "front": "ตัวอย่าง NVIDIA Fermi",
+      "back": "SIMD Processor: 16 SIMD lanes (หน้า 26)",
+      "pages": "หน้า 25–26"
+    },
+    {
+      "front": "GPU memory structures",
+      "back": "CUDA thread ↔ per-CUDA thread private memory (หน้า 27)",
+      "pages": "หน้า 27"
+    },
+    {
+      "front": "Classifying GPUs",
+      "back": "Don’t fit nicely into SIMD/MIMD model (หน้า 28)",
+      "pages": "หน้า 28"
+    },
+    {
+      "front": "Putting GPUs into perspective",
+      "back": "GPU: SIMD processors 8–16, lanes 8–16, MT support 16–32 (หน้า 29)",
+      "pages": "หน้า 29–30"
+    },
+    {
+      "front": "Message passing",
+      "back": "Each processor has private physical address space (หน้า 31)",
+      "pages": "หน้า 31"
+    },
+    {
+      "front": "Loosely coupled clusters",
+      "back": "Network of independent computers; private memory and OS (หน้า 32)",
+      "pages": "หน้า 32"
+    },
+    {
+      "front": "Grid computing",
+      "back": "Separate computers interconnected by long-haul networks (หน้า 33)",
+      "pages": "หน้า 33"
+    },
+    {
+      "front": "Interconnection network topologies และ multistage networks",
+      "back": "Topology = arrangements of processors, switches, and links (หน้า 34)",
+      "pages": "หน้า 34–35"
+    },
+    {
+      "front": "Network characteristics",
+      "back": "Latency per message (unloaded network) (หน้า 36)",
+      "pages": "หน้า 36"
+    },
+    {
+      "front": "Parallel benchmarks และ code or applications",
+      "back": "Linpack: matrix linear algebra; SPECrate: job-level parallelism (หน้า 37)",
+      "pages": "หน้า 37–38"
+    },
+    {
+      "front": "Modeling performance และ arithmetic intensity",
+      "back": "Metric: achievable GFLOPs/sec (หน้า 39)",
+      "pages": "หน้า 39"
+    },
+    {
+      "front": "Concluding remarks",
+      "back": "Goal: higher performance using multiple processors (หน้า 40)",
+      "pages": "หน้า 40"
+    },
+    {
+      "front": "SISD / SIMD / MISD / MIMD",
+      "back": "Pentium 4 / SSE x86 / no examples today / Xeon e5345",
+      "pages": "หน้า 9"
+    },
+    {
+      "front": "SPMD",
+      "back": "Single Program Multiple Data บน MIMD ด้วย conditional code",
+      "pages": "หน้า 9"
+    },
+    {
+      "front": "Task-level parallelism",
+      "back": "high throughput สำหรับ independent jobs",
+      "pages": "หน้า 5"
+    },
+    {
+      "front": "Parallel programming difficulties",
+      "back": "partitioning, coordination, communications overhead",
+      "pages": "หน้า 8"
+    },
+    {
+      "front": "RISC-V vector registers",
+      "back": "v0–v31: 32 × 64-element, 64-bit elements",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "fadd.d.v vs fadd.d.vs",
+      "back": "vector+vector vs scalar+ทุก element",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "DAXPY",
+      "back": "Y = a × X + Y (BLAS)",
+      "pages": "หน้า 11"
+    },
+    {
+      "front": "Fine-grain MT",
+      "back": "switch threads after each cycle",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "Coarse-grain MT",
+      "back": "switch only on long stall (L2-cache miss)",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "SMT",
+      "back": "schedule instructions from multiple threads ใน multiple-issue processor",
+      "pages": "หน้า 16"
+    },
+    {
+      "front": "SMP",
+      "back": "single physical address space; locks",
+      "pages": "หน้า 19"
+    },
+    {
+      "front": "UMA / NUMA",
+      "back": "uniform / nonuniform memory access time",
+      "pages": "หน้า 19"
+    },
+    {
+      "front": "Fermi SIMD processor",
+      "back": "16 lanes; 32-wide thread over 2 cycles; 64 regs/thread",
+      "pages": "หน้า 26"
+    },
+    {
+      "front": "VLIW / Superscalar",
+      "back": "ILP static / ILP dynamic",
+      "pages": "หน้า 28"
+    },
+    {
+      "front": "SIMD or Vector / Tesla",
+      "back": "DLP static / DLP dynamic",
+      "pages": "หน้า 28"
+    },
+    {
+      "front": "Message passing",
+      "back": "private physical address space; send/receive messages",
+      "pages": "หน้า 31"
+    },
+    {
+      "front": "Grid computing",
+      "back": "long-haul networks; ใช้ idle time ของ PC",
+      "pages": "หน้า 33"
+    },
+    {
+      "front": "Bisection bandwidth",
+      "back": "หนึ่งใน throughput ของ network",
+      "pages": "หน้า 36"
+    },
+    {
+      "front": "Arithmetic intensity",
+      "back": "FLOPs per byte of memory accessed",
+      "pages": "หน้า 39"
+    }
+  ]
+}

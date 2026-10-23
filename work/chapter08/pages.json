@@ -1,0 +1,166 @@
+[
+  {
+    "page": 1,
+    "text": "W.Suntiamorntut, Ph.D.\nComputer Architecture & OS\nVIII: Parallel Processors from Client to Cloud\n"
+  },
+  {
+    "page": 2,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n•The structure and architecture of the computer systems;  \n•basic components of computers;  \n•data representations;  \n•the Assembly Language;  \n•memory system organization;  \n•the memory hierarchy; the cache memory;  \n•input and output systems;  \n•storage systems;  \n•computing units;  \n•the multiprocessor architecture;\n2"
+  },
+  {
+    "page": 3,
+    "text": "© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\n"
+  },
+  {
+    "page": 4,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nChapter Overview\n• Introduction \n• Difﬁculty of creating parallel processing programs \n• SISD, MIMD, SIMD, SPMD, Vector \n• Hardware multithreading \n• Multicore and other shared memory multiprocessors \n• Introduction to GPUs \n• Clusters & Message Passing \n• Introduction to multiprocessors network topologies\n4"
+  },
+  {
+    "page": 5,
+    "text": "Introduction\n Goal: connecting multiple computers\nto get higher performance\n Multiprocessors\n Scalability, availability, power efficiency\n Task-level (process-level) parallelism\n High throughput for independent jobs\n Parallel processing program\n Single program run on multiple processors\n Multicore microprocessors\n Chips with multiple processors (cores)\n§6.1 Introduction\nChapter 6 — Parallel Processors  from Client to Cloud — 2\n5"
+  },
+  {
+    "page": 6,
+    "text": "Hardware and Software\n Hardware\n Serial: e.g., Pentium 4\n Parallel: e.g., quad-core Xeon e5345\n Software\n Sequential: e.g., matrix multiplication\n Concurrent: e.g., operating system\n Sequential/concurrent software can run on \nserial/parallel hardware\n Challenge: making effective use of parallel \nhardware\nChapter 6 — Parallel Processors  from Client to Cloud — 3\n6"
+  },
+  {
+    "page": 7,
+    "text": "What We’ve Already Covered\n §2.11: Parallelism and Instructions\n Synchronization\n §3.6: Parallelism and Computer Arithmetic\n Subword Parallelism\n §4.10: Parallelism and Advanced \nInstruction-Level Parallelism\n §5.10: Parallelism and Memory \nHierarchies\n Cache Coherence\nChapter 6 — Parallel Processors  from Client to Cloud — 4\n7"
+  },
+  {
+    "page": 8,
+    "text": "Parallel Programming\n Parallel software is the problem\n Need to get significant performance \nimprovement\n Otherwise, just use a faster uniprocessor, \nsince it’s easier!\n Difficulties\n Partitioning\n Coordination\n Communications overhead\n§6.2 The Difficulty of Creating Parallel Processing Programs\nChapter 6 — Parallel Processors  from Client to Cloud — 5\n8"
+  },
+  {
+    "page": 9,
+    "text": "Instruction and Data Streams\n An alternate classification\nData Streams\nSingle Multiple\nInstruction \nStreams\nSingle SISD :\nIntel Pentium 4\nSIMD : SSE \ninstructions of x86\nMultiple MISD :\nNo examples today\nMIMD :\nIntel Xeon e5345\n SPMD: Single Program Multiple Data\n A parallel program on a MIMD computer\n Conditional code for different processors\nChapter 6 — Parallel Processors  from Client to Cloud — 10\n§6.3 SISD, MIMD, SIMD, SPMD, and Vector\n9"
+  },
+  {
+    "page": 10,
+    "text": "Vector Processors\n Highly pipelined function units\n Stream data from/to vector registers to units\n Data collected from memory into registers\n Results stored from registers to memory\n Example: Vector extension to RISC-V\n v0 to v31: 32 × 64-element registers, (64-bit elements)\n Vector instructions\n fld.v, fsd.v: load/store vector\n fadd.d.v: add vectors of double\n fadd.d.vs: add scalar to each element of vector of double\n Significantly reduces instruction-fetch bandwidth\nChapter 6 — Parallel Processors  from Client to Cloud — 11\n10"
+  },
+  {
+    "page": 11,
+    "text": "Example: DAXPY (Y = a ×X + Y)\n Conventional RISC-V code:\nfld f0,a(x3)ssss //sloadsscalarsa\naddi x5,x19,512sss//sendsofsarraysX\nloop:sfld f1,0(x19)sss //sloadsx[i]\nfmul.d f1,f1,f0ssss //sas*sx[i]\nfld f2,0(x20)sss //sloadsy[i]\nfadd.d f2,f2,f1ssss //sas*sx[i]s+sy[i]\nfsd f2,0(x20)s //sstoresy[i]\naddi x19,x19,8ssss//sincrementsindexstosx\naddi x20,x20,8ssss//sincrementsindexstosy\nbltu x19,x5,loopss//srepeatsifsnotsdone\nVector RISC-V code:\nfld f0,a(x3)ssss//sloadsscalarsa\nfld.v v0,0(x19)sss//sloadsvectorsx\nfmul.d.vs v0,v0,f0ssss//svector-scalarsmultiply\nfld.v v1,0(x20)sss//sloadsvectorsy\nfadd.d.v v1,v1,v0ssss//svector-vectorsadd\nfsd.v v1,0(x20)sss//sstoresvectorsy\nChapter 6 — Parallel Processors  from Client to Cloud — 12\nDAXPY คือ คําสั่งทางพีชคณิตเชิงเส้น (Linear algebra) อยู่ใน library BLAS มาจาก double-precision A*X Plus Y ทําหน้าที่นําเวกเตอร์ X คูณด้วย สเกลาร์ a  แล้วบวกเข้ากับ \nVector Y  (Y = aX + Y)\nvoid daxpy(size_t n, double a, const double x[], double y[]) {  \nfor (size_t i = 0; i < n; i++) {  \ny[i] = a * x[i] + y[i]; // Y = a*X + Y  \n} \n}\n11"
+  },
+  {
+    "page": 12,
+    "text": "Vector vs. Scalar\n Vector architectures and compilers\n Simplify data-parallel programming\n Explicit statement of absence of loop-carried \ndependences\n Reduced checking in hardware\n Regular access patterns benefit from \ninterleaved and burst memory\n Avoid control hazards by avoiding loops\n More general than ad-hoc media \nextensions (such as MMX, SSE)\n Better match with compiler technology\nChapter 6 — Parallel Processors  from Client to Cloud — 13\n12"
+  },
+  {
+    "page": 13,
+    "text": "SIMD\n Operate elementwise on vectors of data\n E.g., MMX and SSE instructions in x86\n Multiple data elements in 128-bit wide registers\n All processors execute the same \ninstruction at the same time\n Each with different data address, etc.\n Simplifies synchronization\n Reduced instruction control hardware\n Works best for highly data-parallel \napplications\nChapter 6 — Parallel Processors  from Client to Cloud — 14\n13"
+  },
+  {
+    "page": 14,
+    "text": "Vector vs. Multimedia Extensions\n Vector instructions have a variable vector width, \nmultimedia extensions have a fixed width\n Vector instructions support strided access, \nmultimedia extensions do not\n Vector units can be combination of pipelined and \narrayed functional units:\nChapter 6 — Parallel Processors  from Client to Cloud — 15\n14"
+  },
+  {
+    "page": 15,
+    "text": "Multithreading\n Performing multiple threads of execution in \nparallel\n Replicate registers, PC, etc.\n Fast switching between threads\n Fine-grain multithreading\n Switch threads after each cycle\n Interleave instruction execution\n If one thread stalls, others are executed\n Coarse-grain multithreading\n Only switch on long stall (e.g., L2-cache miss)\n Simplifies hardware, but doesn’t hide short stalls \n(eg, data hazards)\n§6.4 Hardware Multithreading\nChapter 6 — Parallel Processors  from Client to Cloud — 16\n15"
+  },
+  {
+    "page": 16,
+    "text": "Simultaneous Multithreading\n In multiple-issue dynamically scheduled \nprocessor\n Schedule instructions from multiple threads\n Instructions from independent threads execute \nwhen function units are available\n Within threads, dependencies handled by \nscheduling and register renaming\n Example: Intel Pentium-4 HT\n Two threads: duplicated registers, shared \nfunction units and caches\nChapter 6 — Parallel Processors  from Client to Cloud — 17\n16"
+  },
+  {
+    "page": 17,
+    "text": "Multithreading Example\nChapter 6 — Parallel Processors  from Client to Cloud — 18\n17"
+  },
+  {
+    "page": 18,
+    "text": "Future of Multithreading\n Will it survive? In what form?\n Power considerations simplified \nmicroarchitectures\n Simpler forms of multithreading\n Tolerating cache-miss latency\n Thread switch may be most effective\n Multiple simple cores might share \nresources more effectively\nChapter 6 — Parallel Processors  from Client to Cloud — 19\n18"
+  },
+  {
+    "page": 19,
+    "text": "Shared Memory\n SMP: shared memory multiprocessor\n Hardware provides single physical\naddress space for all processors\n Synchronize shared variables using locks\n Memory access time\n UMA (uniform) vs. NUMA (nonuniform)\nChapter 6 — Parallel Processors  from Client to Cloud — 20\n§6.5 Multicore and Other Shared Memory Multiprocessors\n19"
+  },
+  {
+    "page": 20,
+    "text": "Example: Sum Reduction\n Sum 64,000 numbers on 64 processor UMA\n Each processor has ID: 0  Pn  63\n Partition 1000 numbers per processor\n Initial summation on each processor\nsum[Pn] = 0;\nfor (i = 1000*Pn;\ni < 1000*(Pn+1); i += 1)\nsum[Pn] += A[i];\n Now need to add these partial sums\n Reduction: divide and conquer\n Half the processors add pairs, then quarter, …\n Need to synchronize between reduction steps\nChapter 6 — Parallel Processors  from Client to Cloud — 21\n20"
+  },
+  {
+    "page": 21,
+    "text": "Example: Sum Reduction\nhalfr=r64;\ndo\nsynch();\nifr(half%2rs=r0r&&rPnr==r0)\nsum[0]r+=rsum[half-1];\n/*rConditionalrsumrneededrwhenrhalfrisrodd;\nProcessor0rgetsrmissingrelementr*/\nhalfr=rhalf/2;r/*rdividingrlineronrwhorsumsr*/\nifr(Pnr<rhalf)rsum[Pn]r+=rsum[Pn+half];\nwhiler(halfr>r1);\nChapter 6 — Parallel Processors  from Client to Cloud — 22\n21"
+  },
+  {
+    "page": 22,
+    "text": "History of GPUs\n Early video cards\n Frame buffer memory with address generation for \nvideo output\n 3D graphics processing\n Originally high-end computers (e.g., SGI)\n Moore’s Law  lower cost, higher density\n 3D graphics cards for PCs and game consoles\n Graphics Processing Units\n Processors oriented to 3D graphics tasks\n Vertex/pixel processing, shading, texture mapping,\nrasterization\n§6.6 Introduction to Graphics Processing Units\nChapter 6 — Parallel Processors  from Client to Cloud — 23\n22"
+  },
+  {
+    "page": 23,
+    "text": "Graphics in the System\nChapter 6 — Parallel Processors  from Client to Cloud — 24\n23"
+  },
+  {
+    "page": 24,
+    "text": "GPU Architectures\n Processing is highly data-parallel\n GPUs are highly multithreaded\n Use thread switching to hide memory latency\n Less reliance on multi-level caches\n Graphics memory is wide and high-bandwidth\n Trend toward general purpose GPUs\n Heterogeneous CPU/GPU systems\n CPU for sequential code, GPU for parallel code\n Programming languages/APIs\n DirectX, OpenGL\n C for Graphics (Cg), High Level Shader Language \n(HLSL)\n Compute Unified Device Architecture (CUDA)\nChapter 6 — Parallel Processors  from Client to Cloud — 25\n24"
+  },
+  {
+    "page": 25,
+    "text": "Example: NVIDIA Fermi\n Multiple SIMD processors, each as shown:\nChapter 6 — Parallel Processors  from Client to Cloud — 26\n25"
+  },
+  {
+    "page": 26,
+    "text": "Example: NVIDIA Fermi\n SIMD Processor: 16 SIMD lanes\n SIMD instruction\n Operates on 32 element wide threads\n Dynamically scheduled on 16-wide processor \nover 2 cycles\n 32K x 32-bit registers spread across lanes\n 64 registers per thread context\nChapter 6 — Parallel Processors  from Client to Cloud — 27\n26"
+  },
+  {
+    "page": 27,
+    "text": "GPU Memory Structures\nChapter 6 — Parallel Processors  from Client to Cloud — 28\n27"
+  },
+  {
+    "page": 28,
+    "text": "Classifying GPUs\n Don’t fit nicely into SIMD/MIMD model\n Conditional execution in a thread allows an \nillusion of MIMD\n But with performance degredation\n Need to write general purpose code with care\nStatic: Discovered\nat Compile Time\nDynamic: Discovered \nat Runtime\nInstruction-Level \nParallelism\nVLIW Superscalar\nData-Level \nParallelism\nSIMD or Vector Tesla Multiprocessor\nChapter 6 — Parallel Processors  from Client to Cloud — 29\n28"
+  },
+  {
+    "page": 29,
+    "text": "Putting GPUs into Perspective\nChapter 6 — Parallel Processors  from Client to Cloud — 30\nFeature Multicore with SIMD GPU\nSIMD processors 4 to 8 8 to 16\nSIMD lanes/processor 2 to 4 8 to 16\nMultithreading hardware support for\nSIMD threads\n2 to 4 16 to 32\nTypical ratio of single precision to \ndouble-precision performance\n2:1 2:1\nLargest cache size 8 MB 0.75 MB\nSize of memory address 64-bit 64-bit\nSize of main memory 8 GB to 256 GB 4 GB to 6 GB\nMemory protection at level of page Yes Yes\nDemand paging Yes No\nIntegrated scalar processor/SIMD \nprocessor\nYes No\nCache coherent Yes No\n29"
+  },
+  {
+    "page": 30,
+    "text": "Guide to GPU Terms\nChapter 6 — Parallel Processors  from Client to Cloud — 31\n30"
+  },
+  {
+    "page": 31,
+    "text": "Message Passing\n Each processor has private physical \naddress space\n Hardware sends/receives messages \nbetween processors\n§6.7 Clusters, WSC, and Other Message-Passing MPs\nChapter 6 — Parallel Processors  from Client to Cloud — 32\n31"
+  },
+  {
+    "page": 32,
+    "text": "Loosely Coupled Clusters\n Network of independent computers\n Each has private memory and OS\n Connected using I/O system\n E.g., Ethernet/switch, Internet\n Suitable for applications with independent tasks\n Web servers, databases, simulations, …\n High availability, scalable, affordable\n Problems\n Administration cost (prefer virtual machines)\n Low interconnect bandwidth\n c.f. processor/memory bandwidth on an SMP\nChapter 6 — Parallel Processors  from Client to Cloud — 33\n32"
+  },
+  {
+    "page": 33,
+    "text": "Grid Computing\n Separate computers interconnected by \nlong-haul networks\n E.g., Internet connections\n Work units farmed out, results sent back\n Can make use of idle time on PCs\n E.g., SETI@home, World Community Grid\nChapter 6 — Parallel Processors  from Client to Cloud — 36\n33"
+  },
+  {
+    "page": 34,
+    "text": "Interconnection Networks\n Network topologies\n Arrangements of processors, switches, and links\n§6.8 Introduction to Multiprocessor Network Topologies\nBus Ring\n2D Mesh\nN-cube (N = 3)\nFully connected\nChapter 6 — Parallel Processors  from Client to Cloud — 37\n34"
+  },
+  {
+    "page": 35,
+    "text": "Multistage Networks\nChapter 6 — Parallel Processors  from Client to Cloud — 3835"
+  },
+  {
+    "page": 36,
+    "text": "Network Characteristics\n Performance\n Latency per message (unloaded network)\n Throughput\n Link bandwidth\n Total network bandwidth\n Bisection bandwidth\n Congestion delays (depending on traffic)\n Cost\n Power\n Routability in silicon\nChapter 6 — Parallel Processors  from Client to Cloud — 39\n36"
+  },
+  {
+    "page": 37,
+    "text": "Parallel Benchmarks\n Linpack: matrix linear algebra\n SPECrate: parallel run of SPEC CPU programs\n Job-level parallelism\n SPLASH: Stanford Parallel Applications for \nShared Memory\n Mix of kernels and applications, strong scaling\n NAS (NASA Advanced Supercomputing) suite\n computational fluid dynamics kernels\n PARSEC (Princeton Application Repository for \nShared Memory Computers) suite\n Multithreaded applications using Pthreads and \nOpenMP\n§6.10 Multiprocessor Benchmarks and Performance Models\nChapter 6 — Parallel Processors  from Client to Cloud — 40\n37"
+  },
+  {
+    "page": 38,
+    "text": "Code or Applications?\n Traditional benchmarks\n Fixed code and data sets\n Parallel programming is evolving\n Should algorithms, programming languages, \nand tools be part of the system?\n Compare systems, provided they implement a \ngiven application\n E.g., Linpack, Berkeley Design Patterns\n Would foster innovation in approaches to \nparallelism\nChapter 6 — Parallel Processors  from Client to Cloud — 41\n38"
+  },
+  {
+    "page": 39,
+    "text": "Modeling Performance\n Assume performance metric of interest is \nachievable GFLOPs/sec\n Measured using computational kernels from \nBerkeley Design Patterns\n Arithmetic intensity of a kernel\n FLOPs per byte of memory accessed\n For a given computer, determine\n Peak GFLOPS (from data sheet)\n Peak memory bytes/sec (using Stream \nbenchmark)\nChapter 6 — Parallel Processors  from Client to Cloud — 42\n39"
+  },
+  {
+    "page": 40,
+    "text": "Concluding Remarks\n Goal: higher performance by using multiple \nprocessors\n Difficulties\n Developing parallel software\n Devising appropriate architectures\n SaaS importance is growing and clusters are a \ngood match\n Performance per dollar and performance per \nJoule drive both mobile and WSC\n§6.14 Concluding Remarks\nChapter 6 — Parallel Processors  from Client to Cloud — 56\n40"
+  },
+  {
+    "page": 41,
+    "text": "Q & A"
+  }
+]
