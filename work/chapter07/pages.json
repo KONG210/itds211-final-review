@@ -1,0 +1,214 @@
+[
+  {
+    "page": 1,
+    "text": "W.Suntiamorntut, Ph.D.\nComputer Architecture & OS\nVII: Computing Unit\n1"
+  },
+  {
+    "page": 2,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n•The structure and architecture of the computer systems;  \n•basic components of computers;  \n•data representations;  \n•the Assembly Language;  \n•memory system organization;  \n•the memory hierarchy; the cache memory;  \n•input and output systems;  \n•storage systems;  \n•computing units; - Pipelining - \n•the multiprocessor architecture;\n2"
+  },
+  {
+    "page": 3,
+    "text": "Chapter 4 — The Processor — 29\nPipelining Analogy\n Pipelined laundry: overlapping execution\n Parallelism improves performance\n§4.5 An Overview of Pipelining\n Four loads:\n Speedup\n= 8/3.5 = 2.3\n Non-stop:\n Speedup\n= 2n/0.5n + 1.5 § 4\n= number of stages\n3"
+  },
+  {
+    "page": 4,
+    "text": "Chapter 4 — The Processor — 30\nRISC-V Pipeline\n Five stages, one step per stage\n1. IF: Instruction fetch from memory\n2. ID: Instruction decode & register read\n3. EX: Execute operation or calculate address\n4. MEM: Access memory operand\n5. WB: Write result back to register\n4"
+  },
+  {
+    "page": 5,
+    "text": "Chapter 4 — The Processor — 31\nPipeline Performance\n Assume time for stages is\n 100ps for register read or write\n 200ps for other stages\n Compare pipelined datapath with single-cycle \ndatapath\nInstr Instr fetch Register \nread\nALU op Memory \naccess\nRegister \nwrite\nTotal time\nld 200ps 100 ps 200ps 200ps 100 ps 800ps\nsd 200ps 100 ps 200ps 200ps 700ps\nR-format 200ps 100 ps 200ps 100 ps 600ps\nbeq 200ps 100 ps 200ps 500ps\n5"
+  },
+  {
+    "page": 6,
+    "text": "Chapter 4 — The Processor — 32\nPipeline Performance\nSingle-cycle (T c= 800ps)\nPipelined (T c= 200ps)\n6"
+  },
+  {
+    "page": 7,
+    "text": "Chapter 4 — The Processor — 34\nPipelining and ISA Design\n RISC-V ISA designed for pipelining\n All instructions are 32-bits\n Easier to fetch and decode in one cycle\n c.f. x86: 1- to 17-byte instructions\n Few and regular instruction formats\n Can decode and read registers in one step\n Load/store addressing\n Can calculate address in 3 rdstage, access memory \nin 4thstage\n7"
+  },
+  {
+    "page": 8,
+    "text": "Chapter 4 — The Processor — 35\nHazards\n Situations that prevent starting the next \ninstruction in the next cycle\n Structure hazards\n A required resource is busy\n Data hazard\n Need to wait for previous instruction to \ncomplete its data read/write\n Control hazard\n Deciding on control action depends on \nprevious instruction\n8"
+  },
+  {
+    "page": 9,
+    "text": "Chapter 4 — The Processor — 36\nStructure Hazards\n Conflict for use of a resource\n In RISC-V pipeline with a single memory\n Load/store requires data access\n Instruction fetch would have to stall for that \ncycle\n Would cause a pipeline “bubble”\n Hence, pipelined datapaths require \nseparate instruction/data memories\n Or separate instruction/data caches\n9"
+  },
+  {
+    "page": 10,
+    "text": "Chapter 4 — The Processor — 37\nData Hazards\n An instruction depends on completion of \ndata access by a previous instruction\n add x19, x0, x1\nsub x2, x19, x3\n10"
+  },
+  {
+    "page": 11,
+    "text": "Chapter 4 — The Processor — 38\nForwarding (aka Bypassing)\n Use result when it is computed\n Don’t wait for it to be stored in a register\n Requires extra connections in the datapath\n11"
+  },
+  {
+    "page": 12,
+    "text": "Chapter 4 — The Processor — 39\nLoad-Use Data Hazard\n Can’t always avoid stalls by forwarding\n If value not computed when needed\n Can’t forward backward in time!\n12"
+  },
+  {
+    "page": 13,
+    "text": "Chapter 4 — The Processor — 40\nCode Scheduling to Avoid Stalls\n Reorder code to avoid use of load result in \nthe next instruction\n C code for a = b + e; c = b + f;\nld x1, 0(x0)\nld x2, 8(x0)\nadd x3, x1, x2\nsd x3, 24(x0)\nld x4, 16(x0)\nadd x5, x1, x4\nsd x5, 32(x0)\nstall\nstall\nld x1, 0(x0)\nld x2, 8(x0)\nld x4, 16(x0)\nadd x3, x1, x2\nsd x3, 24(x0)\nadd x5, x1, x4\nsd x5, 32(x0)\n11 cycles13 cycles\n13"
+  },
+  {
+    "page": 14,
+    "text": "Chapter 4 — The Processor — 41\nControl Hazards\n Branch determines flow of control\n Fetching next instruction depends on branch \noutcome\n Pipeline can’t always fetch correct instruction\n Still working on ID stage of branch\n In RISC-V pipeline\n Need to compare registers and compute \ntarget early in the pipeline\n Add hardware to do it in ID stage\n14"
+  },
+  {
+    "page": 15,
+    "text": "Chapter 4 — The Processor — 42\nStall on Branch\n Wait until branch outcome determined \nbefore fetching next instruction\n15"
+  },
+  {
+    "page": 16,
+    "text": "Chapter 4 — The Processor — 43\nBranch Prediction\n Longer pipelines can’t readily determine \nbranch outcome early\n Stall penalty becomes unacceptable\n Predict outcome of branch\n Only stall if prediction is wrong\n In RISC-V pipeline\n Can predict branches not taken\n Fetch instruction after branch, with no delay\n16"
+  },
+  {
+    "page": 17,
+    "text": "Chapter 4 — The Processor — 44\nMore-Realistic Branch Prediction\n Static branch prediction\n Based on typical branch behavior\n Example: loop and if-statement branches\n Predict backward branches taken\n Predict forward branches not taken\n Dynamic branch prediction\n Hardware measures actual branch behavior\n e.g., record recent history of each branch\n Assume future behavior will continue the trend\n When wrong, stall while re-fetching, and update history\n17"
+  },
+  {
+    "page": 18,
+    "text": "Chapter 4 — The Processor — 45\nPipeline Summary\n Pipelining improves performance by \nincreasing instruction throughput\n Executes multiple instructions in parallel\n Each instruction has the same latency\n Subject to hazards\n Structure, data, control\n Instruction set design affects complexity of \npipeline implementation\nThe BIG Picture\n18"
+  },
+  {
+    "page": 19,
+    "text": "Chapter 4 — The Processor — 46\nRISC-V Pipelined Datapath\n§4.6 Pipelined Datapath and Control\nWB\nMEM\nRight-to-left \nflow leads to \nhazards\n19"
+  },
+  {
+    "page": 20,
+    "text": "Chapter 4 — The Processor — 47\nPipeline registers\n Need registers between stages\n To hold information produced in previous cycle\n20"
+  },
+  {
+    "page": 21,
+    "text": "Chapter 4 — The Processor — 48\nPipeline Operation\n Cycle-by-cycle flow of instructions through \nthe pipelined datapath\n “Single-clock-cycle” pipeline diagram\n Shows pipeline usage in a single cycle\n Highlight resources used\n c.f. “multi-clock-cycle” diagram\n Graph of operation over time\n We’ll look at “single-clock-cycle” diagrams \nfor load & store\n21"
+  },
+  {
+    "page": 22,
+    "text": "Chapter 4 — The Processor — 49\nIF for Load, Store, …\n22"
+  },
+  {
+    "page": 23,
+    "text": "Chapter 4 — The Processor — 50\nID for Load, Store, …\n23"
+  },
+  {
+    "page": 24,
+    "text": "Chapter 4 — The Processor — 51\nEX for Load\n24"
+  },
+  {
+    "page": 25,
+    "text": "Chapter 4 — The Processor — 52\nMEM for Load\n25"
+  },
+  {
+    "page": 26,
+    "text": "Chapter 4 — The Processor — 53\nWB for Load\nWrong\nregister\nnumber\n26"
+  },
+  {
+    "page": 27,
+    "text": "Chapter 4 — The Processor — 54\nCorrected Datapath for Load\n27"
+  },
+  {
+    "page": 28,
+    "text": "Chapter 4 — The Processor — 55\nEX for Store\n28"
+  },
+  {
+    "page": 29,
+    "text": "Chapter 4 — The Processor — 56\nMEM for Store\n29"
+  },
+  {
+    "page": 30,
+    "text": "Chapter 4 — The Processor — 57\nWB for Store\n30"
+  },
+  {
+    "page": 31,
+    "text": "Chapter 4 — The Processor — 58\nMulti-Cycle Pipeline Diagram\n Form showing resource usage\n31"
+  },
+  {
+    "page": 32,
+    "text": "Chapter 4 — The Processor — 59\nMulti-Cycle Pipeline Diagram\n Traditional form\n32"
+  },
+  {
+    "page": 33,
+    "text": "Chapter 4 — The Processor — 60\nSingle-Cycle Pipeline Diagram\n State of pipeline in a given cycle\n33"
+  },
+  {
+    "page": 34,
+    "text": "Chapter 4 — The Processor — 61\nPipelined Control (Simplified)\n34"
+  },
+  {
+    "page": 35,
+    "text": "Chapter 4 — The Processor — 64\nData Hazards in ALU Instructions\n Consider this sequence:\nsub  x2, x1,x3\nand  x12,x2,x5\nor   x13,x6,x2\nadd  x14,x2,x2\nsd   x15,100(x2)\n We can resolve hazards with forwarding\n How do we detect when to forward?\n§4.7 Data Hazards: Forwarding vs. Stalling\n35"
+  },
+  {
+    "page": 36,
+    "text": "Chapter 4 — The Processor — 65\nDependencies & Forwarding\n36"
+  },
+  {
+    "page": 37,
+    "text": "Chapter 4 — The Processor — 66\nDetecting the Need to Forward\n Pass register numbers along pipeline\n e.g., ID/EX.RegisterRs1 = register number for Rs1 \nsitting in ID/EX pipeline register\n ALU operand register numbers in EX stage \nare given by\n ID/EX.RegisterRs1, ID/EX.RegisterRs2\n Data hazards when\n1a.EX/MEM.RegisterRd = ID/EX.RegisterRs1\n1b.EX/MEM.RegisterRd = ID/EX.RegisterRs2\n2a.MEM/WB.RegisterRd = ID/EX.RegisterRs1\n2b.MEM/WB.RegisterRd = ID/EX.RegisterRs2\nFwd from\nEX/MEM\npipeline reg\nFwd from\nMEM/WB\npipeline reg\n37"
+  },
+  {
+    "page": 38,
+    "text": "Chapter 4 — The Processor — 67\nDetecting the Need to Forward\n But only if forwarding instruction will write \nto a register!\n EX/MEM.RegWrite, MEM/WB.RegWrite\n And only if Rd for that instruction is not x0\n EX/MEM.RegisterRd  0,\nMEM/WB.RegisterRd  0\n38"
+  },
+  {
+    "page": 39,
+    "text": "Chapter 4 — The Processor — 68\nForwarding Paths\n39"
+  },
+  {
+    "page": 40,
+    "text": "Chapter 4 — The Processor — 69\nForwarding Conditions\nMux control Source Explanation\nForwardA = 00 ID/EX The first ALU operand comes from the register file.\nForwardA = 10 EX/MEM The first ALU operand is forwarded from the prior \nALU result.\nForwardA = 01 MEM/WB The first ALU operand is forwarded from data \nmemory or an earlier ALU result.\nForwardB = 00 ID/EX The second ALU operand comes from the register \nfile.\nForwardB = 10 EX/MEM The second ALU operand is forwarded from the prior \nALU result.\nForwardB = 01 MEM/WB The second ALU operand is forwarded from data \nmemory or an earlier ALU result.\n40"
+  },
+  {
+    "page": 41,
+    "text": "Chapter 4 — The Processor — 70\nDouble Data Hazard\n Consider the sequence:\nadd x1,x1,x2\nadd x1,x1,x3\nadd x1,x1,x4\n Both hazards occur\n Want to use the most recent\n Revise MEM hazard condition\n Only fwd if EX hazard condition isn’t true\n41"
+  },
+  {
+    "page": 42,
+    "text": "Chapter 4 — The Processor — 71\nRevised Forwarding Condition\n MEM hazard\n if (MEM/WB.RegWrite\nand (MEM/WB.RegisterRd  0)\nand not(EX/MEM.RegWrite and (EX/MEM.RegisterRd  0)\nand (EX/MEM.RegisterRd  ID/EX.RegisterRs1))\nand (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01\n if (MEM/WB.RegWrite\nand (MEM/WB.RegisterRd  0)\nand not(EX/MEM.RegWrite and (EX/MEM.RegisterRd  0)\nand (EX/MEM.RegisterRd  ID/EX.RegisterRs2))\nand (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01\n42"
+  },
+  {
+    "page": 43,
+    "text": "Chapter 4 — The Processor — 72\nDatapath with Forwarding\n43"
+  },
+  {
+    "page": 44,
+    "text": "Chapter 4 — The Processor — 73\nLoad-Use Hazard Detection\n Check when using instruction is decoded \nin ID stage\n ALU operand register numbers in ID stage \nare given by\n IF/ID.RegisterRs1, IF/ID.RegisterRs2\n Load-use hazard when\n ID/EX.MemRead and\n((ID/EX.RegisterRd = IF/ID.RegisterRs1) or\n(ID/EX.RegisterRd = IF/ID.RegisterRs1))\n If detected, stall and insert bubble\n44"
+  },
+  {
+    "page": 45,
+    "text": "Chapter 4 — The Processor — 74\nHow to Stall the Pipeline\n Force control values in ID/EX register\nto 0\n EX, MEM and WB do nop(no-operation)\n Prevent update of PC and IF/ID register\n Using instruction is decoded again\n Following instruction is fetched again\n 1-cycle stall allows MEM to read data for ld\n Can subsequently forward to EX stage\n45"
+  },
+  {
+    "page": 46,
+    "text": "Chapter 4 — The Processor — 75\nLoad-Use Data Hazard\nStall inserted \nhere\n46"
+  },
+  {
+    "page": 47,
+    "text": "Chapter 4 — The Processor — 76\nDatapath with Hazard Detection\n47"
+  },
+  {
+    "page": 48,
+    "text": "Chapter 4 — The Processor — 77\nStalls and Performance\n Stalls reduce performance\n But are required to get correct results\n Compiler can arrange code to avoid \nhazards and stalls\n Requires knowledge of the pipeline structure\nThe BIG Picture\n48"
+  },
+  {
+    "page": 49,
+    "text": "Chapter 4 — The Processor — 78\nBranch Hazards\n If branch outcome determined in MEM\n§4.8 Control Hazards\nPC\nFlush these\ninstructions\n(Set control\nvalues to 0)\n49"
+  },
+  {
+    "page": 50,
+    "text": "Chapter 4 — The Processor — 79\nReducing Branch Delay\n Move hardware to determine outcome to ID \nstage\n Target address adder\n Register comparator\n Example: branch taken\n36:qqsubqqx10,qx4,qx8\n40:qqbeqqqx1,qqx3,q16qq//qPC-relativeqbranch\n//qtoq40+16*2=72\n44:qqandqqx12,qx2,qx5\n48:qqorrqqx13,qx2,qx6\n52:qqaddqqx14,qx4,qx2\n56:qqsubqqx15,qx6,qx7\n...\n72:qqldqqqx4,q50(x7)\n50"
+  },
+  {
+    "page": 51,
+    "text": "Chapter 4 — The Processor — 80\nExample: Branch Taken\n51"
+  },
+  {
+    "page": 52,
+    "text": "Chapter 4 — The Processor — 81\nExample: Branch Taken\n52"
+  },
+  {
+    "page": 53,
+    "text": "Q & A\n53"
+  }
+]

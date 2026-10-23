@@ -1,0 +1,451 @@
+
+
+===== PAGE 1 =====
+W.Suntiamorntut, Ph.D.
+Computer Architecture & OS
+II : Computer Systems, Computer Functions, Processor Structure and Function
+
+
+===== PAGE 2 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Outline
+•The structure and architecture of the computer systems;  
+•basic components of computers;  
+•data representations;  
+•the Assembly Language;  
+•memory system organization;  
+•the memory hierarchy; the cache memory;  
+•input and output systems;  
+•storage systems;  
+•computing units;  
+•the multiprocessor architecture;
+
+===== PAGE 3 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Von Neumann Computer Model
+• Most traditional and common computer model 
+• Uses the stored program concept : 
+• Memory holds the program and data 
+• Memory is addressed by location numbers 
+(address) not the type of the contents 
+• Execution and memory accessed is sequential/
+linear
+3
+By John Von Neumann, Institute for Advanced Studies, Princeton
+
+===== PAGE 4 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Harvard Computer Model
+• DSPs and microcontrollers 
+• Separate memory and buses for instructions 
+vs data 
+• Remove bottleneck but adds complexity 
+• Some use hybrid approach: Harvard-style at 
+L1 cache level but Von Neumann at main 
+memory level
+4
+
+===== PAGE 5 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+BUS
+5
+•Two types of buses are commonly found in 
+computer systems: point-to-point, and 
+multipoint buses.
+•Buses consist of data lines, control lines, and 
+address lines. 
+•While the data lines convey bits from one 
+device to another, control lines determine the 
+direction of data flow, and when each device 
+can access the bus. 
+•Address lines determine the location of the 
+source or destination of the data.
+
+===== PAGE 6 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Multipoint BUS
+6
+•A multipoint bus is shown below. 
+•Because a multipoint bus is a shared resource, access to it is controlled through protocols, 
+which are built into the hardware. 
+
+
+===== PAGE 7 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+BUS
+7
+–Distributed using self-detection: Devices decide 
+which gets the bus among themselves. 
+–Distributed using collision-detection: Any 
+device can try to use the bus.  If its data collides 
+with the data of another device,    it tries again.
+–Daisy chain: Permissions are passed from the 
+highest-priority device to the lowest. 
+–Centralized parallel: Each device is directly 
+connected to an arbitration circuit.
+•In a master-slave configuration, where more than one device can be the bus master, 
+concurrent bus master requests must be arbitrated. 
+•Four categories of bus arbitration are:
+
+===== PAGE 8 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Sequence ofarithmeticand logicfunctionsData Results(a) Programming in hardware
+Instructioncodes
+General-purposearithmeticand logicfunctionsData
+ControlsignalsResults(b) Programming in software
+Figure 3.1 Hardware and Software Approaches
+Instructioninterpreter
+Hardware 
+and Software 
+Approaches
+
+===== PAGE 9 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+  Software
+A sequence of codes or instructions 
+Part of the hardware interprets each instruction and generates control signals 
+Provide a new sequence of codes for each new program instead of rewiring 
+the hardware
+  Major components
+CPU 
+•Instruction interpreter, module of general-purposes arithmetic and logic functions,  
+I/O components 
+•Contains basic components for accepting data and instructions and converting them into form of 
+signals usable by the system 
+•Means of reporting results
+
+===== PAGE 10 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Memory address 
+register (MAR) 
+•Specifies the 
+address in memory 
+for the next read or 
+write
+Memory buffer 
+register (MBR) 
+•Contains the data 
+to be written into 
+memory or receives 
+the data read from 
+memory
+I/O address 
+register (I/OAR) 
+•Specifies a particular 
+I/O device
+I/O buffer register 
+(I/OBR) 
+•Used for the 
+exchange of data 
+between an I/O 
+module and the CPU
+MAR
+MBR
+MEMORY
+
+===== PAGE 11 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Computer components : Top-level view
+
+===== PAGE 12 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Basic Instruction Cycle
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Computer Function
+
+===== PAGE 13 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Fetch Cycles
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+■ At the beginning of each instruction cycle the processor fetches an 
+instruction from memory 
+■ The program counter (PC) holds the address of the instruction to be 
+fetched next 
+■ The processor increments the PC after each instruction fetch so that 
+it will fetch the next instruction in sequence 
+■ The fetched instruction is loaded into the instruction register (IR) 
+■ The processor interprets the instruction and performs the required 
+action
+
+===== PAGE 14 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example of Program Execution
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+0   3 4          15 Opcode Address  (a) Instruction format   0 1             15 S Magnitude  (b) Integer format   Program Counter (PC) = Address of instruction Instruction Register (IR) = Instruction being executed Accumulator (AC) = Temporary storage  (c) Internal CPU registers   0001 = Load AC from Memory 0010 = Store AC to Memory 0101 = Add to AC from Memory  (d) Partial list of opcodes    Figure 3.4   Characteristics of a Hypothetical Machine  
+
+===== PAGE 15 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Cycle State Diagram
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 16 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+- Simple Computer Function - 
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+===== PAGE 17 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+MARIE’s seven registers are: 
+•Accumulator, AC, a 16-bit register that holds a conditional operator (e.g., "less than") or one 
+operand of a two-operand instruction. 
+•Memory address register, MAR, a 12-bit register that holds the memory address of an instruction or 
+the operand of an instruction.   
+•Memory buffer register, MBR, a 16-bit register that holds the data after its retrieval from, or before 
+its placement in memory. 
+•Program counter, PC, a 12-bit register that holds the address of the next program instruction to 
+be executed. 
+•Instruction register, IR, which holds an instruction immediately preceding its execution. 
+•Input register, InREG, an 8-bit register that holds data read from an input device. 
+•Output register, OutREG, an 8-bit register, that holds data that is ready for the output device.
+
+===== PAGE 18 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE ARCHITECTURE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 19 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•The registers are interconnected, and connected with main memory through a common 
+data bus. 
+•Each device on the bus is identified by a unique number that is set on the control lines 
+whenever that device is required to carry out an operation. 
+•Separate connections are also provided between the accumulator and the memory buffer 
+register, and the ALU and the accumulator and memory buffer register. 
+•This permits data transfer between these devices without use of the main data bus.
+
+===== PAGE 20 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•This is the MARIE data path 
+shown graphically.
+
+
+===== PAGE 21 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•A computer’s instruction set architecture (ISA) specifies the format of its 
+instructions and the primitive operations that the machine can perform. 
+•The ISA is an interface between a computer’s hardware and its software. 
+•Some ISAs include hundreds of different instructions for processing data and 
+controlling program execution. 
+•The MARIE ISA consists of only 13 instructions.
+
+===== PAGE 22 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•This is the format  
+ of a MARIE instruction: 
+•The fundamental MARIE instructions are:
+
+
+===== PAGE 23 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•This is a bit pattern for a LOAD instruction as it would appear in the IR: 
+•We see that the opcode is 1 and the address from which to load the 
+data is 3.
+
+
+===== PAGE 24 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•This is a bit pattern for a SKIPCOND instruction as it would appear in the 
+IR: 
+•We see that the opcode is 8 and bits 11 and 10 are 10, meaning that the 
+next instruction will be skipped if the value in the AC is greater than zero.
+
+
+===== PAGE 25 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Each of our instructions actually consists of a sequence of smaller instructions 
+called microoperations. 
+•The exact sequence of microoperations that are carried out by an instruction 
+can be specified using register transfer language (RTL). 
+•In the MARIE RTL, we use the notation M[X] to indicate the actual data value 
+stored in memory location X, and ← to indicate the transfer of bytes to a 
+register or memory location.
+
+===== PAGE 26 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•The RTL for the LOAD instruction is: 
+•Similarly, the RTL for the ADD instruction is:
+MAR ← X 
+MBR ← M[MAR] 
+AC ← AC + MBR
+MAR ← X 
+MBR ← M[MAR]  
+AC ← MBR
+
+===== PAGE 27 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MARIE
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Recall that SKIPCOND skips the next instruction according to the 
+value of the AC. 
+•The RTL for the this instruction is the most complex in our 
+instruction set:
+If IR[11 - 10] = 00 then 
+ If AC < 0 then PC ← PC + 1 
+else If IR[11 - 10] = 01 then 
+ If AC = 0 then PC ← PC + 1 
+else If IR[11 - 10] = 11 then 
+ If AC > 0 then PC ← PC + 1
+
+===== PAGE 28 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•The fetch-decode-execute cycle is the series of steps that a computer carries 
+out when it runs a program. 
+•We first have to fetch an instruction from memory, and place it into the IR. 
+•Once in the IR, it is decoded to determine what needs to be done next. 
+•If a memory value (operand) is involved in the operation, it is retrieved and 
+placed into the MBR. 
+•With everything in place, the instruction is executed.
+
+===== PAGE 29 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 30 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•All computers provide a way of interrupting the fetch-decode-execute cycle. 
+•Interrupts occur when: 
+–A user break (e.,g., Control + C) is issued 
+–I/O is requested by the user or a program 
+–A critical error occurs 
+•Interrupts can be caused by  
+ - Hardware interrupt 
+– Software interrupt (software เรียกใช้งาน OS system call)
+
+===== PAGE 31 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Interrupt processing involves adding another step to the fetch-decode-
+execute cycle as shown below.
+
+
+===== PAGE 32 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+ISR = Interrupt Service Routine
+
+===== PAGE 33 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•For general-purpose systems, it is common to disable all interrupts during 
+the time in which an interrupt is being processed. 
+–Typically, this is achieved by setting a bit in the flags register. 
+•Interrupts that are ignored in this case are called maskable. 
+•Nonmaskable interrupts are those interrupts that must be processed in 
+order to keep the system in a stable condition.
+
+===== PAGE 34 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Processing
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Interrupts are very useful in processing I/O. 
+•However, interrupt-driven I/O is complicated, and is beyond the scope of 
+our present discussion. 
+•MARIE, being the simplest of simple systems, uses a modified form of 
+programmed I/O.  
+•All output is placed in an output register, OutREG, and the CPU polls the 
+input register, InREG, until input is sensed, at which time the value is copied 
+into the accumulator.
+
+===== PAGE 35 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+A Simple Program
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Consider the simple MARIE program given below.  We show a set of 
+mnemonic instructions stored at addresses 100 - 106 (hex):
+
+
+===== PAGE 36 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+A Simple Program
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+•Our second instruction is ADD 105:
+
+
+===== PAGE 37 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Classes of Interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Program Generated by some condition that occurs as a result of an instruction execution, such as arithmetic overflow, division by zero, attempt to execute an illegal machine instruction, or reference outside a user's allowed memory space. Timer Generated by a timer within the processor. This allows the operating system to perform certain functions on a regular basis. I/O Generated by an I/O controller, to signal normal completion of an operation, request service from the processor, or to signal a variety of error conditions. Hardware failure Generated by a failure such as power failure or memory parity error.  
+
+===== PAGE 38 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Program Flow of Control without and with Interrupt 
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 39 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Transfer of control via interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 40 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Cycle with Interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 41 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Program Timing : Short I/O wait
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 42 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Program Timing : Long I/O wait
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 43 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Cycle State Diagram, with interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 44 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Transfer of control with multiple interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 45 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example Time Sequence of Multiple Interrupts
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 46 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Q & A

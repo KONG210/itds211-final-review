@@ -1,0 +1,450 @@
+[
+  {
+    "page": 1,
+    "text": "W.Suntiamorntut, Ph.D.\nComputer Architecture & OS\nIV: Memory System Organization, Hierarchy, Cache Memory\n"
+  },
+  {
+    "page": 2,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n•The structure and architecture of the computer systems;  \n•basic components of computers;  \n•data representations;  \n•the Assembly Language;  \n•memory system organization;  \n•the memory hierarchy; the cache memory;  \n•input and output systems;  \n•storage systems;  \n•computing units;  \n•the multiprocessor architecture;"
+  },
+  {
+    "page": 3,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nChapter Overview\n3\n• Introduction \n• Memory Technology \n• The Basic of Caches \n• Direct mapped cache \n• Associative cache : fully associative and n-way set associative  \n• Measuring and Improving Cache Performance \n• Dependable Memory Hierarchy  \n• Virtual Machine  \n• A common framework for memory hierarchy  \n• Using a ﬁnite state machine to control a simple cache"
+  },
+  {
+    "page": 4,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nPrinciple of Locality\n4\n Program access a small promotion of their address space at any time \n Temporal locality \n Spatial locality\nItems accessed recently are likely to be accessed again soon\ne.g., instructions in a loop, induction variables \nItems near those accessed recently are likely to be accessed soon\ne.g., sequential instruction access, array data "
+  },
+  {
+    "page": 5,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nTaking Advantage of locality\n5\nMemory hierarchy \nStore everything on disk \nCopy recently accessed (and nearby) items from disk to smaller DRAM memory \nMain memory \nCopy more recently accessed (and nearby) items from DRAM to smaller SRAM \nmemory \nCache memory attached to CPU"
+  },
+  {
+    "page": 6,
+    "text": "Memory Hierarchy"
+  },
+  {
+    "page": 7,
+    "text": "Cache and Main Memory\n"
+  },
+  {
+    "page": 8,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 4\nMemory Hierarchy Levels\n Block (aka line): unit of copying\n May be multiple words\n If accessed data is present in \nupper level\n Hit: access satisfied by upper level\n Hit ratio: hits/accesses\n If accessed data is absent\n Miss: block copied from lower level\n Time taken: miss penalty\n Miss ratio: misses/accesses\n= 1 – hit ratio\n Then accessed data supplied from \nupper level"
+  },
+  {
+    "page": 9,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 5\nMemory Technology\n Static RAM (SRAM)\n 0.5ns – 2.5ns, $2000 – $5000 per GB\n Dynamic RAM (DRAM)\n 50ns – 70ns, $20 – $75 per GB\n Magnetic disk\n 5ms – 20ms, $0.20 – $2 per GB\n Ideal memory\n Access time of SRAM\n Capacity and cost/GB of disk\n§5.2 Memory Technologies"
+  },
+  {
+    "page": 10,
+    "text": "DRAM Technology\n Data stored as a charge in a capacitor\n Single transistor used to access the charge\n Must periodically be refreshed\n Read contents and write back\n Performed on a DRAM “row”\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 6\n"
+  },
+  {
+    "page": 11,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 7\nAdvanced DRAM Organization\n Bits in a DRAM are organized as a \nrectangular array\n DRAM accesses an entire row\n Burst mode: supply successive words from a \nrow with reduced latency\n Double data rate (DDR) DRAM\n Transfer on rising and falling clock edges\n Quad data rate (QDR) DRAM\n Separate DDR inputs and outputs"
+  },
+  {
+    "page": 12,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 8\nDRAM Generations\n0\n50\n100\n150\n200\n250\n300\n'80 '83 '85 '89 '92 '96 '98 '00 '04 '07\nTrac\nTcac\nYear Capacity $/GB\n1980 64Kbit $1500000\n1983 256Kbit $500000\n1985 1Mbit $200000\n1989 4Mbit $50000\n1992 16Mbit $15000\n1996 64Mbit $10000\n1998 128Mbit $4000\n2000 256Mbit $1000\n2004 512Mbit $250\n2007 1Gbit $50"
+  },
+  {
+    "page": 13,
+    "text": "DRAM Performance Factors\n Row buffer\n Allows several words to be read and refreshed in \nparallel\n Synchronous DRAM\n Allows for consecutive accesses in bursts without \nneeding to send each address\n Improves bandwidth\n DRAM banking\n Allows simultaneous access to multiple DRAMs\n Improves bandwidth\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 9"
+  },
+  {
+    "page": 14,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 10\nIncreasing Memory Bandwidth\n 4-word wide memory\n Miss penalty = 1 + 15 + 1 = 17 bus cycles\n Bandwidth = 16 bytes / 17 cycles = 0.94 B/cycle\n 4-bank interleaved memory\n Miss penalty = 1 + 15 + 4 ×1 = 20 bus cycles\n Bandwidth = 16 bytes / 20 cycles = 0.8 B/cycle"
+  },
+  {
+    "page": 15,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 11\nFlash Storage\n Nonvolatile semiconductor storage\n 100 ×–1 0 0 0 ×faster than disk\n Smaller, lower power, more robust\n But more $/GB (between disk and DRAM)\n"
+  },
+  {
+    "page": 16,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 12\nFlash Types\n NOR flash: bit cell like a NOR gate\n Random read/write access\n Used for instruction memory in embedded systems\n NAND flash: bit cell like a NAND gate\n Denser (bits/area), but block-at-a-time access\n Cheaper per GB\n Used for USB keys, media storage, …\n Flash bits wears out after 1000’s of accesses\n Not suitable for direct RAM or disk replacement\n Wear leveling: remap data to less used blocks"
+  },
+  {
+    "page": 17,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 13\nDisk Storage\n Nonvolatile, rotating magnetic storage\n"
+  },
+  {
+    "page": 18,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 14\nDisk Sectors and Access\n Each sector records\n Sector ID\n Data (512 bytes, 4096 bytes proposed)\n Error correcting code (ECC)\n Used to hide defects and recording errors\n Synchronization fields and gaps\n Access to a sector involves\n Queuing delay if other accesses are pending\n Seek: move the heads\n Rotational latency\n Data transfer\n Controller overhead"
+  },
+  {
+    "page": 19,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 15\nDisk Access Example\n Given\n 512B sector, 15,000rpm, 4ms average seek \ntime, 100MB/s transfer rate, 0.2ms controller \noverhead, idle disk\n Average read time\n 4ms seek time\n+ ½ / (15,000/60) = 2ms rotational latency\n+ 512 / 100MB/s = 0.005ms transfer time\n+ 0.2ms controller delay\n= 6.2ms\n If actual average seek time is 1ms\n Average read time = 3.2ms"
+  },
+  {
+    "page": 20,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 16\nDisk Performance Issues\n Manufacturers quote average seek time\n Based on all possible seeks\n Locality and OS scheduling lead to smaller actual \naverage seek times\n Smart disk controller allocate physical sectors on \ndisk\n Present logical sector interface to host\n SCSI, ATA, SATA\n Disk drives include caches\n Prefetch sectors in anticipation of access\n Avoid seek and rotational delay"
+  },
+  {
+    "page": 21,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 17\nCache Memory\n Cache memory\n The level of the memory hierarchy closest to \nthe CPU\n Given accesses X 1, …, X n–1, Xn\n§5.3 The Basics of Caches\n How do we know if \nthe data is present?\n Where do we look?"
+  },
+  {
+    "page": 22,
+    "text": "Elements of Cache Design"
+  },
+  {
+    "page": 23,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 18\nDirect Mapped Cache\n Location determined by address\n Direct mapped: only one choice\n (Block address) modulo (#Blocks in cache)\n #Blocks is a \npower of 2\n Use low-order \naddress bits"
+  },
+  {
+    "page": 24,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 19\nTags and Valid Bits\n How do we know which particular block is \nstored in a cache location?\n Store block address as well as the data\n Actually, only need the high-order bits\n Called the tag\n What if there is no data in a location?\n Valid bit: 1 = present, 0 = not present\n Initially 0"
+  },
+  {
+    "page": 25,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 20\nCache Example\n 8-blocks, 1 word/block, direct mapped\n Initial state\nIndex V Tag Data\n000 N\n001 N\n010 N\n011 N\n100 N\n101 N\n110 N\n111 N"
+  },
+  {
+    "page": 26,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 21\nCache Example\nIndex V Tag Data\n000 N\n001 N\n010 N\n011 N\n100 N\n101 N\n110 Y 10 Mem[10110]\n111 N\nWord addr Binary addr Hit/miss Cache block\n22 10 110 Miss 110\nBinary adds = 10 110 \nTag Index"
+  },
+  {
+    "page": 27,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 22\nCache Example\nIndex V Tag Data\n000 N\n001 N\n010 Y 11 Mem[11010]\n011 N\n100 N\n101 N\n110 Y 10 Mem[10110]\n111 N\nWord addr Binary addr Hit/miss Cache block\n26 11 010 Miss 010\nBinary adds = 11 010 \nTag Index"
+  },
+  {
+    "page": 28,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 23\nCache Example\nIndex V Tag Data\n000 N\n001 N\n010 Y 11 Mem[11010]\n011 N\n100 N\n101 N\n110 Y 10 Mem[10110]\n111 N\nWord addr Binary addr Hit/miss Cache block\n22 10 110 Hit 110\n26 11 010 Hit 010"
+  },
+  {
+    "page": 29,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 24\nCache Example\nIndex V Tag Data\n000 Y 10 Mem[10000]\n001 N\n010 Y 11 Mem[11010]\n011 Y 00 Mem[00011]\n100 N\n101 N\n110 Y 10 Mem[10110]\n111 N\nWord addr Binary addr Hit/miss Cache block\n16 10 000 Miss 000\n30 0  0 1 1 M i s s 0 1 1\n16 10 000 Hit 000\n1\n2\n3\n1\n2\n3"
+  },
+  {
+    "page": 30,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 25\nCache Example\nIndex V Tag Data\n000 Y 10 Mem[10000]\n001 N\n010 Y 10 Mem[10010]\n011 Y 00 Mem[00011]\n100 N\n101 N\n110 Y 10 Mem[10110]\n111 N\nWord addr Binary addr Hit/miss Cache block\n18 10 010 Miss 0104\n4"
+  },
+  {
+    "page": 31,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 26\nAddress Subdivision\n"
+  },
+  {
+    "page": 32,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 27\nExample: Larger Block Size\n 64 blocks, 16 bytes/block\n To what block number does address 1200 \nmap?\n Block address = ¬1200/16 ¼= 75\n Block number = 75 modulo 64 = 11\nTag Index Offset\n03491063\n4 bits6 bits22 bits\nBlock address = address\nNumber of bytes / Block\nBlock number = Block address modulo  \nNumber of blocks\n16 bytes / block\n64 blocks"
+  },
+  {
+    "page": 33,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 28\nBlock Size Considerations\n Larger blocks should reduce miss rate\n Due to spatial locality\n But in a fixed-sized cache\n Larger blocks  fewer of them\n More competition  increased miss rate\n Larger blocks  pollution\n Larger miss penalty\n Can override benefit of reduced miss rate\n Early restart and critical-word-first can help"
+  },
+  {
+    "page": 34,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 29\nCache Misses\n On cache hit, CPU proceeds normally\n On cache miss\n Stall the CPU pipeline\n Fetch block from next level of hierarchy\n Instruction cache miss\n Restart instruction fetch\n Data cache miss\n Complete data access"
+  },
+  {
+    "page": 35,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 30\nWrite-Through\n On data-write hit, could just update the block in \ncache\n But then cache and memory would be inconsistent\n Write through: also update memory\n But makes writes take longer\n e.g., if base CPI = 1, 10% of instructions are stores, \nwrite to memory takes 100 cycles\n Effective CPI = 1 + 0.1 ×100 = 11\n Solution: write buffer\n Holds data waiting to be written to memory\n CPU continues immediately\n Only stalls on write if write buffer is already full"
+  },
+  {
+    "page": 36,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 31\nWrite-Back\n Alternative: On data-write hit, just update \nthe block in cache\n Keep track of whether each block is dirty\n When a dirty block is replaced\n Write it back to memory\n Can use a write buffer to allow replacing block \nto be read first"
+  },
+  {
+    "page": 37,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 32\nWrite Allocation\n What should happen on a write miss?\n Alternatives for write-through\n Allocate on miss: fetch the block\n Write around: don’t fetch the block\n Since programs often write a whole block before \nreading it (e.g., initialization)\n For write-back\n Usually fetch the block"
+  },
+  {
+    "page": 38,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 33\nExample: Intrinsity FastMATH\n Embedded MIPS processor\n 12-stage pipeline\n Instruction and data access on each cycle\n Split cache: separate I-cache and D-cache\n Each 16KB: 256 blocks ×16 words/block\n D-cache: write-through or write-back\n SPEC2000 miss rates\n I-cache: 0.4%\n D-cache: 11.4%\n Weighted average: 3.2%"
+  },
+  {
+    "page": 39,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 34\nExample: Intrinsity FastMATH\n"
+  },
+  {
+    "page": 40,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 35\nMain Memory Supporting Caches\n Use DRAMs for main memory\n Fixed width (e.g., 1 word)\n Connected by fixed-width clocked bus\n Bus clock is typically slower than CPU clock\n Example cache block read\n 1 bus cycle for address transfer\n 15 bus cycles per DRAM access\n 1 bus cycle per data transfer\n For 4-word block, 1-word-wide DRAM\n Miss penalty = 1 + 4 ×15 + 4 ×1 = 65 bus cycles\n Bandwidth = 16 bytes / 65 cycles = 0.25 B/cycle"
+  },
+  {
+    "page": 41,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 36\nMeasuring Cache Performance\n Components of CPU time\n Program execution cycles\n Includes cache hit time\n Memory stall cycles\n Mainly from cache misses\n With simplifying assumptions:\n§5.4 Measuring and Improving Cache Performance\npenalty Miss\nnInstructio\nMisses\nProgram\nnsInstructio\npenalty Missrate Miss\nProgram\naccessesMemory \ncyclesstallMemory \n\n"
+  },
+  {
+    "page": 42,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 37\nCache Performance Example\n Given\n I-cache miss rate = 2%\n D-cache miss rate = 4%\n Miss penalty = 100 cycles\n Base CPI (ideal cache) = 2\n Load & stores are 36% of instructions\n Miss cycles per instruction\n I-cache: 0.02 ×100 = 2\n D-cache: 0.36 ×0.04 ×100 = 1.44\n Actual CPI = 2 + 2 + 1.44 = 5.44\n Ideal CPU is 5.44/2 =2.72 times faster"
+  },
+  {
+    "page": 43,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 38\nAverage Access Time\n Hit time is also important for performance\n Average memory access time (AMAT)\n AMAT = Hit time + Miss rate ×Miss penalty\n Example\n CPU with 1ns clock, hit time = 1 cycle, miss \npenalty = 20 cycles, I-cache miss rate = 5%\n AMAT = 1 + 0.05 ×20 = 2ns\n 2 cycles per instruction"
+  },
+  {
+    "page": 44,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 39\nPerformance Summary\n When CPU performance increased\n Miss penalty becomes more significant\n Decreasing base CPI\n Greater proportion of time spent on memory \nstalls\n Increasing clock rate\n Memory stalls account for more CPU cycles\n Can’t neglect cache behavior when \nevaluating system performance"
+  },
+  {
+    "page": 45,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 40\nAssociative Caches\n Fully associative\n Allow a given block to go in any cache entry\n Requires all entries to be searched at once\n Comparator per entry (expensive)\n n-way set associative\n Each set contains nentries\n Block number determines which set\n (Block number) modulo (#Sets in cache)\n Search all entries in a given set at once\n ncomparators (less expensive)"
+  },
+  {
+    "page": 46,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 41\nAssociative Cache Example"
+  },
+  {
+    "page": 47,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 42\nSpectrum of Associativity\n For a cache with 8 entries\n"
+  },
+  {
+    "page": 48,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 43\nAssociativity Example\n Compare 4-block caches\n Direct mapped, 2-way set associative,\nfully associative\n Block access sequence: 0, 8, 0, 6, 8\n Direct mapped\nBlock \naddress\nCache \nindex\nHit/miss Cache content after access\n0123\n00 m i s s Mem[0]\n80 m i s s Mem[8]\n00 m i s s Mem[0]\n62 m i s s M e m [ 0 ] Mem[6]\n80 m i s s Mem[8] Mem[6]"
+  },
+  {
+    "page": 49,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 44\nAssociativity Example\n 2-way set associative\nBlock \naddress\nCache \nindex\nHit/miss Cache content after access\nSet 0 Set 1\n00 m i s s Mem[0]\n80 m i s s M e m [ 0 ] Mem[8]\n00 h i t Mem[0] Mem[8]\n60 m i s s M e m [ 0 ] Mem[6]\n80 m i s s Mem[8] Mem[6]\n Fully associative\nBlock \naddress\nHit/miss Cache content after access\n0m i s s Mem[0]\n8m i s s M e m [ 0 ] Mem[8]\n0h i t Mem[0] Mem[8]\n6m i s s M e m [ 0 ] M e m [ 8 ] Mem[6]\n8h i t M e m [ 0 ] Mem[8] Mem[6]"
+  },
+  {
+    "page": 50,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 45\nHow Much Associativity\n Increased associativity decreases miss \nrate\n But with diminishing returns\n Simulation of a system with 64KB\nD-cache, 16-word blocks, SPEC2000\n 1-way: 10.3%\n 2-way: 8.6%\n 4-way: 8.3%\n 8-way: 8.1%"
+  },
+  {
+    "page": 51,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 46\nSet Associative Cache Organization\n"
+  },
+  {
+    "page": 52,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 47\nReplacement Policy\n Direct mapped: no choice\n Set associative\n Prefer non-valid entry, if there is one\n Otherwise, choose among entries in the set\n Least-recently used (LRU)\n Choose the one unused for the longest time\n Simple for 2-way, manageable for 4-way, too hard \nbeyond that\n Random\n Gives approximately the same performance \nas LRU for high associativity"
+  },
+  {
+    "page": 53,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 48\nMultilevel Caches\n Primary cache attached to CPU\n Small, but fast\n Level-2 cache services misses from \nprimary cache\n Larger, slower, but still faster than main \nmemory\n Main memory services L-2 cache misses\n Some high-end systems include L-3 cache"
+  },
+  {
+    "page": 54,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 49\nMultilevel Cache Example\n Given\n CPU base CPI = 1, clock rate = 4GHz\n Miss rate/instruction = 2%\n Main memory access time = 100ns\n With just primary cache\n Miss penalty = 100ns/0.25ns = 400 cycles\n Effective CPI = 1 + 0.02 ×400 = 9"
+  },
+  {
+    "page": 55,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 50\nExample (cont.)\n Now add L-2 cache\n Access time = 5ns\n Global miss rate to main memory = 0.5%\n Primary miss with L-2 hit\n Penalty = 5ns/0.25ns = 20 cycles\n Primary miss with L-2 miss\n Extra penalty = 500 cycles\n CPI = 1 + 0.02 ×20 + 0.005 ×400 = 3.4\n Performance ratio = 9/3.4 = 2.6"
+  },
+  {
+    "page": 56,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 51\nMultilevel Cache Considerations\n Primary cache\n Focus on minimal hit time\n L-2 cache\n Focus on low miss rate to avoid main memory \naccess\n Hit time has less overall impact\n Results\n L-1 cache usually smaller than a single cache\n L-1 block size smaller than L-2 block size"
+  },
+  {
+    "page": 57,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 52\nInteractions with Advanced CPUs\n Out-of-order CPUs can execute \ninstructions during cache miss\n Pending store stays in load/store unit\n Dependent instructions wait in reservation \nstations\n Independent instructions continue\n Effect of miss depends on program data \nflow\n Much harder to analyse\n Use system simulation"
+  },
+  {
+    "page": 58,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 53\nInteractions with Software\n Misses depend on \nmemory access \npatterns\n Algorithm behavior\n Compiler \noptimization for \nmemory access"
+  },
+  {
+    "page": 59,
+    "text": "Software Optimization via Blocking\n Goal:  maximize accesses to data before it \nis replaced\n Consider inner loops of DGEMM:\nfor (int j = 0; j < n; ++j)\n{\ndouble cij = C[i+j*n];\nfor( int k = 0; k < n; k++ )\ncij += A[i+k*n] * B[k+j*n];\nC[i+j*n] = cij;\n}\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 54"
+  },
+  {
+    "page": 60,
+    "text": "DGEMM Access Pattern\n C, A, and B arrays\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 55\nolder accesses\nnew accesses"
+  },
+  {
+    "page": 61,
+    "text": "Cache Blocked DGEMM\n1 #define BLOCKSIZE 32\n2 void do_block (int n, int si, int sj, int sk, double *A, double\n3 *B, double *C)\n4 {\n5  for (int i = si; i < si+BLOCKSIZE; ++i)\n6   for (int j = sj; j < sj+BLOCKSIZE; ++j)\n7   {\n8    double cij = C[i +j*n];/* cij = C[i][j] */\n9    for( int k = sk; k < sk+BLOCKSIZE; k++ )\n10    cij += A[i+k*n] * B[k+ j*n];/* cij+=A[i][k]*B[k][j] */\n11   C[i+j*n] = cij ;/* C[i][j] = cij */\n12  }\n13 }\n14 void dgemm (int n, double* A, double* B, double* C)\n15 {\n16  for ( int sj = 0; sj < n; sj += BLOCKSIZE )\n17   for ( int si = 0; si < n; si += BLOCKSIZE )\n18    for ( int sk = 0; sk < n; sk += BLOCKSIZE )\n19     do_block(n, si,  sj, sk, A, B, C);\n20 }\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 56"
+  },
+  {
+    "page": 62,
+    "text": "Blocked DGEMM Access Pattern\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 57\nUnoptimized Blocked\n"
+  },
+  {
+    "page": 63,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 58\nDependability\n Fault: failure of a \ncomponent\n May or may not lead \nto system failure\nService accomplishment\nService delivered\nas specified\nService interruption\nDeviation from\nspecified service\nFailureRestoration\n§5.5 Dependable Memory Hierarchy"
+  },
+  {
+    "page": 64,
+    "text": "Chapter 6 — Storage and Other I/O Topics — 59\nDependability Measures\n Reliability: mean time to failure (MTTF)\n Service interruption: mean time to repair (MTTR)\n Mean time between failures\n MTBF = MTTF + MTTR\n Availability = MTTF / (MTTF + MTTR)\n Improving Availability\n Increase MTTF: fault avoidance, fault tolerance, fault \nforecasting\n Reduce MTTR: improved tools and processes for \ndiagnosis and repair"
+  },
+  {
+    "page": 65,
+    "text": "The Hamming SEC Code\n Hamming distance\n Number of bits that are different between two \nbit patterns\n Minimum distance = 2 provides single bit \nerror detection\n E.g. parity code\n Minimum distance = 3 provides single \nerror correction, 2 bit error detection\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 60"
+  },
+  {
+    "page": 66,
+    "text": "Encoding SEC\n To calculate Hamming code:\n Number bits from 1 on the left\n All bit positions that are a power 2 are parity \nbits\n Each parity bit checks certain data bits:\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 61\n"
+  },
+  {
+    "page": 67,
+    "text": "Decoding SEC\n Value of parity bits indicates which bits are \nin error\n Use numbering from encoding procedure\n E.g.\n Parity bits = 0000 indicates no error\n Parity bits = 1010 indicates bit 10 was flipped\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 62"
+  },
+  {
+    "page": 68,
+    "text": "SEC/DEC Code\n Add an additional parity bit for the whole word \n(pn)\n Make Hamming distance = 4\n Decoding:\n Let H = SEC parity bits\n H even, p neven, no error\n H odd, p nodd, correctable single bit error\n H even, p nodd, error in p nbit\n H odd, p neven, double error occurred\n Note:  ECC DRAM uses SEC/DEC with 8 bits \nprotecting each 64 bits\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 63"
+  },
+  {
+    "page": 69,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 64\nVirtual Machines\n Host computer emulates guest operating system \nand machine resources\n Improved isolation of multiple guests\n Avoids security and reliability problems\n Aids sharing of resources\n Virtualization has some performance impact\n Feasible with modern high-performance comptuers\n Examples\n IBM VM/370 (1970s technology!)\n VMWare\n Microsoft Virtual PC\n§5.6 Virtual Machines"
+  },
+  {
+    "page": 70,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 65\nVirtual Machine Monitor\n Maps virtual resources to physical \nresources\n Memory, I/O devices, CPUs\n Guest code runs on native machine in user \nmode\n Traps to VMM on privileged instructions and \naccess to protected resources\n Guest OS may be different from host OS\n VMM handles real I/O devices\n Emulates generic virtual I/O devices for guest"
+  },
+  {
+    "page": 71,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 66\nExample: Timer Virtualization\n In native machine, on timer interrupt\n OS suspends current process, handles \ninterrupt, selects and resumes next process\n With Virtual Machine Monitor\n VMM suspends current VM, handles interrupt, \nselects and resumes next VM\n If a VM requires timer interrupts\n VMM emulates a virtual timer\n Emulates interrupt for VM when physical timer \ninterrupt occurs"
+  },
+  {
+    "page": 72,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 67\nInstruction Set Support\n User and System modes\n Privileged instructions only available in \nsystem mode\n Trap to system if executed in user mode\n All physical resources only accessible \nusing privileged instructions\n Including page tables, interrupt controls, I/O \nregisters\n Renaissance of virtualization support\n Current ISAs (e.g., x86) adapting"
+  },
+  {
+    "page": 73,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 68\nVirtual Memory\n Use main memory as a “cache” for \nsecondary (disk) storage\n Managed jointly by CPU hardware and the \noperating system (OS)\n Programs share main memory\n Each gets a private virtual address space \nholding its frequently used code and data\n Protected from other programs\n CPU and OS translate virtual addresses to \nphysical addresses\n VM “block” is called a page\n VM translation “miss” is called a page fault\n§5.7 Virtual Memory"
+  },
+  {
+    "page": 74,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 69\nAddress Translation\n Fixed-size pages (e.g., 4K)\n"
+  },
+  {
+    "page": 75,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 70\nPage Fault Penalty\n On page fault, the page must be fetched \nfrom disk\n Takes millions of clock cycles\n Handled by OS code\n Try to minimize page fault rate\n Fully associative placement\n Smart replacement algorithms"
+  },
+  {
+    "page": 76,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 71\nPage Tables\n Stores placement information\n Array of page table entries, indexed by virtual \npage number\n Page table register in CPU points to page \ntable in physical memory\n If page is present in memory\n PTE stores the physical page number\n Plus other status bits (referenced, dirty, …)\n If page is not present\n PTE can refer to location in swap space on \ndisk"
+  },
+  {
+    "page": 77,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 72\nTranslation Using a Page Table\n"
+  },
+  {
+    "page": 78,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 73\nMapping Pages to Storage\n"
+  },
+  {
+    "page": 79,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 74\nReplacement and Writes\n To reduce page fault rate, prefer least-\nrecently used (LRU) replacement\n Reference bit (aka use bit) in PTE set to 1 on \naccess to page\n Periodically cleared to 0 by OS\n A page with reference bit = 0 has not been \nused recently\n Disk writes take millions of cycles\n Block at once, not individual locations\n Write through is impractical\n Use write-back\n Dirty bit in PTE set when page is written"
+  },
+  {
+    "page": 80,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 75\nFast Translation Using a TLB\n Address translation would appear to require \nextra memory references\n One to access the PTE\n Then the actual memory access\n But access to page tables has good locality\n So use a fast cache of PTEs within the CPU\n Called a Translation Look-aside Buffer (TLB)\n Typical: 16–512 PTEs, 0.5–1 cycle for hit, 10–100 \ncycles for miss, 0.01%–1% miss rate\n Misses could be handled by hardware or software"
+  },
+  {
+    "page": 81,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 76\nFast Translation Using a TLB"
+  },
+  {
+    "page": 82,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 77\nTLB Misses\n If page is in memory\n Load the PTE from memory and retry\n Could be handled in hardware\n Can get complex for more complicated page table \nstructures\n Or in software\n Raise a special exception, with optimized handler\n If page is not in memory (page fault)\n OS handles fetching the page and updating \nthe page table\n Then restart the faulting instruction"
+  },
+  {
+    "page": 83,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 78\nTLB Miss Handler\n TLB miss indicates\n Page present, but PTE not in TLB\n Page not preset\n Must recognize TLB miss before \ndestination register overwritten\n Raise exception\n Handler copies PTE from memory to TLB\n Then restarts instruction\n If page not present, page fault will occur"
+  },
+  {
+    "page": 84,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 79\nPage Fault Handler\n Use faulting virtual address to find PTE\n Locate page on disk\n Choose page to replace\n If dirty, write to disk first\n Read page into memory and update page \ntable\n Make process runnable again\n Restart from faulting instruction"
+  },
+  {
+    "page": 85,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 80\nTLB and Cache Interaction\n If cache tag uses \nphysical address\n Need to translate \nbefore cache lookup\n Alternative: use virtual \naddress tag\n Complications due to \naliasing\n Different virtual \naddresses for shared \nphysical address\n"
+  },
+  {
+    "page": 86,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 81\nMemory Protection\n Different tasks can share parts of their \nvirtual address spaces\n But need to protect against errant access\n Requires OS assistance\n Hardware support for OS protection\n Privileged supervisor mode (aka kernel mode)\n Privileged instructions\n Page tables and other state information only \naccessible in supervisor mode\n System call exception (e.g., ecall in RISC-V)"
+  },
+  {
+    "page": 87,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 82\nThe Memory Hierarchy\n Common principles apply at all levels of \nthe memory hierarchy\n Based on notions of caching\n At each level in the hierarchy\n Block placement\n Finding a block\n Replacement on a miss\n Write policy\n§5.8 A Common Framework for Memory Hierarchies\nThe BIG Picture"
+  },
+  {
+    "page": 88,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 83\nBlock Placement\n Determined by associativity\n Direct mapped (1-way associative)\n One choice for placement\n n-way set associative\n n choices within a set\n Fully associative\n Any location\n Higher associativity reduces miss rate\n Increases complexity, cost, and access time"
+  },
+  {
+    "page": 89,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 84\nFinding a Block\n Hardware caches\n Reduce comparisons to reduce cost\n Virtual memory\n Full table lookup makes full associativity feasible\n Benefit in reduced miss rate\nAssociativity Location method Tag comparisons\nDirect mapped Index 1\nn-way set \nassociative\nSet index, then search \nentries within the set\nn\nFully associative Search all entries #entries\nFull lookup table 0"
+  },
+  {
+    "page": 90,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 85\nReplacement\n Choice of entry to replace on a miss\n Least recently used (LRU)\n Complex and costly hardware for high associativity\n Random\n Close to LRU, easier to implement\n Virtual memory\n LRU approximation with hardware support"
+  },
+  {
+    "page": 91,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 86\nWrite Policy\n Write-through\n Update both upper and lower levels\n Simplifies replacement, but may require write \nbuffer\n Write-back\n Update upper level only\n Update lower level when block is replaced\n Need to keep more state\n Virtual memory\n Only write-back is feasible, given disk write \nlatency "
+  },
+  {
+    "page": 92,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 87\nSources of Misses\n Compulsory misses (aka cold start misses)\n First access to a block\n Capacity misses\n Due to finite cache size\n A replaced block is later accessed again\n Conflict misses (aka collision misses)\n In a non-fully associative cache\n Due to competition for entries in a set\n Would not occur in a fully associative cache of \nthe same total size"
+  },
+  {
+    "page": 93,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 88\nCache Design Trade-offs\nDesign change Effect on miss rate Negative performance \neffect\nIncrease cache size Decrease capacity \nmisses\nMay increase access \ntime\nIncrease associativity Decrease conflict \nmisses\nMay increase access \ntime\nIncrease block size Decrease compulsory \nmisses\nIncreases miss \npenalty. For very large \nblock size, may \nincrease miss rate \ndue to pollution."
+  },
+  {
+    "page": 94,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 89\nCache Control\n Example cache characteristics\n Direct-mapped, write-back, write allocate\n Block size: 4 words (16 bytes)\n Cache size: 16 KB (1024 blocks)\n 32-bit byte addresses\n Valid bit and dirty bit per block\n Blocking cache\n CPU waits until access is complete\n§5.9 Using a Finite State Machine to Control A Simple Cache\nTag Index Offset\n034131431\n4 bits10 bits18 bits"
+  },
+  {
+    "page": 95,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 90\nInterface Signals\nCacheCPU Memory\nRead/Write\nValid\nAddress\nWrite Data\nRead Data\nReady\n32\n32\n32\nRead/Write\nValid\nAddress\nWrite Data\nRead Data\nReady\n32\n128\n128\nMultiple cycles \nper access"
+  },
+  {
+    "page": 96,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 91\nFinite State Machines\n Use an FSM to \nsequence control steps\n Set of states, transition \non each clock edge\n State values are binary \nencoded\n Current state stored in a \nregister\n Next state\n= fn(current state,\ncurrent inputs)\n Control output signals\n= fo(current state)"
+  },
+  {
+    "page": 97,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 92\nCache Controller FSM\nCould \npartition into \nseparate \nstates to \nreduce clock \ncycle time"
+  },
+  {
+    "page": 98,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 93\nCache Coherence Problem\n Suppose two CPU cores share a physical \naddress space\n Write-through caches\n§5.10 Parallelism and Memory Hierarchies: Cache Coherence\nTime \nstep\nEvent CPU A’s \ncache\nCPU B’s \ncache\nMemory\n00\n1C P U  A  r e a d s  X 0 0\n2C P U  B  r e a d s  X 0 0 0\n3C P U  A  w r i t e s  1  t o  X 1 0 1"
+  },
+  {
+    "page": 99,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 94\nCoherence Defined\n Informally: Reads return most recently \nwritten value\n Formally:\n P writes X; P reads X (no intervening writes)\nread returns written value\n P1writes X; P 2reads X (sufficiently later)\nread returns written value\n c.f. CPU B reading X after step 3 in example\n P1writes X, P 2writes X\nall processors see writes in the same order\n End up with the same final value for X"
+  },
+  {
+    "page": 100,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 95\nCache Coherence Protocols\n Operations performed by caches in \nmultiprocessors to ensure coherence\n Migration of data to local caches\n Reduces bandwidth for shared memory\n Replication of read-shared data\n Reduces contention for access\n Snooping protocols\n Each cache monitors bus reads/writes\n Directory-based protocols\n Caches and memory record sharing status of \nblocks in a directory"
+  },
+  {
+    "page": 101,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 96\nInvalidating Snooping Protocols\n Cache gets exclusive access to a block \nwhen it is to be written\n Broadcasts an invalidate message on the bus\n Subsequent read in another cache misses\n Owning cache supplies updated value\nCPU activity Bus activity CPU A’s \ncache\nCPU B’s \ncache\nMemory\n0\nCPU A reads X Cache miss for X 0 0\nCPU B reads X Cache miss for X 0 0 0\nCPU A writes 1 to X Invalidate for X 1 0\nCPU B read X Cache miss for X 1 1 1"
+  },
+  {
+    "page": 102,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 97\nMemory Consistency\n When are writes seen by other processors\n “Seen” means a read returns the written value\n Can’t be instantaneously\n Assumptions\n A write completes only when all processors have seen \nit\n A processor does not reorder writes with other \naccesses\n Consequence\n P writes X then writes Y\nall processors that see new Y also see new X\n Processors can reorder reads, but not writes"
+  },
+  {
+    "page": 103,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 98\nMultilevel On-Chip Caches\n§5.13 The ARM Cortex-A53 and Intel Core i7 Memory Hierarchies\n"
+  },
+  {
+    "page": 104,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 99\n2-Level TLB Organization\n"
+  },
+  {
+    "page": 105,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 100\nSupporting Multiple Issue\n Both have multi-banked caches that allow \nmultiple accesses per cycle assuming no \nbank conflicts\n Other optimizations\n Return requested word first\n Non-blocking cache\n Hit under miss\n Miss under miss\n Data prefetching"
+  },
+  {
+    "page": 106,
+    "text": "RISC-V System Instructions\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 101\n§5.14 Real Stuff: RISC-V System and Special Instructions\nType Mnemonic Name\nMem ordering fence.i Instruction fence\nfence Fence\nsfence.vm Address translation fence\nCSR access csrrwi CSR read/write immediate\ncsrrsi CSR read/set immediate\ncsrrci CSR read/clear immediate\ncsrrw CSR read/write\ncsrrs CSR read/set\ncsrrc CSR read/clear\nSystem ecall Environment call\nebreak Environment breakpoint\nsret Supervisor exception return\nwfi Wait for interrupt"
+  },
+  {
+    "page": 107,
+    "text": "DGEMM\n Combine cache blocking and subword \nparallelism\nChapter 5 — Large and Fast: Exploiting Memory Hierarchy — 102\n§5.15 Going Faster:  Cache Blocking and Matrix Multiply\n"
+  },
+  {
+    "page": 108,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 103\nPitfalls\n Byte vs. word addressing\n Example: 32-byte direct-mapped cache,\n4-byte blocks\n Byte 36 maps to block 1\n Word 36 maps to block 4\n Ignoring memory system effects when \nwriting or generating code\n Example: iterating over rows vs. columns of \narrays\n Large strides result in poor locality\n§5.16 Fallacies and Pitfalls"
+  },
+  {
+    "page": 109,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 104\nPitfalls\n In multiprocessor with shared L2 or L3 \ncache\n Less associativity than cores results in conflict \nmisses\n More cores need to increase associativity\n Using AMAT to evaluate performance of \nout-of-order processors\n Ignores effect of non-blocked accesses\n Instead, evaluate performance by simulation"
+  },
+  {
+    "page": 110,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 105\nPitfalls\n Extending address range using segments\n E.g., Intel 80286\n But a segment is not always big enough\n Makes address arithmetic complicated\n Implementing a VMM on an ISA not \ndesigned for virtualization\n E.g., non-privileged instructions accessing \nhardware resources\n Either extend ISA, or require guest OS not to \nuse problematic instructions"
+  },
+  {
+    "page": 111,
+    "text": "Chapter 5 — Large and Fast: Exploiting Memory Hierarchy — 106\nConcluding Remarks\n Fast memories are small, large memories are \nslow\n We really want fast, large memories /\n Caching gives this illusion -\n Principle of locality\n Programs use a small part of their memory space \nfrequently\n Memory hierarchy\n L1 cache lL2 cache l… lDRAM memory\nldisk\n Memory system design is critical for \nmultiprocessors\n§5.17 Concluding Remarks"
+  },
+  {
+    "page": 112,
+    "text": "Q & A"
+  }
+]

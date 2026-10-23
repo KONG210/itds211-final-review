@@ -1,0 +1,2959 @@
+{
+  "source": "itds-211_comp_arch_Chapter04.pdf",
+  "sourcePageCount": 112,
+  "course": "ITDS-211 · Computer Architecture & Operating System",
+  "instructor": "W. Suntiamorntut, Ph.D.",
+  "chapter": "Chapter04 · Memory System Organization, Hierarchy, Cache Memory",
+  "description": "จาก locality สู่ memory hierarchy, cache performance, dependability, virtual memory และ multicore coherence",
+  "notice": "เลขหน้าคือหน้า PDF 1–112; หน้า 32 และ 55 มีตัวเลขในสไลด์ที่ไม่สอดคล้องกัน จึงระบุให้ตรวจต้นฉบับในหัวข้อที่เกี่ยวข้อง",
+  "purpose": "บทนี้เรียนเพื่อเข้าใจว่าระบบให้ภาพเสมือนหน่วยความจำที่ทั้งเร็วและใหญ่ได้อย่างไร: อาศัย locality และ cache หลายระดับ พร้อมดูต้นทุนของ miss, การป้องกัน/แก้ข้อผิดพลาด, virtual memory และความสอดคล้องของ cache เมื่อมีหลาย core",
+  "purposePages": "หน้า 3–8, 41–44, 63–86, 98–102, 111",
+  "objectiveNote": "รายการวัตถุประสงค์รายบทที่ระบุโดยตรง: ต้องตรวจสอบจากต้นฉบับ; เป้าหมายต่อไปนี้สังเคราะห์จาก Chapter Overview หน้า 3 และหัวข้อในสไลด์",
+  "flashcardNote": "บัตรทบทวนยึดศัพท์ นิยาม สูตร และหลักการที่ปรากฏในสไลด์; เมื่อเจอหน้าที่ตัวเลขขัดกันให้เปิดภาพและใช้ป้าย “ต้องตรวจสอบจากต้นฉบับ”",
+  "goals": [
+    {
+      "text": "อธิบาย locality, memory technology และการส่ง block ผ่าน memory hierarchy",
+      "pages": "หน้า 3–20"
+    },
+    {
+      "text": "อ่าน cache mapping, associativity, write policy และคำนวณ hit/miss, CPI, AMAT จากตัวอย่าง",
+      "pages": "หน้า 21–56"
+    },
+    {
+      "text": "เชื่อม software locality, dependability/ECC, VM, page table และ TLB กับผลต่อประสิทธิภาพ",
+      "pages": "หน้า 57–86"
+    },
+    {
+      "text": "ใช้กรอบ placement/finding/replacement/write เพื่อวิเคราะห์ cache controller, coherence, consistency และ pitfalls",
+      "pages": "หน้า 87–111"
+    }
+  ],
+  "limits": [
+    "ตรวจครบ 112 หน้า: หน้า 1 ปก, 2 Course Outline, 3 Chapter Overview, 112 Q&A; เนื้อหาวิชาอยู่หน้า 4–111",
+    "ไม่มีข้อสอบเก่าหรือน้ำหนักคะแนนในไฟล์ จึงจัดระดับจากหลักการ สูตร ขั้นตอน และตัวอย่างที่สไลด์ให้ ไม่อ้างว่าเป็นข้อสอบจริง",
+    "ไม่มีรายการ Chapter Objectives ที่ประกาศเป็นข้อชัดเจน: ต้องตรวจสอบจากต้นฉบับ",
+    "หน้า 32 ภาพ address มีเลขบิตสูงสุดที่ชวนเข้าใจเป็น 64 บิต แต่ Tag 22 + Index 6 + Offset 4 รวม 32 บิต: ต้องตรวจสอบจากต้นฉบับ",
+    "หน้า 55 ข้อความ extra penalty = 500 cycles ไม่ตรงกับการแปลง 100 ns / 0.25 ns และสมการที่ใช้ 400 cycles: ต้องตรวจสอบจากต้นฉบับ",
+    "ราคาหน่วยความจำและตัวอย่างระบบในสไลด์เป็นตัวอย่างตามเอกสาร ไม่ใช่ข้อมูลตลาดหรือสเปกปัจจุบัน",
+    "ตารางและแผนภาพที่มีข้อความหนาแน่นเก็บเป็นภาพขยายในแกลเลอรี เพื่ออ่านคู่กับสรุปที่ย่อแล้ว"
+  ],
+  "figures": [
+    {
+      "id": "fig-4",
+      "page": 4,
+      "file": "slide-004.png",
+      "title": "Principle of Locality · หน้า 4",
+      "caption": "สไลด์แสดง Principle of Locality สำหรับหัวข้อ Locality และ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 4)"
+    },
+    {
+      "id": "fig-5",
+      "page": 5,
+      "file": "slide-005.png",
+      "title": "Taking Advantage of locality · หน้า 5",
+      "caption": "สไลด์แสดง Taking Advantage of locality สำหรับหัวข้อ Locality และ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 5)"
+    },
+    {
+      "id": "fig-6",
+      "page": 6,
+      "file": "slide-006.png",
+      "title": "Memory Hierarchy · หน้า 6",
+      "caption": "สไลด์แสดง Memory Hierarchy สำหรับหัวข้อ Locality และ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 6)"
+    },
+    {
+      "id": "fig-7",
+      "page": 7,
+      "file": "slide-007.png",
+      "title": "Cache and Main Memory · หน้า 7",
+      "caption": "สไลด์แสดง Cache and Main Memory สำหรับหัวข้อ Locality และ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 7)"
+    },
+    {
+      "id": "fig-8",
+      "page": 8,
+      "file": "slide-008.png",
+      "title": "Memory Hierarchy Levels · หน้า 8",
+      "caption": "สไลด์แสดง Memory Hierarchy Levels สำหรับหัวข้อ Locality และ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 8)"
+    },
+    {
+      "id": "fig-9",
+      "page": 9,
+      "file": "slide-009.png",
+      "title": "Memory Technology · หน้า 9",
+      "caption": "สไลด์แสดง Memory Technology สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 9)"
+    },
+    {
+      "id": "fig-10",
+      "page": 10,
+      "file": "slide-010.png",
+      "title": "DRAM Technology · หน้า 10",
+      "caption": "สไลด์แสดง DRAM Technology สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 10)"
+    },
+    {
+      "id": "fig-11",
+      "page": 11,
+      "file": "slide-011.png",
+      "title": "Advanced DRAM Organization · หน้า 11",
+      "caption": "สไลด์แสดง Advanced DRAM Organization สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 11)"
+    },
+    {
+      "id": "fig-12",
+      "page": 12,
+      "file": "slide-012.png",
+      "title": "DRAM Generations · หน้า 12",
+      "caption": "สไลด์แสดง DRAM Generations สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 12)"
+    },
+    {
+      "id": "fig-13",
+      "page": 13,
+      "file": "slide-013.png",
+      "title": "DRAM Performance Factors · หน้า 13",
+      "caption": "สไลด์แสดง DRAM Performance Factors สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 13)"
+    },
+    {
+      "id": "fig-14",
+      "page": 14,
+      "file": "slide-014.png",
+      "title": "Increasing Memory Bandwidth · หน้า 14",
+      "caption": "สไลด์แสดง Increasing Memory Bandwidth สำหรับหัวข้อ SRAM, DRAM และเทคนิคเพิ่ม bandwidth (itds-211_comp_arch_Chapter04.pdf, หน้า 14)"
+    },
+    {
+      "id": "fig-15",
+      "page": 15,
+      "file": "slide-015.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 11 · หน้า 15",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 11 สำหรับหัวข้อ Flash: NOR, NAND และ wear leveling (itds-211_comp_arch_Chapter04.pdf, หน้า 15)"
+    },
+    {
+      "id": "fig-16",
+      "page": 16,
+      "file": "slide-016.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 12 · หน้า 16",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 12 สำหรับหัวข้อ Flash: NOR, NAND และ wear leveling (itds-211_comp_arch_Chapter04.pdf, หน้า 16)"
+    },
+    {
+      "id": "fig-17",
+      "page": 17,
+      "file": "slide-017.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 13 · หน้า 17",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 13 สำหรับหัวข้อ Disk sector และเวลาการเข้าถึง (itds-211_comp_arch_Chapter04.pdf, หน้า 17)"
+    },
+    {
+      "id": "fig-18",
+      "page": 18,
+      "file": "slide-018.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 14 · หน้า 18",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 14 สำหรับหัวข้อ Disk sector และเวลาการเข้าถึง (itds-211_comp_arch_Chapter04.pdf, หน้า 18)"
+    },
+    {
+      "id": "fig-19",
+      "page": 19,
+      "file": "slide-019.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 15 · หน้า 19",
+      "caption": "แผนภาพเวลา disk access และตัวอย่าง 15,000 rpm ที่สไลด์ประมาณ 6.2 ms (itds-211_comp_arch_Chapter04.pdf, หน้า 19)"
+    },
+    {
+      "id": "fig-20",
+      "page": 20,
+      "file": "slide-020.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 16 · หน้า 20",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 16 สำหรับหัวข้อ Disk sector และเวลาการเข้าถึง (itds-211_comp_arch_Chapter04.pdf, หน้า 20)"
+    },
+    {
+      "id": "fig-21",
+      "page": 21,
+      "file": "slide-021.png",
+      "title": "Cache Memory · หน้า 21",
+      "caption": "สไลด์แสดง Cache Memory สำหรับหัวข้อ Cache lookup, direct mapping, tag และ valid (itds-211_comp_arch_Chapter04.pdf, หน้า 21)"
+    },
+    {
+      "id": "fig-22",
+      "page": 22,
+      "file": "slide-022.png",
+      "title": "Elements of Cache Design · หน้า 22",
+      "caption": "สไลด์แสดง Elements of Cache Design สำหรับหัวข้อ Cache lookup, direct mapping, tag และ valid (itds-211_comp_arch_Chapter04.pdf, หน้า 22)"
+    },
+    {
+      "id": "fig-23",
+      "page": 23,
+      "file": "slide-023.png",
+      "title": "Direct Mapped Cache · หน้า 23",
+      "caption": "สไลด์แสดง Direct Mapped Cache สำหรับหัวข้อ Cache lookup, direct mapping, tag และ valid (itds-211_comp_arch_Chapter04.pdf, หน้า 23)"
+    },
+    {
+      "id": "fig-24",
+      "page": 24,
+      "file": "slide-024.png",
+      "title": "Tags and Valid Bits · หน้า 24",
+      "caption": "สไลด์แสดง Tags and Valid Bits สำหรับหัวข้อ Cache lookup, direct mapping, tag และ valid (itds-211_comp_arch_Chapter04.pdf, หน้า 24)"
+    },
+    {
+      "id": "fig-25",
+      "page": 25,
+      "file": "slide-025.png",
+      "title": "Cache Example · หน้า 25",
+      "caption": "สไลด์แสดง Cache Example สำหรับหัวข้อ ไล่สถานะ 8-block direct-mapped cache (itds-211_comp_arch_Chapter04.pdf, หน้า 25)"
+    },
+    {
+      "id": "fig-26",
+      "page": 26,
+      "file": "slide-026.png",
+      "title": "Cache Example · หน้า 26",
+      "caption": "สไลด์แสดง Cache Example สำหรับหัวข้อ ไล่สถานะ 8-block direct-mapped cache (itds-211_comp_arch_Chapter04.pdf, หน้า 26)"
+    },
+    {
+      "id": "fig-27",
+      "page": 27,
+      "file": "slide-027.png",
+      "title": "Cache Example · หน้า 27",
+      "caption": "สไลด์แสดง Cache Example สำหรับหัวข้อ ไล่สถานะ 8-block direct-mapped cache (itds-211_comp_arch_Chapter04.pdf, หน้า 27)"
+    },
+    {
+      "id": "fig-28",
+      "page": 28,
+      "file": "slide-028.png",
+      "title": "Cache Example · หน้า 28",
+      "caption": "สไลด์แสดง Cache Example สำหรับหัวข้อ ไล่สถานะ 8-block direct-mapped cache (itds-211_comp_arch_Chapter04.pdf, หน้า 28)"
+    },
+    {
+      "id": "fig-29",
+      "page": 29,
+      "file": "slide-029.png",
+      "title": "Cache Example · หน้า 29",
+      "caption": "ตารางไล่ direct-mapped cache จากลำดับการเข้าถึงในตัวอย่าง 8 blocks (itds-211_comp_arch_Chapter04.pdf, หน้า 29)"
+    },
+    {
+      "id": "fig-30",
+      "page": 30,
+      "file": "slide-030.png",
+      "title": "Cache Example · หน้า 30",
+      "caption": "ตารางสรุป hit/miss และ block ที่ถูกแทนในตัวอย่าง direct-mapped (itds-211_comp_arch_Chapter04.pdf, หน้า 30)"
+    },
+    {
+      "id": "fig-31",
+      "page": 31,
+      "file": "slide-031.png",
+      "title": "Address Subdivision · หน้า 31",
+      "caption": "สไลด์แสดง Address Subdivision สำหรับหัวข้อ Tag–Index–Offset และการคำนวณ block (itds-211_comp_arch_Chapter04.pdf, หน้า 31)"
+    },
+    {
+      "id": "fig-32",
+      "page": 32,
+      "file": "slide-032.png",
+      "title": "Example: Larger Block Size · หน้า 32",
+      "caption": "ภาพแบ่ง Tag–Index–Offset ของ address; เลข bit สูงสุดกับผลรวมช่องไม่ตรงกัน: ต้องตรวจสอบจากต้นฉบับ (itds-211_comp_arch_Chapter04.pdf, หน้า 32)"
+    },
+    {
+      "id": "fig-33",
+      "page": 33,
+      "file": "slide-033.png",
+      "title": "Block Size Considerations · หน้า 33",
+      "caption": "สไลด์แสดง Block Size Considerations สำหรับหัวข้อ ขนาด block กับการจัดการ cache miss (itds-211_comp_arch_Chapter04.pdf, หน้า 33)"
+    },
+    {
+      "id": "fig-34",
+      "page": 34,
+      "file": "slide-034.png",
+      "title": "Cache Misses · หน้า 34",
+      "caption": "สไลด์แสดง Cache Misses สำหรับหัวข้อ ขนาด block กับการจัดการ cache miss (itds-211_comp_arch_Chapter04.pdf, หน้า 34)"
+    },
+    {
+      "id": "fig-35",
+      "page": 35,
+      "file": "slide-035.png",
+      "title": "Write-Through · หน้า 35",
+      "caption": "สไลด์แสดง Write-Through สำหรับหัวข้อ Write-through, write-back และ write miss (itds-211_comp_arch_Chapter04.pdf, หน้า 35)"
+    },
+    {
+      "id": "fig-36",
+      "page": 36,
+      "file": "slide-036.png",
+      "title": "Write-Back · หน้า 36",
+      "caption": "สไลด์แสดง Write-Back สำหรับหัวข้อ Write-through, write-back และ write miss (itds-211_comp_arch_Chapter04.pdf, หน้า 36)"
+    },
+    {
+      "id": "fig-37",
+      "page": 37,
+      "file": "slide-037.png",
+      "title": "Write Allocation · หน้า 37",
+      "caption": "สไลด์แสดง Write Allocation สำหรับหัวข้อ Write-through, write-back และ write miss (itds-211_comp_arch_Chapter04.pdf, หน้า 37)"
+    },
+    {
+      "id": "fig-38",
+      "page": 38,
+      "file": "slide-038.png",
+      "title": "Example: Intrinsity FastMATH · หน้า 38",
+      "caption": "สไลด์แสดง Example: Intrinsity FastMATH สำหรับหัวข้อ Split cache และ main memory ที่รองรับ cache (itds-211_comp_arch_Chapter04.pdf, หน้า 38)"
+    },
+    {
+      "id": "fig-39",
+      "page": 39,
+      "file": "slide-039.png",
+      "title": "Example: Intrinsity FastMATH · หน้า 39",
+      "caption": "สไลด์แสดง Example: Intrinsity FastMATH สำหรับหัวข้อ Split cache และ main memory ที่รองรับ cache (itds-211_comp_arch_Chapter04.pdf, หน้า 39)"
+    },
+    {
+      "id": "fig-40",
+      "page": 40,
+      "file": "slide-040.png",
+      "title": "Main Memory Supporting Caches · หน้า 40",
+      "caption": "สไลด์แสดง Main Memory Supporting Caches สำหรับหัวข้อ Split cache และ main memory ที่รองรับ cache (itds-211_comp_arch_Chapter04.pdf, หน้า 40)"
+    },
+    {
+      "id": "fig-41",
+      "page": 41,
+      "file": "slide-041.png",
+      "title": "Measuring Cache Performance · หน้า 41",
+      "caption": "ตัวอย่าง memory stall cycles และ CPI จาก instruction mix (itds-211_comp_arch_Chapter04.pdf, หน้า 41)"
+    },
+    {
+      "id": "fig-42",
+      "page": 42,
+      "file": "slide-042.png",
+      "title": "Cache Performance Example · หน้า 42",
+      "caption": "ตัวอย่าง CPI เปรียบการลด miss rate และ miss penalty (itds-211_comp_arch_Chapter04.pdf, หน้า 42)"
+    },
+    {
+      "id": "fig-43",
+      "page": 43,
+      "file": "slide-043.png",
+      "title": "Average Access Time · หน้า 43",
+      "caption": "สูตร Average Memory Access Time (AMAT) และตัวอย่าง (itds-211_comp_arch_Chapter04.pdf, หน้า 43)"
+    },
+    {
+      "id": "fig-44",
+      "page": 44,
+      "file": "slide-044.png",
+      "title": "Performance Summary · หน้า 44",
+      "caption": "สไลด์แสดง Performance Summary สำหรับหัวข้อ Memory stall CPI และ AMAT (itds-211_comp_arch_Chapter04.pdf, หน้า 44)"
+    },
+    {
+      "id": "fig-45",
+      "page": 45,
+      "file": "slide-045.png",
+      "title": "Associative Caches · หน้า 45",
+      "caption": "สไลด์แสดง Associative Caches สำหรับหัวข้อ Direct, n-way และ fully associative (itds-211_comp_arch_Chapter04.pdf, หน้า 45)"
+    },
+    {
+      "id": "fig-46",
+      "page": 46,
+      "file": "slide-046.png",
+      "title": "Associative Cache Example · หน้า 46",
+      "caption": "สไลด์แสดง Associative Cache Example สำหรับหัวข้อ Direct, n-way และ fully associative (itds-211_comp_arch_Chapter04.pdf, หน้า 46)"
+    },
+    {
+      "id": "fig-47",
+      "page": 47,
+      "file": "slide-047.png",
+      "title": "Spectrum of Associativity · หน้า 47",
+      "caption": "สไลด์แสดง Spectrum of Associativity สำหรับหัวข้อ Direct, n-way และ fully associative (itds-211_comp_arch_Chapter04.pdf, หน้า 47)"
+    },
+    {
+      "id": "fig-48",
+      "page": 48,
+      "file": "slide-048.png",
+      "title": "Associativity Example · หน้า 48",
+      "caption": "ตาราง direct-mapped cache สำหรับลำดับ 0,8,0,6,8 (itds-211_comp_arch_Chapter04.pdf, หน้า 48)"
+    },
+    {
+      "id": "fig-49",
+      "page": 49,
+      "file": "slide-049.png",
+      "title": "Associativity Example · หน้า 49",
+      "caption": "ตารางเทียบ 2-way กับ fully associative สำหรับลำดับเดียวกัน (itds-211_comp_arch_Chapter04.pdf, หน้า 49)"
+    },
+    {
+      "id": "fig-50",
+      "page": 50,
+      "file": "slide-050.png",
+      "title": "How Much Associativity · หน้า 50",
+      "caption": "สไลด์แสดง How Much Associativity สำหรับหัวข้อ ตัวอย่าง access 0, 8, 0, 6, 8 (itds-211_comp_arch_Chapter04.pdf, หน้า 50)"
+    },
+    {
+      "id": "fig-51",
+      "page": 51,
+      "file": "slide-051.png",
+      "title": "Set Associative Cache Organization · หน้า 51",
+      "caption": "สไลด์แสดง Set Associative Cache Organization สำหรับหัวข้อ Replacement policy: LRU และ Random (itds-211_comp_arch_Chapter04.pdf, หน้า 51)"
+    },
+    {
+      "id": "fig-52",
+      "page": 52,
+      "file": "slide-052.png",
+      "title": "Replacement Policy · หน้า 52",
+      "caption": "สไลด์แสดง Replacement Policy สำหรับหัวข้อ Replacement policy: LRU และ Random (itds-211_comp_arch_Chapter04.pdf, หน้า 52)"
+    },
+    {
+      "id": "fig-53",
+      "page": 53,
+      "file": "slide-053.png",
+      "title": "Multilevel Caches · หน้า 53",
+      "caption": "สไลด์แสดง Multilevel Caches สำหรับหัวข้อ L1/L2 และตัวอย่าง CPI หลายระดับ (itds-211_comp_arch_Chapter04.pdf, หน้า 53)"
+    },
+    {
+      "id": "fig-54",
+      "page": 54,
+      "file": "slide-054.png",
+      "title": "Multilevel Cache Example · หน้า 54",
+      "caption": "สไลด์แสดง Multilevel Cache Example สำหรับหัวข้อ L1/L2 และตัวอย่าง CPI หลายระดับ (itds-211_comp_arch_Chapter04.pdf, หน้า 54)"
+    },
+    {
+      "id": "fig-55",
+      "page": 55,
+      "file": "slide-055.png",
+      "title": "Example (cont.) · หน้า 55",
+      "caption": "ตัวอย่าง L1/L2: ข้อความ extra penalty 500 cycles ไม่ตรงกับสมการที่ใช้ 400 cycles: ต้องตรวจสอบจากต้นฉบับ (itds-211_comp_arch_Chapter04.pdf, หน้า 55)"
+    },
+    {
+      "id": "fig-56",
+      "page": 56,
+      "file": "slide-056.png",
+      "title": "Multilevel Cache Considerations · หน้า 56",
+      "caption": "สไลด์แสดง Multilevel Cache Considerations สำหรับหัวข้อ L1/L2 และตัวอย่าง CPI หลายระดับ (itds-211_comp_arch_Chapter04.pdf, หน้า 56)"
+    },
+    {
+      "id": "fig-57",
+      "page": 57,
+      "file": "slide-057.png",
+      "title": "Interactions with Advanced CPUs · หน้า 57",
+      "caption": "สไลด์แสดง Interactions with Advanced CPUs สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 57)"
+    },
+    {
+      "id": "fig-58",
+      "page": 58,
+      "file": "slide-058.png",
+      "title": "Interactions with Software · หน้า 58",
+      "caption": "สไลด์แสดง Interactions with Software สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 58)"
+    },
+    {
+      "id": "fig-59",
+      "page": 59,
+      "file": "slide-059.png",
+      "title": "Software Optimization via Blocking · หน้า 59",
+      "caption": "สไลด์แสดง Software Optimization via Blocking สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 59)"
+    },
+    {
+      "id": "fig-60",
+      "page": 60,
+      "file": "slide-060.png",
+      "title": "DGEMM Access Pattern · หน้า 60",
+      "caption": "สไลด์แสดง DGEMM Access Pattern สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 60)"
+    },
+    {
+      "id": "fig-61",
+      "page": 61,
+      "file": "slide-061.png",
+      "title": "Cache Blocked DGEMM · หน้า 61",
+      "caption": "สไลด์แสดง Cache Blocked DGEMM สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 61)"
+    },
+    {
+      "id": "fig-62",
+      "page": 62,
+      "file": "slide-062.png",
+      "title": "Blocked DGEMM Access Pattern · หน้า 62",
+      "caption": "สไลด์แสดง Blocked DGEMM Access Pattern สำหรับหัวข้อ Advanced CPU, locality ของ software และ blocking (itds-211_comp_arch_Chapter04.pdf, หน้า 62)"
+    },
+    {
+      "id": "fig-63",
+      "page": 63,
+      "file": "slide-063.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 58 · หน้า 63",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 58 สำหรับหัวข้อ Dependability: MTTF, MTTR, MTBF, Availability (itds-211_comp_arch_Chapter04.pdf, หน้า 63)"
+    },
+    {
+      "id": "fig-64",
+      "page": 64,
+      "file": "slide-064.png",
+      "title": "Chapter 6 — Storage and Other I/O Topics — 59 · หน้า 64",
+      "caption": "สไลด์แสดง Chapter 6 — Storage and Other I/O Topics — 59 สำหรับหัวข้อ Dependability: MTTF, MTTR, MTBF, Availability (itds-211_comp_arch_Chapter04.pdf, หน้า 64)"
+    },
+    {
+      "id": "fig-65",
+      "page": 65,
+      "file": "slide-065.png",
+      "title": "The Hamming SEC Code · หน้า 65",
+      "caption": "แผนภาพ Hamming code เพิ่ม parity bits เพื่อแก้ single-bit error (itds-211_comp_arch_Chapter04.pdf, หน้า 65)"
+    },
+    {
+      "id": "fig-66",
+      "page": 66,
+      "file": "slide-066.png",
+      "title": "Encoding SEC · หน้า 66",
+      "caption": "สไลด์แสดง Encoding SEC สำหรับหัวข้อ Hamming SEC และ SEC/DEC (itds-211_comp_arch_Chapter04.pdf, หน้า 66)"
+    },
+    {
+      "id": "fig-67",
+      "page": 67,
+      "file": "slide-067.png",
+      "title": "Decoding SEC · หน้า 67",
+      "caption": "สไลด์แสดง Decoding SEC สำหรับหัวข้อ Hamming SEC และ SEC/DEC (itds-211_comp_arch_Chapter04.pdf, หน้า 67)"
+    },
+    {
+      "id": "fig-68",
+      "page": 68,
+      "file": "slide-068.png",
+      "title": "SEC/DEC Code · หน้า 68",
+      "caption": "ตาราง syndrome และ parity สำหรับ SEC/DEC; ไม่มีตัวอย่างครบทุกบิตในหน้านี้ (itds-211_comp_arch_Chapter04.pdf, หน้า 68)"
+    },
+    {
+      "id": "fig-69",
+      "page": 69,
+      "file": "slide-069.png",
+      "title": "Virtual Machines · หน้า 69",
+      "caption": "สไลด์แสดง Virtual Machines สำหรับหัวข้อ Virtual Machines, VMM และ privileged support (itds-211_comp_arch_Chapter04.pdf, หน้า 69)"
+    },
+    {
+      "id": "fig-70",
+      "page": 70,
+      "file": "slide-070.png",
+      "title": "Virtual Machine Monitor · หน้า 70",
+      "caption": "สไลด์แสดง Virtual Machine Monitor สำหรับหัวข้อ Virtual Machines, VMM และ privileged support (itds-211_comp_arch_Chapter04.pdf, หน้า 70)"
+    },
+    {
+      "id": "fig-71",
+      "page": 71,
+      "file": "slide-071.png",
+      "title": "Example: Timer Virtualization · หน้า 71",
+      "caption": "สไลด์แสดง Example: Timer Virtualization สำหรับหัวข้อ Virtual Machines, VMM และ privileged support (itds-211_comp_arch_Chapter04.pdf, หน้า 71)"
+    },
+    {
+      "id": "fig-72",
+      "page": 72,
+      "file": "slide-072.png",
+      "title": "Instruction Set Support · หน้า 72",
+      "caption": "สไลด์แสดง Instruction Set Support สำหรับหัวข้อ Virtual Machines, VMM และ privileged support (itds-211_comp_arch_Chapter04.pdf, หน้า 72)"
+    },
+    {
+      "id": "fig-73",
+      "page": 73,
+      "file": "slide-073.png",
+      "title": "Virtual Memory · หน้า 73",
+      "caption": "สไลด์แสดง Virtual Memory สำหรับหัวข้อ Virtual Memory, address translation และ page fault (itds-211_comp_arch_Chapter04.pdf, หน้า 73)"
+    },
+    {
+      "id": "fig-74",
+      "page": 74,
+      "file": "slide-074.png",
+      "title": "Address Translation · หน้า 74",
+      "caption": "ภาพแปล virtual address เป็น physical address โดยคง page offset (itds-211_comp_arch_Chapter04.pdf, หน้า 74)"
+    },
+    {
+      "id": "fig-75",
+      "page": 75,
+      "file": "slide-075.png",
+      "title": "Page Fault Penalty · หน้า 75",
+      "caption": "สไลด์แสดง Page Fault Penalty สำหรับหัวข้อ Virtual Memory, address translation และ page fault (itds-211_comp_arch_Chapter04.pdf, หน้า 75)"
+    },
+    {
+      "id": "fig-76",
+      "page": 76,
+      "file": "slide-076.png",
+      "title": "Page Tables · หน้า 76",
+      "caption": "สไลด์แสดง Page Tables สำหรับหัวข้อ Page table, PTE และ replacement/write-back (itds-211_comp_arch_Chapter04.pdf, หน้า 76)"
+    },
+    {
+      "id": "fig-77",
+      "page": 77,
+      "file": "slide-077.png",
+      "title": "Translation Using a Page Table · หน้า 77",
+      "caption": "แผนภาพ Virtual Page Number, page table และ Physical Page Number (itds-211_comp_arch_Chapter04.pdf, หน้า 77)"
+    },
+    {
+      "id": "fig-78",
+      "page": 78,
+      "file": "slide-078.png",
+      "title": "Mapping Pages to Storage · หน้า 78",
+      "caption": "สไลด์แสดง Mapping Pages to Storage สำหรับหัวข้อ Page table, PTE และ replacement/write-back (itds-211_comp_arch_Chapter04.pdf, หน้า 78)"
+    },
+    {
+      "id": "fig-79",
+      "page": 79,
+      "file": "slide-079.png",
+      "title": "Replacement and Writes · หน้า 79",
+      "caption": "สไลด์แสดง Replacement and Writes สำหรับหัวข้อ Page table, PTE และ replacement/write-back (itds-211_comp_arch_Chapter04.pdf, หน้า 79)"
+    },
+    {
+      "id": "fig-80",
+      "page": 80,
+      "file": "slide-080.png",
+      "title": "Fast Translation Using a TLB · หน้า 80",
+      "caption": "สไลด์แสดง Fast Translation Using a TLB สำหรับหัวข้อ TLB lookup, miss handler และ page fault handler (itds-211_comp_arch_Chapter04.pdf, หน้า 80)"
+    },
+    {
+      "id": "fig-81",
+      "page": 81,
+      "file": "slide-081.png",
+      "title": "Fast Translation Using a TLB · หน้า 81",
+      "caption": "ลำดับ TLB hit/miss กับ page table และ page fault (itds-211_comp_arch_Chapter04.pdf, หน้า 81)"
+    },
+    {
+      "id": "fig-82",
+      "page": 82,
+      "file": "slide-082.png",
+      "title": "TLB Misses · หน้า 82",
+      "caption": "สไลด์แสดง TLB Misses สำหรับหัวข้อ TLB lookup, miss handler และ page fault handler (itds-211_comp_arch_Chapter04.pdf, หน้า 82)"
+    },
+    {
+      "id": "fig-83",
+      "page": 83,
+      "file": "slide-083.png",
+      "title": "TLB Miss Handler · หน้า 83",
+      "caption": "สไลด์แสดง TLB Miss Handler สำหรับหัวข้อ TLB lookup, miss handler และ page fault handler (itds-211_comp_arch_Chapter04.pdf, หน้า 83)"
+    },
+    {
+      "id": "fig-84",
+      "page": 84,
+      "file": "slide-084.png",
+      "title": "Page Fault Handler · หน้า 84",
+      "caption": "สไลด์แสดง Page Fault Handler สำหรับหัวข้อ TLB lookup, miss handler และ page fault handler (itds-211_comp_arch_Chapter04.pdf, หน้า 84)"
+    },
+    {
+      "id": "fig-85",
+      "page": 85,
+      "file": "slide-085.png",
+      "title": "TLB and Cache Interaction · หน้า 85",
+      "caption": "สไลด์แสดง TLB and Cache Interaction สำหรับหัวข้อ TLB/Cache interaction และ Memory Protection (itds-211_comp_arch_Chapter04.pdf, หน้า 85)"
+    },
+    {
+      "id": "fig-86",
+      "page": 86,
+      "file": "slide-086.png",
+      "title": "Memory Protection · หน้า 86",
+      "caption": "สไลด์แสดง Memory Protection สำหรับหัวข้อ TLB/Cache interaction และ Memory Protection (itds-211_comp_arch_Chapter04.pdf, หน้า 86)"
+    },
+    {
+      "id": "fig-87",
+      "page": 87,
+      "file": "slide-087.png",
+      "title": "The Memory Hierarchy · หน้า 87",
+      "caption": "สไลด์แสดง The Memory Hierarchy สำหรับหัวข้อ กรอบร่วมของ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 87)"
+    },
+    {
+      "id": "fig-88",
+      "page": 88,
+      "file": "slide-088.png",
+      "title": "Block Placement · หน้า 88",
+      "caption": "สไลด์แสดง Block Placement สำหรับหัวข้อ กรอบร่วมของ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 88)"
+    },
+    {
+      "id": "fig-89",
+      "page": 89,
+      "file": "slide-089.png",
+      "title": "Finding a Block · หน้า 89",
+      "caption": "สไลด์แสดง Finding a Block สำหรับหัวข้อ กรอบร่วมของ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 89)"
+    },
+    {
+      "id": "fig-90",
+      "page": 90,
+      "file": "slide-090.png",
+      "title": "Replacement · หน้า 90",
+      "caption": "สไลด์แสดง Replacement สำหรับหัวข้อ กรอบร่วมของ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 90)"
+    },
+    {
+      "id": "fig-91",
+      "page": 91,
+      "file": "slide-091.png",
+      "title": "Write Policy · หน้า 91",
+      "caption": "สไลด์แสดง Write Policy สำหรับหัวข้อ กรอบร่วมของ Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 91)"
+    },
+    {
+      "id": "fig-92",
+      "page": 92,
+      "file": "slide-092.png",
+      "title": "Sources of Misses · หน้า 92",
+      "caption": "สไลด์แสดง Sources of Misses สำหรับหัวข้อ Compulsory, Capacity, Conflict miss และ trade-offs (itds-211_comp_arch_Chapter04.pdf, หน้า 92)"
+    },
+    {
+      "id": "fig-93",
+      "page": 93,
+      "file": "slide-093.png",
+      "title": "Cache Design Trade-offs · หน้า 93",
+      "caption": "สไลด์แสดง Cache Design Trade-offs สำหรับหัวข้อ Compulsory, Capacity, Conflict miss และ trade-offs (itds-211_comp_arch_Chapter04.pdf, หน้า 93)"
+    },
+    {
+      "id": "fig-94",
+      "page": 94,
+      "file": "slide-094.png",
+      "title": "Cache Control · หน้า 94",
+      "caption": "ตัวอย่าง cache 16 KB, block 16 B, address 32 บิต และ field tag/index/offset (itds-211_comp_arch_Chapter04.pdf, หน้า 94)"
+    },
+    {
+      "id": "fig-95",
+      "page": 95,
+      "file": "slide-095.png",
+      "title": "Interface Signals · หน้า 95",
+      "caption": "สไลด์แสดง Interface Signals สำหรับหัวข้อ Cache Controller ด้วย Finite State Machine (itds-211_comp_arch_Chapter04.pdf, หน้า 95)"
+    },
+    {
+      "id": "fig-96",
+      "page": 96,
+      "file": "slide-096.png",
+      "title": "Finite State Machines · หน้า 96",
+      "caption": "สไลด์แสดง Finite State Machines สำหรับหัวข้อ Cache Controller ด้วย Finite State Machine (itds-211_comp_arch_Chapter04.pdf, หน้า 96)"
+    },
+    {
+      "id": "fig-97",
+      "page": 97,
+      "file": "slide-097.png",
+      "title": "Cache Controller FSM · หน้า 97",
+      "caption": "แผนภาพสถานะ FSM ของ cache controller (itds-211_comp_arch_Chapter04.pdf, หน้า 97)"
+    },
+    {
+      "id": "fig-98",
+      "page": 98,
+      "file": "slide-098.png",
+      "title": "Cache Coherence Problem · หน้า 98",
+      "caption": "ตารางสอง CPU core แสดงสำเนา X ใน cache ที่อาจไม่ตรงกัน (itds-211_comp_arch_Chapter04.pdf, หน้า 98)"
+    },
+    {
+      "id": "fig-99",
+      "page": 99,
+      "file": "slide-099.png",
+      "title": "Coherence Defined · หน้า 99",
+      "caption": "สไลด์แสดง Coherence Defined สำหรับหัวข้อ Cache Coherence และ invalidating snooping (itds-211_comp_arch_Chapter04.pdf, หน้า 99)"
+    },
+    {
+      "id": "fig-100",
+      "page": 100,
+      "file": "slide-100.png",
+      "title": "Cache Coherence Protocols · หน้า 100",
+      "caption": "สไลด์แสดง Cache Coherence Protocols สำหรับหัวข้อ Cache Coherence และ invalidating snooping (itds-211_comp_arch_Chapter04.pdf, หน้า 100)"
+    },
+    {
+      "id": "fig-101",
+      "page": 101,
+      "file": "slide-101.png",
+      "title": "Invalidating Snooping Protocols · หน้า 101",
+      "caption": "ตาราง invalidating snooping หลัง CPU A เขียน X แล้ว CPU B อ่านซ้ำ (itds-211_comp_arch_Chapter04.pdf, หน้า 101)"
+    },
+    {
+      "id": "fig-102",
+      "page": 102,
+      "file": "slide-102.png",
+      "title": "Memory Consistency · หน้า 102",
+      "caption": "สไลด์แสดง Memory Consistency สำหรับหัวข้อ Memory Consistency และลำดับการมองเห็น writes (itds-211_comp_arch_Chapter04.pdf, หน้า 102)"
+    },
+    {
+      "id": "fig-103",
+      "page": 103,
+      "file": "slide-103.png",
+      "title": "Multilevel On-Chip Caches · หน้า 103",
+      "caption": "ภาพลำดับ cache ของ ARM Cortex-A53 และ Intel Core i7 (itds-211_comp_arch_Chapter04.pdf, หน้า 103)"
+    },
+    {
+      "id": "fig-104",
+      "page": 104,
+      "file": "slide-104.png",
+      "title": "2-Level TLB Organization · หน้า 104",
+      "caption": "ภาพการจัด TLB สองระดับของระบบตัวอย่าง (itds-211_comp_arch_Chapter04.pdf, หน้า 104)"
+    },
+    {
+      "id": "fig-105",
+      "page": 105,
+      "file": "slide-105.png",
+      "title": "Supporting Multiple Issue · หน้า 105",
+      "caption": "สไลด์แสดง Supporting Multiple Issue สำหรับหัวข้อ ARM/Intel cache, 2-level TLB และ system instructions (itds-211_comp_arch_Chapter04.pdf, หน้า 105)"
+    },
+    {
+      "id": "fig-106",
+      "page": 106,
+      "file": "slide-106.png",
+      "title": "RISC-V System Instructions · หน้า 106",
+      "caption": "สไลด์แสดง RISC-V System Instructions สำหรับหัวข้อ ARM/Intel cache, 2-level TLB และ system instructions (itds-211_comp_arch_Chapter04.pdf, หน้า 106)"
+    },
+    {
+      "id": "fig-107",
+      "page": 107,
+      "file": "slide-107.png",
+      "title": "DGEMM · หน้า 107",
+      "caption": "ภาพ DGEMM ที่รวม cache blocking กับ subword parallelism (itds-211_comp_arch_Chapter04.pdf, หน้า 107)"
+    },
+    {
+      "id": "fig-108",
+      "page": 108,
+      "file": "slide-108.png",
+      "title": "Pitfalls · หน้า 108",
+      "caption": "ตัวอย่าง byte 36 กับ word 36 map ไป cache block ต่างกัน (itds-211_comp_arch_Chapter04.pdf, หน้า 108)"
+    },
+    {
+      "id": "fig-109",
+      "page": 109,
+      "file": "slide-109.png",
+      "title": "Pitfalls · หน้า 109",
+      "caption": "สไลด์แสดง Pitfalls สำหรับหัวข้อ Pitfalls และข้อสรุป Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 109)"
+    },
+    {
+      "id": "fig-110",
+      "page": 110,
+      "file": "slide-110.png",
+      "title": "Pitfalls · หน้า 110",
+      "caption": "สไลด์แสดง Pitfalls สำหรับหัวข้อ Pitfalls และข้อสรุป Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 110)"
+    },
+    {
+      "id": "fig-111",
+      "page": 111,
+      "file": "slide-111.png",
+      "title": "Concluding Remarks · หน้า 111",
+      "caption": "สไลด์แสดง Concluding Remarks สำหรับหัวข้อ Pitfalls และข้อสรุป Memory Hierarchy (itds-211_comp_arch_Chapter04.pdf, หน้า 111)"
+    }
+  ],
+  "topics": [
+    {
+      "id": "locality-hierarchy",
+      "title": "Locality และ Memory Hierarchy",
+      "level": "core",
+      "pages": "หน้า 3–8",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "โปรแกรมใช้เพียงส่วนเล็กของ address space ในแต่ละช่วงเวลา จึงเกิด temporal locality และ spatial locality. ลำดับชั้นหน่วยความจำอาศัยการคัดลอกข้อมูลที่ใช้ล่าสุดหรืออยู่ใกล้กันจาก disk สู่ DRAM แล้วสู่ SRAM cache; การพบข้อมูลระดับบนคือ hit มิฉะนั้นต้องย้าย block ขึ้นมาและเกิด miss penalty.",
+      "remember": [
+        "Temporal: สิ่งที่ใช้ไม่นานมักถูกใช้ซ้ำ; Spatial: สิ่งที่อยู่ใกล้กันมักถูกใช้ต่อ (หน้า 4)",
+        "Disk → main memory/DRAM → cache/SRAM ใกล้ CPU (หน้า 5–7)",
+        "Block/line เป็นหน่วยคัดลอก; hit ratio=hits/accesses; miss ratio=1−hit ratio (หน้า 8)"
+      ],
+      "terms": [
+        "temporal locality",
+        "spatial locality",
+        "block/line",
+        "hit/miss ratio",
+        "miss penalty"
+      ],
+      "example": "สไลด์ยก loop/induction variables สำหรับ temporal และ sequential instructions/array data สำหรับ spatial (หน้า 4)",
+      "confusion": "hit หมายถึงพบที่ระดับบน ณ การเข้าถึงครั้งนั้น; miss แล้วจึงคัดลอก block จากระดับล่าง ไม่ใช่เพิ่มข้อมูลทีละ byte เสมอ",
+      "mnemonic": "ใช้ซ้ำเร็ว = temporal; ใช้ข้างกัน = spatial; ย้ายเป็น block",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "สิ่งที่เพิ่งใช้มีแนวโน้มใช้ซ้ำเป็น locality แบบใด?",
+          "options": [
+            "Temporal",
+            "Spatial",
+            "Write-back",
+            "Fully associative"
+          ],
+          "correct": 0,
+          "answer": "Temporal locality",
+          "pages": "หน้า 3–8"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "miss ratio สัมพันธ์กับ hit ratio อย่างไร?",
+          "answer": "miss ratio = 1 − hit ratio",
+          "pages": "หน้า 3–8"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หลังเกิด miss ข้อมูลถูกนำขึ้นมาในหน่วยใด?",
+          "answer": "block หรือ line จากระดับล่างขึ้นระดับบน",
+          "pages": "หน้า 3–8"
+        }
+      ],
+      "figures": [
+        "fig-4",
+        "fig-5",
+        "fig-6",
+        "fig-7",
+        "fig-8"
+      ]
+    },
+    {
+      "id": "memory-technology",
+      "title": "SRAM, DRAM และเทคนิคเพิ่ม bandwidth",
+      "level": "core",
+      "pages": "หน้า 9–14",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "สไลด์เปรียบ SRAM, DRAM และ magnetic disk ตามเวลาเข้าถึง ความจุ และต้นทุนในบริบทตัวอย่าง. DRAM เก็บประจุใน capacitor จึงต้อง refresh; การจัดแถว row, burst, DDR/QDR และ banking ช่วยการส่งข้อมูลต่อเนื่องหรือพร้อมกัน. ภาพหน้า 14 เปรียบ memory หนึ่ง word, 4-word wide และ 4-bank interleaved ด้วยจำนวน bus cycles.",
+      "remember": [
+        "ตัวเลขหน้า 9 เป็นค่าตัวอย่างในสไลด์: SRAM 0.5–2.5ns; DRAM 50–70ns; disk 5–20ms",
+        "DRAM read/refresh เป็นระดับ row; burst ส่งคำต่อเนื่อง; DDR ส่งบนขอบขึ้นและลง (หน้า 10–13)",
+        "ตัวอย่างหน้า 14: 4-word wide 17 cycles/0.94 B-cycle; 4-bank interleaved 20 cycles/0.8 B-cycle"
+      ],
+      "terms": [
+        "SRAM",
+        "DRAM",
+        "refresh",
+        "row buffer",
+        "burst",
+        "DDR/QDR",
+        "banking"
+      ],
+      "example": "หน้า 14 คำนวณ 16/17≈0.94 B/cycle และ 16/20=0.8 B/cycle ตามสมมติฐานในภาพ",
+      "confusion": "ห้ามนำตัวเลขเวลา/ราคา/DRAM generations หน้า 9,12 ไปอ้างเป็นข้อมูลปัจจุบัน; เป็นตัวอย่างในเอกสาร",
+      "mnemonic": "DRAM ต้อง refresh; row/burst/bank ช่วยส่งข้อมูล",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "DRAM ต้องทำอะไรเป็นระยะตามหน้า 10?",
+          "options": [
+            "Refresh",
+            "Invalidate",
+            "Page fault",
+            "Write-around"
+          ],
+          "correct": 0,
+          "answer": "Refresh",
+          "pages": "หน้า 9–14"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "DDR ต่างจากการส่งหนึ่งขอบสัญญาณอย่างไร?",
+          "answer": "ส่งข้อมูลทั้ง rising และ falling clock edges",
+          "pages": "หน้า 9–14"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "ตัวอย่าง 4-word wide หน้า 14 มี bandwidth เท่าไร?",
+          "answer": "16 bytes/17 cycles≈0.94 B/cycle",
+          "pages": "หน้า 9–14"
+        }
+      ],
+      "figures": [
+        "fig-9",
+        "fig-10",
+        "fig-11",
+        "fig-12",
+        "fig-13",
+        "fig-14"
+      ]
+    },
+    {
+      "id": "flash-storage",
+      "title": "Flash: NOR, NAND และ wear leveling",
+      "level": "important",
+      "pages": "หน้า 15–16",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "Flash เป็น nonvolatile semiconductor storage ที่สไลด์เปรียบกับ disk. NOR เน้น random access และตัวอย่าง instruction memory ใน embedded system; NAND หนาแน่นกว่าและเข้าถึงเป็น block. การเขียนซ้ำทำให้เสื่อม จึงมี wear leveling กระจายการใช้งาน block.",
+      "remember": [
+        "Flash ไม่หายเมื่อปิดไฟตามคำว่า nonvolatile (หน้า 15)",
+        "NOR: random read/write; NAND: denser, block-at-a-time และใช้กับ USB/media storage (หน้า 16)",
+        "Wear leveling remap ไปยัง block ที่ถูกใช้น้อย (หน้า 16)"
+      ],
+      "terms": [
+        "nonvolatile",
+        "NOR flash",
+        "NAND flash",
+        "wear leveling"
+      ],
+      "example": "จับคู่ NOR กับ instruction memory embedded และ NAND กับ USB/media storage ตามหน้า 16",
+      "confusion": "ตัวเลขความเร็ว/ราคา/อายุการเขียนหน้า 15–16 เป็นบริบทของสไลด์ ไม่ใช่สเปกปัจจุบันทุกอุปกรณ์",
+      "mnemonic": "NOR อ่านสุ่ม; NAND อ่านเป็น block; สึกแล้วกระจายเขียน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Flash ประเภทใดในสไลด์หนาแน่นและเข้าถึงเป็น block?",
+          "options": [
+            "NAND",
+            "NOR",
+            "DRAM",
+            "SRAM"
+          ],
+          "correct": 0,
+          "answer": "NAND",
+          "pages": "หน้า 15–16"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "wear leveling ทำอะไร?",
+          "answer": "ย้าย/กระจายข้อมูลไป block ที่ใช้น้อยเพื่อลดการสึกเฉพาะจุด",
+          "pages": "หน้า 15–16"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Flash หน้า 15 ต่างจาก DRAM ด้านการคงข้อมูลอย่างไร?",
+          "answer": "Flash เป็น nonvolatile; DRAM เก็บประจุและต้อง refresh ตามหน้า 10",
+          "pages": "หน้า 15–16"
+        }
+      ],
+      "figures": [
+        "fig-15",
+        "fig-16"
+      ]
+    },
+    {
+      "id": "disk-access",
+      "title": "Disk sector และเวลาการเข้าถึง",
+      "level": "core",
+      "pages": "หน้า 17–20",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Disk เป็น nonvolatile rotating magnetic storage; sector มีรหัสระบุ ข้อมูล ECC และส่วนช่วยซิงโครไนซ์. เวลาการเข้าถึงหนึ่ง sector รวม queue, seek, rotational latency, transfer และ controller overhead. ตัวอย่าง 15,000 rpm/512B ให้เวลาอ่านเฉลี่ยประมาณ 6.2ms โดยเวลา seek เป็นส่วนสำคัญ.",
+      "remember": [
+        "องค์ประกอบการเข้าถึง: queue, seek, rotation, transfer, controller (หน้า 18)",
+        "ตัวอย่างหน้า 19: 4ms seek +2ms rotation +0.005ms transfer +0.2ms controller ≈6.2ms",
+        "ถ้า actual average seek 1ms สไลด์ให้ average read 3.2ms (หน้า 19)"
+      ],
+      "terms": [
+        "sector",
+        "seek",
+        "rotational latency",
+        "transfer time",
+        "controller overhead",
+        "disk cache"
+      ],
+      "example": "½ revolution /(15000/60 revolutions/s)=2ms rotational latency ตามหน้า 19",
+      "confusion": "ค่า 6.2ms เป็นการปัดจาก 6.205ms และสมมติ disk idle; หน้า 20 ระบุ locality/OS scheduling ทำให้ seek จริงต่างจากค่าเฉลี่ยผู้ผลิต",
+      "mnemonic": "รอคิว–หา track–รอหมุน–ส่งข้อมูล–คุมอุปกรณ์",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ส่วนใดคือเวลารอหัวอ่านย้ายตำแหน่ง?",
+          "options": [
+            "Seek",
+            "Rotation",
+            "Transfer",
+            "Refresh"
+          ],
+          "correct": 0,
+          "answer": "Seek",
+          "pages": "หน้า 17–20"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เวลาการเข้าถึง sector ประกอบด้วยอะไรบ้าง?",
+          "answer": "queue, seek, rotational latency, transfer และ controller overhead",
+          "pages": "หน้า 17–20"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "ตัวอย่างหน้า 19 เมื่อ seek เหลือ 1ms ได้ read time ประมาณเท่าไร?",
+          "answer": "3.2ms ตามสไลด์",
+          "pages": "หน้า 17–20"
+        }
+      ],
+      "figures": [
+        "fig-17",
+        "fig-18",
+        "fig-19",
+        "fig-20"
+      ]
+    },
+    {
+      "id": "cache-basics",
+      "title": "Cache lookup, direct mapping, tag และ valid",
+      "level": "core",
+      "pages": "หน้า 21–24",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Cache เป็นระดับใน memory hierarchy ที่ใกล้ CPU; ต้องตอบว่าข้อมูลอยู่ใน cache หรือไม่และควรหา entry ไหน. Direct-mapped cache ให้แต่ละ memory block มีตำแหน่งเดียว โดย index = block address mod จำนวน cache blocks. Tag แยก block ที่ชน index และ valid bit ระบุว่าช่องนั้นมีข้อมูลจริงหรือไม่.",
+      "remember": [
+        "Direct mapped: index = block address modulo #cache blocks (หน้า 23)",
+        "ถ้า #blocks เป็นกำลังสอง ใช้บิตล่างเป็น index; tag เป็นบิตสูงของ block address (หน้า 23–24)",
+        "valid=1 แปลมีข้อมูล, 0 แปลไม่มี; ค่าเริ่มต้น 0 (หน้า 24)"
+      ],
+      "terms": [
+        "direct mapped",
+        "index",
+        "tag",
+        "valid bit"
+      ],
+      "example": "cache 8 blocks ใช้ 3 index bits; หน้า 25 แสดงทุก entry เริ่ม valid=N",
+      "confusion": "index ตรงกันยังไม่พอเป็น hit ต้อง valid และ tag ตรงกัน",
+      "mnemonic": "Index ชี้ช่อง; Tag เช็กตัวตน; Valid เช็กว่ามี",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "direct-mapped block address หา index อย่างไร?",
+          "options": [
+            "mod #cache blocks",
+            "บวก tag",
+            "หาร hit ratio",
+            "คูณ miss penalty"
+          ],
+          "correct": 0,
+          "answer": "block address mod จำนวน cache blocks",
+          "pages": "หน้า 21–24"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "valid bit ช่วยตอบอะไร?",
+          "answer": "ช่อง cache มีข้อมูลที่ใช้ได้หรือยัง",
+          "pages": "หน้า 21–24"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใด index ตรงแต่ tag ต่างจึงเป็น miss?",
+          "answer": "ช่องเดียวกันอาจเก็บคนละ memory block จึงต้องเทียบ tag",
+          "pages": "หน้า 21–24"
+        }
+      ],
+      "figures": [
+        "fig-21",
+        "fig-22",
+        "fig-23",
+        "fig-24"
+      ]
+    },
+    {
+      "id": "direct-cache-trace",
+      "title": "ไล่สถานะ 8-block direct-mapped cache",
+      "level": "important",
+      "pages": "หน้า 25–30",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "ตัวอย่าง cache 8 blocks, 1 word/block เริ่มทุก valid bit เป็น N แล้วเข้าถึง word addresses หลายตัว. Word 22 ลง index 110/tag 10 และ word 26 ลง index 010/tag 11; การเข้าซ้ำเป็น hit จน word 18 มาใช้ index 010 เดียวกับ 26 และแทนที่ด้วย tag 10.",
+      "remember": [
+        "22→binary 10 110→index110 miss ครั้งแรก; 26→11 010→index010 miss (หน้า 26–27)",
+        "22 และ 26 เข้าซ้ำเป็น hit ตามสถานะหลังโหลด (หน้า 28)",
+        "16→index000 miss; 3→index011 miss; 16 เข้าซ้ำ hit; 18→index010 miss/แทน 26 (หน้า 29–30)"
+      ],
+      "terms": [
+        "cache trace",
+        "hit/miss",
+        "tag/index collision"
+      ],
+      "example": "ตามตารางหน้า 25–30 ทีละ access แล้วปรับ valid/tag/data เฉพาะช่องที่ miss",
+      "confusion": "หน้า 29 มีลำดับตัวอย่างย่อย 16,3,16; อย่าสับสนกับ access 22/26 ในหน้าก่อนและอย่าอ่านสีตารางแทนลำดับเวลา",
+      "mnemonic": "แปลง address → index/tag → เทียบ → อัปเดตเฉพาะ miss",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "word 22 ใช้ index ใดในตัวอย่าง?",
+          "options": [
+            "110",
+            "010",
+            "000",
+            "011"
+          ],
+          "correct": 0,
+          "answer": "110",
+          "pages": "หน้า 25–30"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เพราะเหตุใด word 18 เป็น miss ที่ index 010?",
+          "answer": "index เดียวกับ 26 แต่ tag 10 ต่างจาก tag 11 ที่เก็บอยู่",
+          "pages": "หน้า 25–30"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "access 16 ครั้งที่สองในหน้า 29 เป็น hit หรือ miss?",
+          "answer": "Hit เพราะ entry 000 valid และ tag 10 ยังตรง",
+          "pages": "หน้า 25–30"
+        }
+      ],
+      "figures": [
+        "fig-25",
+        "fig-26",
+        "fig-27",
+        "fig-28",
+        "fig-29",
+        "fig-30"
+      ]
+    },
+    {
+      "id": "address-subdivision",
+      "title": "Tag–Index–Offset และการคำนวณ block",
+      "level": "core",
+      "pages": "หน้า 31–32",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "ที่อยู่ byte แบ่งเป็น tag, index และ offset เพื่อหา cache entry และตำแหน่งภายใน block. ตัวอย่าง 64 blocks ขนาด 16 bytes/block ให้ block address=floor(1200/16)=75 แล้ว cache block=75 mod64=11; offset 4 บิตและ index 6 บิต.",
+      "remember": [
+        "block address=floor(byte address/bytes per block) (หน้า 32)",
+        "cache block number=block address mod #blocks (หน้า 32)",
+        "64 blocks→6 index bits; 16 bytes/block→4 offset bits (หน้า 32)"
+      ],
+      "terms": [
+        "tag",
+        "index",
+        "byte offset",
+        "block address",
+        "modulo"
+      ],
+      "example": "1200/16=75 และ 75 mod64=11 ตามตัวอย่างหน้า 32",
+      "confusion": "รูปหน้า 32 เขียนช่วง bit address ถึง 63 แต่ระบุ tag 22+index6+offset4=32 บิต ขัดกัน: ต้องตรวจสอบจากต้นฉบับ; อย่าเดาความกว้าง address จากรูปนี้",
+      "mnemonic": "หารขนาด block ก่อน; mod จำนวนช่องต่อ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "16 bytes/block ต้องใช้ offset กี่บิต?",
+          "options": [
+            "4",
+            "6",
+            "10",
+            "22"
+          ],
+          "correct": 0,
+          "answer": "4 บิต",
+          "pages": "หน้า 31–32"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สูตรหา block address จาก byte address คืออะไร?",
+          "answer": "floor(address/bytes per block)",
+          "pages": "หน้า 31–32"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "address 1200 ใน cache 64 blocks, 16B/block ไป block ไหน?",
+          "answer": "floor(1200/16)=75; 75 mod64=11",
+          "pages": "หน้า 31–32"
+        }
+      ],
+      "figures": [
+        "fig-31",
+        "fig-32"
+      ]
+    },
+    {
+      "id": "block-size-misses",
+      "title": "ขนาด block กับการจัดการ cache miss",
+      "level": "core",
+      "pages": "หน้า 33–34",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "block ใหญ่ใช้ spatial locality เพื่อลด miss บางส่วน แต่ cache ขนาดคงที่มีจำนวน block น้อยลง จึงเพิ่ม competition/pollution และ miss penalty. เมื่อ cache miss CPU อาจ stall แล้วดึง block จากระดับล่าง; instruction miss กลับไป fetch ส่วน data miss ทำ data access ต่อ.",
+      "remember": [
+        "larger block อาจลด miss จาก spatial locality แต่เพิ่ม miss penalty (หน้า 33)",
+        "cache ขนาดคงที่: block ใหญ่→จำนวน entry น้อย→competition/pollution (หน้า 33)",
+        "on miss: stall pipeline, fetch block; instruction/data miss กลับขั้นต่างกัน (หน้า 34)"
+      ],
+      "terms": [
+        "block size",
+        "pollution",
+        "miss penalty",
+        "early restart",
+        "critical-word-first"
+      ],
+      "example": "หน้า 33 ระบุ early restart/critical-word-first ว่าช่วยลดผลของ miss penalty",
+      "confusion": "อย่าจำว่า block ใหญ่ยิ่งดีเสมอ; มีทั้งประโยชน์จาก locality และค่าเสียโอกาสของ entry",
+      "mnemonic": "Block ใหญ่ช่วยใกล้เคียง แต่กินช่องและโหลดนาน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "block ใหญ่ใน cache ขนาดคงที่ทำให้จำนวน entry อย่างไร?",
+          "options": [
+            "ลดลง",
+            "เพิ่มขึ้น",
+            "ไม่เปลี่ยน",
+            "เป็นศูนย์"
+          ],
+          "correct": 0,
+          "answer": "ลดลง",
+          "pages": "หน้า 33–34"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "CPU ทำอะไรเมื่อ cache miss ตามหน้า 34?",
+          "answer": "stall pipeline แล้วดึง block จากระดับถัดไป",
+          "pages": "หน้า 33–34"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใด block ใหญ่อาจเพิ่ม miss rate?",
+          "answer": "มี entry น้อยลง เกิด competition/pollution มากขึ้น",
+          "pages": "หน้า 33–34"
+        }
+      ],
+      "figures": [
+        "fig-33",
+        "fig-34"
+      ]
+    },
+    {
+      "id": "cache-writes",
+      "title": "Write-through, write-back และ write miss",
+      "level": "core",
+      "pages": "หน้า 35–37",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Write-through เขียนทั้ง cache และ memory ทุก write hit จึงอาจใช้ write buffer ลดการรอ. Write-back เขียน cache ก่อน ติด dirty bit แล้วค่อยเขียน block กลับเมื่อถูกแทนที่. เมื่อ write miss สไลด์เทียบ write allocate (fetch block) กับ write-around (ไม่ fetch) และระบุ write-back มัก fetch block.",
+      "remember": [
+        "Write-through อัปเดต cache+memory; ตัวอย่าง base CPI1, stores10%, write100 cycles→CPI11 (หน้า 35)",
+        "Write buffer ให้ CPU เดินต่อได้จน buffer เต็ม (หน้า 35)",
+        "Write-back ใช้ dirty bit; write miss แบบ allocate ดึง block, write-around ไม่ดึง (หน้า 36–37)"
+      ],
+      "terms": [
+        "write-through",
+        "write-back",
+        "dirty bit",
+        "write buffer",
+        "write allocate",
+        "write-around"
+      ],
+      "example": "เปรียบหน้า 35–36: เขียน memory ทุกครั้งกับเขียนเมื่อแทน dirty block",
+      "confusion": "Write policy สำหรับ hit กับ write allocation สำหรับ miss เป็นคนละการตัดสินใจ",
+      "mnemonic": "Through เขียนล่างทันที; Back เขียนล่างตอนแทน; Miss เลือกดึงหรือข้าม",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "นโยบายใดต้องติด dirty bit?",
+          "options": [
+            "Write-back",
+            "Write-through",
+            "Write-around",
+            "Direct mapped"
+          ],
+          "correct": 0,
+          "answer": "Write-back",
+          "pages": "หน้า 35–37"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "write-around หมายถึงอะไรในหน้า 37?",
+          "answer": "write miss แล้วไม่ fetch block เข้าค cache",
+          "pages": "หน้า 35–37"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "ตัวอย่างหน้า 35 effective CPI เท่าไร?",
+          "answer": "1+0.1×100=11",
+          "pages": "หน้า 35–37"
+        }
+      ],
+      "figures": [
+        "fig-35",
+        "fig-36",
+        "fig-37"
+      ],
+      "comparison": {
+        "headers": [
+          "เรื่อง",
+          "Write-through",
+          "Write-back"
+        ],
+        "rows": [
+          [
+            "เขียนเมื่อ hit",
+            "cache และ memory",
+            "cache ก่อน"
+          ],
+          [
+            "การเขียนระดับล่าง",
+            "ทุก write hit",
+            "เมื่อ dirty block ถูกแทน"
+          ],
+          [
+            "สิ่งช่วย/สถานะ",
+            "write buffer",
+            "dirty bit"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "cache-organization-example",
+      "title": "Split cache และ main memory ที่รองรับ cache",
+      "level": "important",
+      "pages": "หน้า 38–40",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "กรณี Intrinsity FastMATH ในสไลด์ใช้ split I-cache/D-cache และแสดง miss rate ต่างกัน; เป็นตัวอย่างสถาปัตยกรรมเฉพาะ. หน้า 40 แสดงว่าความกว้าง memory/bus ส่งผลต่อ miss penalty และ bandwidth โดยตัวอย่าง 4-word block ผ่าน memory กว้างหนึ่ง word ใช้ 65 bus cycles.",
+      "remember": [
+        "ตัวอย่าง FastMATH: I-cache/D-cache อย่างละ 16KB, 256 blocks×16 words/block; miss rate 0.4%/11.4% (หน้า 38)",
+        "หน้า 40: address1 + DRAM 4×15 + transfer4×1 =65 bus cycles",
+        "bandwidth=16 bytes/65 cycles≈0.25 B/cycle (หน้า 40)"
+      ],
+      "terms": [
+        "split cache",
+        "I-cache/D-cache",
+        "bus width",
+        "miss penalty",
+        "bandwidth"
+      ],
+      "example": "ใช้ภาพหน้า 39 ดู tag/index/offset ของ split cache และคำนวณหน้า 40",
+      "confusion": "ตัวเลข miss rate และขนาด cache หน้า 38 เป็นของเครื่องตัวอย่าง ไม่ใช่ค่า RISC-V ทั่วไป",
+      "mnemonic": "กว้างบัส/หน่วยความจำกำหนดเวลาขนหนึ่ง block",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "I-cache กับ D-cache ในตัวอย่างหน้า 38 แยกกันหรือรวมกัน?",
+          "options": [
+            "แยกกัน",
+            "รวมกัน",
+            "ไม่ใช้ cache",
+            "เป็น disk"
+          ],
+          "correct": 0,
+          "answer": "แยกกัน",
+          "pages": "หน้า 38–40"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "miss penalty หน้า 40 ของ 4-word block ผ่าน 1-word DRAM เท่าไร?",
+          "answer": "65 bus cycles",
+          "pages": "หน้า 38–40"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "bandwidth ตัวอย่างหน้า 40 ได้เท่าไร?",
+          "answer": "16/65≈0.25 B/cycle",
+          "pages": "หน้า 38–40"
+        }
+      ],
+      "figures": [
+        "fig-38",
+        "fig-39",
+        "fig-40"
+      ]
+    },
+    {
+      "id": "cache-performance",
+      "title": "Memory stall CPI และ AMAT",
+      "level": "core",
+      "pages": "หน้า 41–44",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "สไลด์แยก CPU cycles สำหรับการรันโปรแกรมออกจาก memory stall cycles ที่มักเกิดจาก cache miss. ภายใต้สมมติฐานที่ระบุ miss cycles คำนวณจากจำนวน access หรือ miss ต่อ instruction คูณ miss penalty; AMAT รวม hit time กับ miss rate×miss penalty. ตัวอย่างแสดง actual CPI 5.44 และ AMAT 2ns.",
+      "remember": [
+        "memory stall cycles≈memory accesses/program×miss rate×miss penalty (หน้า 41)",
+        "I-cache:0.02×100=2; D-cache:0.36×0.04×100=1.44; actual CPI=2+2+1.44=5.44 (หน้า 42)",
+        "AMAT=hit time+miss rate×miss penalty; ตัวอย่าง 1+0.05×20=2ns (หน้า 43)"
+      ],
+      "terms": [
+        "CPI",
+        "memory stall cycles",
+        "AMAT",
+        "hit time",
+        "miss rate",
+        "miss penalty"
+      ],
+      "example": "ตัวอย่างหน้า 42 ideal CPI 2 เทียบ actual 5.44 ให้สัดส่วน 5.44/2=2.72 ตามสไลด์",
+      "confusion": "miss rate ของ I-cache ต่อ instruction ต่างจาก D-cache ที่ต้องคูณสัดส่วน load/store 0.36; หน้า 44 ย้ำดู cache behavior เมื่อประเมิน performance",
+      "mnemonic": "CPI ฐานบวก stall; AMAT hit บวกโอกาส miss คูณ penalty",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "สูตร AMAT คือข้อใด?",
+          "options": [
+            "Hit time + miss rate×miss penalty",
+            "Hit time×miss rate",
+            "CPI+clock rate",
+            "Tag+index+offset"
+          ],
+          "correct": 0,
+          "answer": "Hit time + miss rate×miss penalty",
+          "pages": "หน้า 41–44"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไม D-cache หน้า 42 ต้องคูณ 0.36?",
+          "answer": "มี load/store 36% ของ instructions จึงไม่ใช่ทุกคำสั่งที่เข้าถึง D-cache",
+          "pages": "หน้า 41–44"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "จงหา actual CPI ตัวอย่างหน้า 42",
+          "answer": "2+0.02×100+0.36×0.04×100=5.44",
+          "pages": "หน้า 41–44"
+        }
+      ],
+      "figures": [
+        "fig-41",
+        "fig-42",
+        "fig-43",
+        "fig-44"
+      ]
+    },
+    {
+      "id": "associativity",
+      "title": "Direct, n-way และ fully associative",
+      "level": "core",
+      "pages": "หน้า 45–47",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Fully associative วาง block ใน entry ใดก็ได้แต่ต้องเทียบทุก entry; n-way set associative กำหนด set จาก block number mod จำนวน sets แล้วค้นหา n entries ใน set. ภาพหน้า 46–47 แสดงสองแบบนี้เทียบกับ direct mapped ซึ่งมีเพียงตำแหน่งเดียว.",
+      "remember": [
+        "Fully associative: วางได้ทุก entry ต้องค้นพร้อมกันทุก entry (หน้า 45)",
+        "n-way: set=block number mod #sets; ค้น n entries ใน set (หน้า 45)",
+        "direct mapped เป็น 1-way; spectrum หน้า 47 ใช้ cache 8 entries"
+      ],
+      "terms": [
+        "fully associative",
+        "n-way set associative",
+        "set index",
+        "comparator"
+      ],
+      "example": "อ่านภาพหน้า 46 โดยตาม block เดียวไปได้หนึ่งช่อง/หนึ่ง set/ทุกช่องตามสามรูปแบบ",
+      "confusion": "associativity เพิ่มทางเลือกตำแหน่งแต่เพิ่ม comparator/ความซับซ้อน ไม่ใช่เพิ่มจำนวน entries ของ cache ในตัวอย่างเทียบ",
+      "mnemonic": "หนึ่งช่อง–หลายช่องใน set–ทุกช่อง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แบบใดวาง block ได้ทุก entry?",
+          "options": [
+            "Fully associative",
+            "Direct mapped",
+            "Write-through",
+            "Page table"
+          ],
+          "correct": 0,
+          "answer": "Fully associative",
+          "pages": "หน้า 45–47"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "n-way set associative หา set อย่างไร?",
+          "answer": "block number mod จำนวน sets",
+          "pages": "หน้า 45–47"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไม fully associative มี hardware cost สูง?",
+          "answer": "ต้องค้น/เปรียบเทียบหลาย entry พร้อมกัน",
+          "pages": "หน้า 45–47"
+        }
+      ],
+      "figures": [
+        "fig-45",
+        "fig-46",
+        "fig-47"
+      ],
+      "comparison": {
+        "headers": [
+          "Mapping",
+          "ที่วาง block",
+          "จำนวนเปรียบเทียบตามหน้า 89"
+        ],
+        "rows": [
+          [
+            "Direct mapped",
+            "หนึ่ง entry",
+            "1"
+          ],
+          [
+            "n-way",
+            "หนึ่งใน n entries ของ set",
+            "n"
+          ],
+          [
+            "Fully associative",
+            "ทุก entry",
+            "จำนวน entries"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "associativity-trace",
+      "title": "ตัวอย่าง access 0, 8, 0, 6, 8",
+      "level": "important",
+      "pages": "หน้า 48–50",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "สไลด์เทียบ cache ขนาด 4 blocks ที่รับลำดับ 0,8,0,6,8. Direct mapped ชน index จน miss ทุกครั้ง; 2-way set associative ได้ hit ที่ 0 ครั้งที่สอง; fully associative ได้ hit ที่ 0 และ 8 ที่กลับมา. ข้อมูล simulation หน้า 50 แสดง miss rate ลดลงเมื่อ associativity สูงขึ้นแต่ผลเพิ่มเริ่มน้อยลง.",
+      "remember": [
+        "Direct mapped: 5 misses ใน 5 accesses (หน้า 48)",
+        "2-way: miss,miss,hit,miss,miss; fully: miss,miss,hit,miss,hit (หน้า 49)",
+        "SPEC2000 example หน้า 50: 1/2/4/8-way miss 10.3/8.6/8.3/8.1%"
+      ],
+      "terms": [
+        "conflict miss",
+        "set",
+        "associativity",
+        "diminishing returns"
+      ],
+      "example": "ไล่ตารางหน้า 48–49 ทีละ access; 0 กับ 8 ใช้ index 0 ใน direct mapped",
+      "confusion": "ตัวเลขหน้า 50 เป็นผล simulation กรณี 64KB D-cache ไม่ใช่กฎว่าทุก cache มี miss rate ตามนี้",
+      "mnemonic": "เพิ่มทางเลือกที่วาง ลดการชน แต่ผลเพิ่มลดลง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ลำดับ 0,8,0,6,8 แบบ fully associative มี hit กี่ครั้ง?",
+          "options": [
+            "2",
+            "0",
+            "1",
+            "5"
+          ],
+          "correct": 0,
+          "answer": "2 ครั้ง: ที่ 0 ครั้งที่สอง และ 8 ครั้งสุดท้าย",
+          "pages": "หน้า 48–50"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "direct mapped ในตัวอย่างมีเหตุใด miss ทุกครั้ง?",
+          "answer": "0 และ 8 ชน index เดียวกันและแทนกัน; access อื่นก็ไม่ทำให้มี hit ในลำดับนี้",
+          "pages": "หน้า 48–50"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "2-way set associative ในหน้า 49 มี hit ที่ access ไหน?",
+          "answer": "access 0 ครั้งที่สอง",
+          "pages": "หน้า 48–50"
+        }
+      ],
+      "figures": [
+        "fig-48",
+        "fig-49",
+        "fig-50"
+      ]
+    },
+    {
+      "id": "replacement",
+      "title": "Replacement policy: LRU และ Random",
+      "level": "core",
+      "pages": "หน้า 51–52",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "เมื่อ miss แล้วต้องแทน entry, direct mapped ไม่มีตัวเลือก ส่วน set associative ควรใช้ entry invalid ก่อน. หากเต็มแล้วจึงเลือกตามนโยบาย เช่น LRU เลือก entry ที่ไม่ถูกใช้นานที่สุด หรือ random. สไลด์ระบุ LRU ซับซ้อนขึ้นเมื่อ associativity สูง.",
+      "remember": [
+        "direct mapped ไม่มี choice ในการแทน (หน้า 52)",
+        "set associative ใช้ non-valid entry ก่อน; เต็มแล้วจึงเลือกใน set (หน้า 52)",
+        "LRU เลือก entry ไม่ใช้ยาวนานสุด; random ใกล้ LRU ใน high associativity ตามสไลด์ (หน้า 52)"
+      ],
+      "terms": [
+        "replacement policy",
+        "LRU",
+        "random",
+        "valid entry"
+      ],
+      "example": "ดูภาพการจัด set หน้า 51 แล้วถามว่าถ้ามีช่อง invalid จะต้องแทนของเดิมหรือไม่",
+      "confusion": "LRU หมายถึงเวลาตั้งแต่ใช้งานครั้งล่าสุด ไม่ใช่ข้อมูลที่เก่าที่สุดตามเวลานำเข้าครั้งแรก",
+      "mnemonic": "ว่างก่อน; เต็มแล้วค่อยเลือก LRU หรือสุ่ม",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "LRU แทน entry ใด?",
+          "options": [
+            "ที่ไม่ถูกใช้นานที่สุด",
+            "ที่เพิ่งใช้ล่าสุด",
+            "tag ต่ำสุด",
+            "entry แรกเสมอ"
+          ],
+          "correct": 0,
+          "answer": "ไม่ถูกใช้นานที่สุด",
+          "pages": "หน้า 51–52"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "direct mapped มีนโยบายเลือก entry แทนหรือไม่?",
+          "answer": "ไม่มี choice เพราะแต่ละ block มีที่เดียว",
+          "pages": "หน้า 51–52"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้ามี invalid entry ใน set ควรทำอย่างไรตามหน้า 52?",
+          "answer": "ใช้ entry นั้นก่อนแทนข้อมูลที่ valid",
+          "pages": "หน้า 51–52"
+        }
+      ],
+      "figures": [
+        "fig-51",
+        "fig-52"
+      ]
+    },
+    {
+      "id": "multilevel-cache",
+      "title": "L1/L2 และตัวอย่าง CPI หลายระดับ",
+      "level": "core",
+      "pages": "หน้า 53–56",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "L1 อยู่ใกล้ CPU จึงเน้น hit time ต่ำ ส่วน L2 ใหญ่กว่าและรับ miss จาก L1 เพื่อลดการไป main memory. ตัวอย่าง 4GHz/base CPI1 มี L1 อย่างเดียว CPI9; เมื่อมี L2 สไลด์คำนวณ CPI3.4 และ performance ratio 9/3.4≈2.6. หน้าตัวอย่างมีคำบรรยาย penalty หนึ่งจุดไม่ตรงกับสมการ จึงต้องอ่านคู่กัน.",
+      "remember": [
+        "L1 เล็ก/เร็ว; L2 ใหญ่/ช้ากว่า L1 แต่เร็วกว่า main memory (หน้า 53,56)",
+        "4GHz→cycle 0.25ns; 100ns main memory→400 cycles; L1 only CPI=1+0.02×400=9 (หน้า 54)",
+        "L2 access 5ns→20 cycles; global miss 0.5%; สมการหน้า 55 ให้ CPI=1+0.02×20+0.005×400=3.4"
+      ],
+      "terms": [
+        "L1/L2 cache",
+        "global miss rate",
+        "miss penalty",
+        "effective CPI"
+      ],
+      "example": "ฝึกคำนวณแยก penalty ที่ L2 กับ main memory จากตัวอย่างหน้า 54–55",
+      "confusion": "หน้า 55 เขียน “Extra penalty = 500 cycles” แต่สมการใช้ 400 cycles และ 100ns/0.25ns ในหน้า 54 เท่ากับ 400: ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "L1 เน้น hit เร็ว; L2 กัน miss ลง DRAM",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "L1 มักเน้นสิ่งใด?",
+          "options": [
+            "hit time ต่ำ",
+            "จุใหญ่ที่สุด",
+            "disk latency",
+            "ECC"
+          ],
+          "correct": 0,
+          "answer": "hit time ต่ำ",
+          "pages": "หน้า 53–56"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "CPI เมื่อมีเพียง primary cache ในตัวอย่างเท่าไร?",
+          "answer": "1+0.02×400=9",
+          "pages": "หน้า 53–56"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "สมการ CPI เมื่อเพิ่ม L2 หน้า 55 ให้ผลเท่าไร?",
+          "answer": "1+0.02×20+0.005×400=3.4; แต่คำบรรยาย extra penalty ต้องตรวจต้นฉบับ",
+          "pages": "หน้า 53–56"
+        }
+      ],
+      "figures": [
+        "fig-53",
+        "fig-54",
+        "fig-55",
+        "fig-56"
+      ]
+    },
+    {
+      "id": "software-blocking",
+      "title": "Advanced CPU, locality ของ software และ blocking",
+      "level": "important",
+      "pages": "หน้า 57–62",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "out-of-order CPU อาจทำงานอิสระต่อได้ขณะ cache miss จึงวิเคราะห์เวลาได้ยากและสไลด์เสนอ simulation. รูปแบบการเข้าถึง memory ขึ้นกับ algorithm/compiler; ตัวอย่าง DGEMM ใช้ blocking เพื่อใช้ข้อมูลซ้ำก่อนถูกแทนใน cache และภาพหน้า 60–62 เปรียบ access pattern.",
+      "remember": [
+        "out-of-order: dependent instructions รอ, independent instructions อาจเดินต่อ (หน้า 57)",
+        "miss rate ขึ้นกับ memory access pattern/algorithm/compiler (หน้า 58)",
+        "blocking เป้าหมายคือใช้ข้อมูลให้มากก่อนถูกแทน; ตัวอย่างใช้ BLOCKSIZE=32 (หน้า 59–62)"
+      ],
+      "terms": [
+        "out-of-order",
+        "memory access pattern",
+        "DGEMM",
+        "blocking",
+        "BLOCKSIZE"
+      ],
+      "example": "ตามภาพ C/A/B หน้า 60 กับ blocked access pattern หน้า 62 เพื่อเห็นการใช้ข้อมูลซ้ำในบริเวณย่อย",
+      "confusion": "อย่าอ้างว่า cache miss ทุกครั้ง stall CPU เต็ม penalty เมื่อเป็น out-of-order; หน้า 57 ระบุ independent work ยังทำได้",
+      "mnemonic": "จัดงานเป็น block ใช้ข้อมูลซ้ำก่อนหลุด cache",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "blocking ใน DGEMM มีเป้าหมายอะไร?",
+          "options": [
+            "ใช้ข้อมูลซ้ำก่อนถูกแทน",
+            "ปิด cache",
+            "เพิ่ม stride",
+            "ลบ DRAM"
+          ],
+          "correct": 0,
+          "answer": "ใช้ข้อมูลซ้ำก่อนถูกแทน",
+          "pages": "หน้า 57–62"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "out-of-order CPU ทำอะไรระหว่าง miss ได้?",
+          "answer": "คำสั่งอิสระบางส่วนยังเดินต่อ ส่วน dependent รอ",
+          "pages": "หน้า 57–62"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "BLOCKSIZE ในโค้ดตัวอย่างหน้า 61 เป็นเท่าไร?",
+          "answer": "32 ตามสไลด์",
+          "pages": "หน้า 57–62"
+        }
+      ],
+      "figures": [
+        "fig-57",
+        "fig-58",
+        "fig-59",
+        "fig-60",
+        "fig-61",
+        "fig-62"
+      ]
+    },
+    {
+      "id": "dependability",
+      "title": "Dependability: MTTF, MTTR, MTBF, Availability",
+      "level": "core",
+      "pages": "หน้า 63–64",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "สไลด์แยก fault ของ component ออกจาก failure ของ service; fault อาจนำหรือไม่ไปสู่ system failure. ความเชื่อถือได้วัดด้วย MTTF และเวลาซ่อมด้วย MTTR; MTBF=MTTF+MTTR และ availability=MTTF/(MTTF+MTTR). เพิ่ม availability ได้โดยเพิ่ม MTTF หรือ ลด MTTR.",
+      "remember": [
+        "fault เป็น failure ของ component แต่อาจไม่ทำให้บริการล้ม (หน้า 63)",
+        "MTBF=MTTF+MTTR; Availability=MTTF/(MTTF+MTTR) (หน้า 64)",
+        "เพิ่ม MTTF ผ่าน avoidance/tolerance/forecasting; ลด MTTR ด้วย diagnosis/repair ที่ดีขึ้น (หน้า 64)"
+      ],
+      "terms": [
+        "fault",
+        "failure",
+        "restoration",
+        "MTTF",
+        "MTTR",
+        "MTBF",
+        "availability"
+      ],
+      "example": "ไล่ภาพหน้า 63 จาก service delivered → interruption → restoration กลับ service",
+      "confusion": "MTBF รวมเวลาทำงานก่อนเสียกับเวลาซ่อม; อย่าใช้แทน MTTF ในสูตร availability โดยไม่แปลง",
+      "mnemonic": "เวลาทำงานเทียบงานบวกเวลาซ่อม คือ availability",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "สูตร Availability ในสไลด์คืออะไร?",
+          "options": [
+            "MTTF/(MTTF+MTTR)",
+            "MTTR/MTTF",
+            "MTTF×MTTR",
+            "MTBF−MTTR"
+          ],
+          "correct": 0,
+          "answer": "MTTF/(MTTF+MTTR)",
+          "pages": "หน้า 63–64"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "MTBF สัมพันธ์กับ MTTF/MTTR อย่างไร?",
+          "answer": "MTBF=MTTF+MTTR",
+          "pages": "หน้า 63–64"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "fault ทุกครั้งเป็น system failure หรือไม่?",
+          "answer": "ไม่; หน้า 63 ระบุ fault อาจนำหรือไม่สู่ system failure",
+          "pages": "หน้า 63–64"
+        }
+      ],
+      "figures": [
+        "fig-63",
+        "fig-64"
+      ]
+    },
+    {
+      "id": "ecc-hamming",
+      "title": "Hamming SEC และ SEC/DEC",
+      "level": "core",
+      "pages": "หน้า 65–68",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Hamming distance คือจำนวนตำแหน่งบิตที่ต่างกัน; minimum distance 2 ตรวจข้อผิดพลาดหนึ่งบิต และ 3 แก้หนึ่งบิตพร้อมตรวจสองบิตตามสไลด์. การเข้ารหัส SEC วาง parity bits ที่ตำแหน่งกำลังสองเมื่อเลขตำแหน่งเริ่ม 1 จากซ้าย. เพิ่ม parity ทั้ง word ให้ SEC/DEC มี distance 4 และใช้ parity syndrome ช่วยแยกกรณี error.",
+      "remember": [
+        "Hamming distance 2 ตรวจ 1-bit; distance 3 แก้ 1-bit/ตรวจ 2-bit (หน้า 65)",
+        "SEC parity positions 1,2,4,8; ตารางหน้า 66 บอก data bits ที่แต่ละตัวตรวจ",
+        "syndrome 0000→no error; 1010→bit 10 flipped (หน้า 67)",
+        "เพิ่ม whole-word parity p_n เป็น SEC/DEC distance4; สไลด์ยก ECC DRAM 8 bits ต่อ 64 bits (หน้า 68)"
+      ],
+      "terms": [
+        "Hamming distance",
+        "SEC",
+        "SEC/DEC",
+        "parity bit",
+        "syndrome",
+        "ECC DRAM"
+      ],
+      "example": "ดูตารางหน้า 66 แล้วอ่าน syndrome 1010 ว่าเลขตำแหน่ง 10 ตามตัวอย่างหน้า 67",
+      "confusion": "หน้า 68 ใช้ถ้อยคำ H even/odd ร่วมกับ p_n even/odd; ต้องตรวจสอบจากต้นฉบับหากจะนำไปคำนวณชุด parity โดยละเอียด เพราะสไลด์ไม่ได้ให้ตัวอย่างข้อมูลครบ",
+      "mnemonic": "พาริตีอยู่ 1,2,4,8; syndrome ชี้ตำแหน่ง; เพิ่ม parity ทั้ง word ตรวจสองบิต",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "minimum distance 3 ทำอะไรได้ตามสไลด์?",
+          "options": [
+            "แก้ 1-bit และตรวจ 2-bit",
+            "แก้ 2-bit",
+            "ตรวจ 3-bit เท่านั้น",
+            "ไม่ตรวจได้"
+          ],
+          "correct": 0,
+          "answer": "แก้ 1-bit และตรวจ 2-bit",
+          "pages": "หน้า 65–68"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "parity bit ของ SEC วางที่ตำแหน่งใด?",
+          "answer": "ตำแหน่งเลขกำลังสองเมื่อเริ่มนับ 1 จากซ้าย เช่น 1,2,4,8",
+          "pages": "หน้า 65–68"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "syndrome 1010 ในหน้า 67 หมายถึงอะไร?",
+          "answer": "บิตตำแหน่ง 10 พลิก",
+          "pages": "หน้า 65–68"
+        }
+      ],
+      "figures": [
+        "fig-65",
+        "fig-66",
+        "fig-67",
+        "fig-68"
+      ]
+    },
+    {
+      "id": "virtual-machines",
+      "title": "Virtual Machines, VMM และ privileged support",
+      "level": "core",
+      "pages": "หน้า 69–72",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Virtual machine ให้ host จำลอง guest OS และทรัพยากรเพื่อแยกผู้ใช้หลายกลุ่มและแชร์เครื่อง. VMM map virtual resources ไป physical resources; guest code ทำงาน user mode และ trap ไป VMM เมื่อใช้ privileged instruction หรือ protected resource. ตัวอย่าง timer virtualization แสดง VMM รับ interrupt จริงและจำลองให้ VM.",
+      "remember": [
+        "VM ช่วย isolation และ resource sharing แต่มี performance impact (หน้า 69)",
+        "VMM map memory/I-O/CPU; privileged access trap ไป VMM (หน้า 70)",
+        "หน้า 71 เปรียบ OS จัด process กับ VMM จัด VM บน timer interrupt",
+        "หน้า 72 system/user modes และ privileged instructions คุ้มครอง physical resources"
+      ],
+      "terms": [
+        "VM",
+        "host/guest",
+        "VMM",
+        "trap",
+        "privileged instruction",
+        "timer virtualization"
+      ],
+      "example": "อ่านหน้า 71 เปรียบเส้นทาง timer ของ native machine กับ VMM",
+      "confusion": "guest OS ไม่ได้เข้าถึงอุปกรณ์จริงได้อิสระ; VMM จัดการ real I/O และ emulates virtual I/O ตามหน้า 70",
+      "mnemonic": "Guest เห็นเครื่องเสมือน; VMM จับสิทธิ์และ map ของจริง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ใคร map virtual resource ไป physical resource?",
+          "options": [
+            "VMM",
+            "guest application",
+            "cache tag",
+            "disk sector"
+          ],
+          "correct": 0,
+          "answer": "VMM",
+          "pages": "หน้า 69–72"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "guest code ในตัวอย่างรัน mode ใด?",
+          "answer": "user mode และ trap เมื่อเจอ privileged access",
+          "pages": "หน้า 69–72"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "timer interrupt ใต้ VMM จัดหน่วยใดต่อ?",
+          "answer": "VMM เลือก/สลับ VM และจำลอง timer ให้ VM ที่ต้องการ",
+          "pages": "หน้า 69–72"
+        }
+      ],
+      "figures": [
+        "fig-69",
+        "fig-70",
+        "fig-71",
+        "fig-72"
+      ]
+    },
+    {
+      "id": "virtual-memory",
+      "title": "Virtual Memory, address translation และ page fault",
+      "level": "core",
+      "pages": "หน้า 73–75",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Virtual memory ใช้ main memory เป็น cache ของ disk โดย CPU hardware กับ OS ร่วมกันจัดการ. โปรแกรมมี virtual address space ของตน และ address translation แปลง virtual page number เป็น physical page number โดย page offset คงเดิม. ถ้า page ไม่อยู่ใน memory เกิด page fault ซึ่งมี penalty สูงและ OS ต้องนำ page จาก disk.",
+      "remember": [
+        "VM block เรียก page; translation miss เรียก page fault (หน้า 73)",
+        "ตัวอย่าง fixed-size 4K page มี offset 12 bits ตามภาพหน้า 74",
+        "page fault ดึง page จาก disk ใช้หลายล้าน cycles; OS handle (หน้า 75)"
+      ],
+      "terms": [
+        "virtual address",
+        "physical address",
+        "page",
+        "page offset",
+        "page fault"
+      ],
+      "example": "ตามลูกศรภาพหน้า 74: แปล page number แต่ส่ง offset เดิมไปต่อ physical address",
+      "confusion": "page fault เป็น page ไม่อยู่ main memory; ไม่ใช่ TLB miss ทุกครั้ง (แยกในหน้า 82–84)",
+      "mnemonic": "เปลี่ยนเลข page; offset คง; ไม่พบจึงไป disk",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "หน่วย block ของ virtual memory เรียกว่าอะไร?",
+          "options": [
+            "Page",
+            "Sector",
+            "Tag",
+            "Word"
+          ],
+          "correct": 0,
+          "answer": "Page",
+          "pages": "หน้า 73–75"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "page fault เกิดเมื่อใด?",
+          "answer": "page ที่ต้องการไม่อยู่ใน main memory ต้องดึงจาก disk",
+          "pages": "หน้า 73–75"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "offset ของ 4K page ในภาพหน้า 74 กี่บิต?",
+          "answer": "12 บิต",
+          "pages": "หน้า 73–75"
+        }
+      ],
+      "figures": [
+        "fig-73",
+        "fig-74",
+        "fig-75"
+      ]
+    },
+    {
+      "id": "page-table",
+      "title": "Page table, PTE และ replacement/write-back",
+      "level": "core",
+      "pages": "หน้า 76–79",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Page table มี PTE ตาม virtual page number; ถ้า present จะให้ physical page number กับ status bits หากไม่อยู่ memory อาจชี้ swap space. Reference/use bit ช่วยประมาณ LRU และ dirty bit ระบุ page ที่ถูกเขียน. Disk write ช้ามากจึงใช้ write-back เมื่อจำเป็นต้องแทน page.",
+      "remember": [
+        "Page table register ชี้ page table ใน physical memory; PTE indexed by virtual page number (หน้า 76)",
+        "PTE เก็บ physical page number/status หรือที่อยู่ swap space (หน้า 76–78)",
+        "reference bit set เมื่อ access และ OS ล้างเป็นระยะ; dirty bit set เมื่อเขียน page (หน้า 79)",
+        "page ที่ dirty ต้องเขียน disk เมื่อถูกแทน; write-through ไม่เหมาะกับ disk (หน้า 79)"
+      ],
+      "terms": [
+        "PTE",
+        "page table register",
+        "swap space",
+        "reference bit",
+        "dirty bit",
+        "write-back"
+      ],
+      "example": "ภาพหน้า 77–78 ชี้ว่า page ใน virtual space บางหน้า map ไป physical memory และบางหน้าไป disk",
+      "confusion": "valid/present bit กับ dirty/reference มีหน้าที่ต่างกัน; reference=0 เพียงบอกว่าไม่น่าใช้ล่าสุดตามการล้างรอบก่อน",
+      "mnemonic": "PTE บอกที่; reference บอกใช้; dirty บอกต้องเขียนกลับ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "bit ใดบอก page ถูกเขียน?",
+          "options": [
+            "Dirty bit",
+            "Reference bit",
+            "Tag bit",
+            "Offset"
+          ],
+          "correct": 0,
+          "answer": "Dirty bit",
+          "pages": "หน้า 76–79"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "PTE เก็บอะไรเมื่อ page อยู่ใน physical memory?",
+          "answer": "physical page number และ status bits",
+          "pages": "หน้า 76–79"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใด virtual memory ใช้ write-back?",
+          "answer": "การเขียน disk ช้ามาก จึงเขียนเป็น page/block เมื่อจำเป็น",
+          "pages": "หน้า 76–79"
+        }
+      ],
+      "figures": [
+        "fig-76",
+        "fig-77",
+        "fig-78",
+        "fig-79"
+      ]
+    },
+    {
+      "id": "tlb",
+      "title": "TLB lookup, miss handler และ page fault handler",
+      "level": "core",
+      "pages": "หน้า 80–84",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "TLB เป็น cache ของ PTE ใน CPU เพื่อไม่ต้องเข้าถึง page table ใน memory ทุกครั้ง. TLB miss อาจเกิดทั้งเมื่อ page อยู่ memory หรือไม่อยู่; กรณีแรกเติม PTE แล้ว retry ส่วนกรณีหลังเป็น page fault ให้ OS นำ page จาก disk อัปเดต page table และ restart instruction. ภาพหน้า 81 แสดง TLB, page table, physical memory และ disk ร่วมกัน.",
+      "remember": [
+        "TLB=Translation Look-aside Buffer; cache PTE ใน CPU (หน้า 80)",
+        "page present แต่ไม่ใน TLB→โหลด PTE จาก memory/retry (หน้า 82–83)",
+        "page absent→OS locate disk, choose replacement, write dirty page, read page, update table, restart (หน้า 82–84)"
+      ],
+      "terms": [
+        "TLB",
+        "PTE",
+        "TLB hit/miss",
+        "page fault handler",
+        "restart instruction"
+      ],
+      "example": "อ่านแผนภาพหน้า 81 แล้วตามสองทาง: TLB miss แต่ PTE valid กับ PTE invalid/page fault",
+      "confusion": "TLB miss ไม่เท่ากับ page fault เสมอ; คำว่า “page not preset” หน้า 83 ดูเป็น typo ของ present แต่ใช้บริบทหน้า 82 ประกอบ",
+      "mnemonic": "TLB ไม่มีรายการ ≠ page ไม่มีใน RAM; ตรวจ PTE ก่อน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "TLB เก็บอะไรเป็นหลัก?",
+          "options": [
+            "PTE",
+            "sector data",
+            "ECC syndrome",
+            "CPU instruction text ทั้งหมด"
+          ],
+          "correct": 0,
+          "answer": "PTE",
+          "pages": "หน้า 80–84"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ถ้า page อยู่ RAM แต่ TLB miss จะทำอย่างไร?",
+          "answer": "นำ PTE จาก page table มาเติม TLB แล้ว retry instruction",
+          "pages": "หน้า 80–84"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้า page ไม่อยู่ RAM ใครจัดการและทำอะไร?",
+          "answer": "OS page fault handler ดึงจาก disk อัปเดต page table แล้ว restart",
+          "pages": "หน้า 80–84"
+        }
+      ],
+      "figures": [
+        "fig-80",
+        "fig-81",
+        "fig-82",
+        "fig-83",
+        "fig-84"
+      ]
+    },
+    {
+      "id": "tlb-cache-protection",
+      "title": "TLB/Cache interaction และ Memory Protection",
+      "level": "important",
+      "pages": "หน้า 85–86",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "ถ้า cache ใช้ physical address เป็น tag ต้องแปล virtual address ก่อน lookup; การใช้ virtual tag มีปัญหา aliasing เมื่อหลาย virtual address ชี้ physical address เดียวกัน. Hardware กับ OS ยังต้องป้องกัน address space ผ่าน supervisor mode, privileged instructions และ page tables ที่เข้าถึงได้เฉพาะสิทธิ์สูง.",
+      "remember": [
+        "physical tag→translate ก่อน cache lookup (หน้า 85)",
+        "virtual tag มี aliasing เมื่อ virtual addresses ต่างกันแชร์ physical address (หน้า 85)",
+        "supervisor/kernel mode และ privileged instructions ป้องกัน page table/resource; ecall เป็นตัวอย่าง system call (หน้า 86)"
+      ],
+      "terms": [
+        "physical/virtual tag",
+        "aliasing",
+        "supervisor mode",
+        "privileged instruction",
+        "ecall"
+      ],
+      "example": "ภาพหน้า 85 เทียบลำดับ TLB→cache กับทางเลือก virtual-address tag",
+      "confusion": "อย่าสับสน address translation เพื่อหาตำแหน่งจริงกับ memory protection เพื่อจำกัดสิทธิ์เข้าถึง",
+      "mnemonic": "แปลก่อนหาเมื่อ tag จริง; kernel คุมสิทธิ์",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "physical-address cache tag ต้องทำอะไรก่อน lookup?",
+          "options": [
+            "translate address",
+            "write disk",
+            "invalidate ทุก block",
+            "เพิ่ม CPI"
+          ],
+          "correct": 0,
+          "answer": "translate address",
+          "pages": "หน้า 85–86"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "aliasing ในหน้า 85 เกิดจากอะไร?",
+          "answer": "virtual addresses ต่างกันอ้าง physical address ร่วมกัน",
+          "pages": "หน้า 85–86"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หน้า 86 ระบุโหมดที่เข้าถึง page table/state ที่มีสิทธิ์สูงคืออะไร?",
+          "answer": "supervisor/kernel mode",
+          "pages": "หน้า 85–86"
+        }
+      ],
+      "figures": [
+        "fig-85",
+        "fig-86"
+      ]
+    },
+    {
+      "id": "memory-framework",
+      "title": "กรอบร่วมของ Memory Hierarchy",
+      "level": "core",
+      "pages": "หน้า 87–91",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "ทุกระดับของ memory hierarchy มีคำถามร่วมกันสี่เรื่อง: วาง block ที่ไหน, หา block อย่างไร, miss แล้วแทนตัวใด และเขียนข้อมูลลงระดับล่างเมื่อใด. ระดับ associativity กำหนดทางเลือกในการวางและจำนวน tag comparison; write-through กับ write-back มีต้นทุนและสถานะที่ต้องเก็บต่างกัน.",
+      "remember": [
+        "Placement: direct 1 ที่, n-way n ที่ใน set, fully ที่ใดก็ได้ (หน้า 88)",
+        "Finding: direct เปรียบเทียบ tag 1, n-way n, fully ตามจำนวน entries; full lookup table เป็นอีกวิธี (หน้า 89)",
+        "Replacement: LRU หรือ random; virtual memory ใช้ LRU approximation (หน้า 90)",
+        "Write-through อัปเดตบน/ล่าง; write-back อัปเดตล่างเมื่อถูกแทน; virtual memory ใช้ write-back เพราะ disk latency (หน้า 91)"
+      ],
+      "terms": [
+        "block placement",
+        "tag comparison",
+        "replacement",
+        "LRU",
+        "write-through",
+        "write-back"
+      ],
+      "example": "ตารางหน้า 89 แสดง index → 1 comparison; set index → n comparisons; search all entries → #entries comparisons",
+      "confusion": "associativity สูงลด miss แต่เพิ่มความซับซ้อน ต้นทุน และ access time; ไม่ได้ดีขึ้นทุกมิติ",
+      "mnemonic": "วาง–หา–แทน–เขียน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "direct mapped มีทางเลือกวาง block กี่ตำแหน่ง?",
+          "options": [
+            "1",
+            "n",
+            "#entries",
+            "ไม่จำกัด"
+          ],
+          "correct": 0,
+          "answer": "1",
+          "pages": "หน้า 87–91"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไม virtual memory ใช้ write-back?",
+          "answer": "disk write latency สูงตามสไลด์",
+          "pages": "หน้า 87–91"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "n-way set associative ต้องเปรียบเทียบ tag กี่รายการใน set?",
+          "answer": "n รายการ",
+          "pages": "หน้า 87–91"
+        }
+      ],
+      "figures": [
+        "fig-87",
+        "fig-88",
+        "fig-89",
+        "fig-90",
+        "fig-91"
+      ],
+      "comparison": {
+        "headers": [
+          "แบบ",
+          "ตำแหน่งวาง",
+          "การเปรียบเทียบ tag"
+        ],
+        "rows": [
+          [
+            "Direct mapped",
+            "1",
+            "1"
+          ],
+          [
+            "n-way set associative",
+            "n ภายใน set",
+            "n"
+          ],
+          [
+            "Fully associative",
+            "ที่ใดก็ได้",
+            "#entries"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "miss-taxonomy",
+      "title": "Compulsory, Capacity, Conflict miss และ trade-offs",
+      "level": "core",
+      "pages": "หน้า 92–93",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Compulsory miss เกิดเมื่อเข้าถึง block ครั้งแรก; capacity miss เกิดเพราะ cache จำกัดจน block เดิมถูกแทนและต้องใช้ซ้ำ; conflict miss เกิดจากหลาย block แย่งตำแหน่งใน set ของ cache ที่ไม่ fully associative. การเพิ่มขนาด cache, associativity และ block size ลด miss ต่างชนิดกัน แต่มีต้นทุนเรื่อง access time, miss penalty หรือ pollution.",
+      "remember": [
+        "Compulsory = first access (หน้า 92)",
+        "Capacity = finite size ทำให้ block ที่ถูกแทนถูกเรียกอีก (หน้า 92)",
+        "Conflict = แข่ง entry ใน set; ไม่เกิดใน fully associative ขนาดรวมเท่ากัน (หน้า 92)",
+        "เพิ่ม cache size ลด capacity; เพิ่ม associativity ลด conflict; เพิ่ม block size ลด compulsory แต่ใหญ่มากอาจเพิ่ม miss/pollution (หน้า 93)"
+      ],
+      "terms": [
+        "compulsory/cold start",
+        "capacity",
+        "conflict/collision",
+        "pollution",
+        "miss penalty"
+      ],
+      "example": "ตารางหน้า 93 จับคู่ design change กับชนิด miss ที่ลดและผลเสียด้านเวลา",
+      "confusion": "อย่าจับคู่เพิ่ม associativity กับ capacity miss; ผลโดยตรงในตารางคือ conflict miss",
+      "mnemonic": "ครั้งแรก–ที่ไม่พอ–ที่ชนกัน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "first access เป็น miss ประเภทใด?",
+          "options": [
+            "compulsory",
+            "capacity",
+            "conflict",
+            "coherence"
+          ],
+          "correct": 0,
+          "answer": "compulsory",
+          "pages": "หน้า 92–93"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เพิ่ม associativity ลด miss ใดตามตาราง?",
+          "answer": "conflict miss",
+          "pages": "หน้า 92–93"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดเพิ่ม block size มากเกินไปอาจเสียผล?",
+          "answer": "miss penalty เพิ่ม และ pollution อาจทำให้ miss rate สูงขึ้น",
+          "pages": "หน้า 92–93"
+        }
+      ],
+      "figures": [
+        "fig-92",
+        "fig-93"
+      ],
+      "comparison": {
+        "headers": [
+          "Miss",
+          "สาเหตุ",
+          "แนวลดตามสไลด์"
+        ],
+        "rows": [
+          [
+            "Compulsory",
+            "เรียก block ครั้งแรก",
+            "เพิ่ม block size"
+          ],
+          [
+            "Capacity",
+            "cache รวมไม่พอ",
+            "เพิ่ม cache size"
+          ],
+          [
+            "Conflict",
+            "block ชนกันใน set",
+            "เพิ่ม associativity"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "cache-fsm",
+      "title": "Cache Controller ด้วย Finite State Machine",
+      "level": "core",
+      "pages": "หน้า 94–97",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "ตัวอย่าง cache เป็น direct-mapped, write-back, write allocate, blocking cache ขนาด 16 KB มี 1024 blocks ขนาด block 16 bytes และ address 32 บิต. Controller ใช้ FSM คุมขั้นตอนตาม clock โดยเก็บ current state ใน register, หา next state จาก current state กับ input และสร้าง control output จาก current state. ภาพ FSM แสดงทางเดิน hit, miss, dirty write-back และ memory read.",
+      "remember": [
+        "ตัวอย่าง: 32-bit byte address; tag 18, index 10, offset 4 (หน้า 94)",
+        "valid/dirty bit ต่อ block; CPU รอ access ให้เสร็จใน blocking cache (หน้า 94)",
+        "interface CPU–cache–memory มี read/write, valid, address, data, ready และการเข้าถึง memory หลาย cycles (หน้า 95)",
+        "next state = fn(current state,current inputs); outputs = fo(current state) (หน้า 96)"
+      ],
+      "terms": [
+        "FSM",
+        "current state",
+        "next state",
+        "valid bit",
+        "dirty bit",
+        "blocking cache"
+      ],
+      "example": "16 KB/16 B = 1024 blocks จึงใช้ index 10 บิต; offset 4 บิต; tag 32−10−4=18 บิต (หน้า 94)",
+      "confusion": "write-back miss ที่ victim dirty ต้องเขียน block เดิมกลับก่อนโหลด block ใหม่; อ่านรายละเอียดลูกศรหน้า 97",
+      "mnemonic": "สถานะปัจจุบัน + input → สถานะถัดไป",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตัวอย่าง cache หน้า 94 เป็นนโยบายใด?",
+          "options": [
+            "write-back/write allocate",
+            "write-through/write around",
+            "fully associative",
+            "non-blocking"
+          ],
+          "correct": 0,
+          "answer": "write-back/write allocate",
+          "pages": "หน้า 94–97"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใด index 10 บิต?",
+          "answer": "1024 blocks = 2^10 ตำแหน่ง",
+          "pages": "หน้า 94–97"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "FSM คำนวณ next state จากอะไร?",
+          "answer": "current state และ current inputs",
+          "pages": "หน้า 94–97"
+        }
+      ],
+      "figures": [
+        "fig-94",
+        "fig-95",
+        "fig-96",
+        "fig-97"
+      ]
+    },
+    {
+      "id": "cache-coherence",
+      "title": "Cache Coherence และ invalidating snooping",
+      "level": "core",
+      "pages": "หน้า 98–101",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "เมื่อหลาย core แชร์ physical address แต่เก็บสำเนาไว้ใน cache ของตน การเขียนของ core หนึ่งอาจทำให้สำเนาอีก core เก่า. Coherence ต้องให้การอ่านเห็นค่าที่เขียนล่าสุดตามเงื่อนไขในสไลด์ และทุก processor เห็นลำดับการเขียนไปยัง X เหมือนกัน. Snooping เฝ้าดู bus ส่วน directory-based เก็บสถานะผู้แชร์; invalidating snooping ส่ง invalidate เมื่อขอสิทธิ์เขียนแบบ exclusive.",
+      "remember": [
+        "ตัวอย่าง CPU A/B อ่าน X=0 แล้ว A เขียน 1: cache B อาจยังมี 0 (หน้า 98)",
+        "coherence ครอบคลุม read-after-own-write, read-after-other-write เมื่อเวลาพอ และลำดับ write ต่อ X เหมือนกัน (หน้า 99)",
+        "snooping monitor bus; directory บันทึก sharing status (หน้า 100)",
+        "invalidate → read ของ cache อื่น miss แล้ว owner ส่งค่าล่าสุด (หน้า 101)"
+      ],
+      "terms": [
+        "cache coherence",
+        "snooping",
+        "directory-based",
+        "invalidate",
+        "exclusive access"
+      ],
+      "example": "ไล่ตารางหน้า 101: A/B อ่าน X=0, A เขียน X=1 และ invalidate, B อ่านซ้ำแล้ว miss ก่อนรับค่าใหม่",
+      "confusion": "write-through ให้ memory ใหม่ได้ แต่ไม่ได้ทำให้สำเนาใน cache อื่นใหม่เอง; ต้องมี coherence protocol",
+      "mnemonic": "เขียนร่วม → แจ้งลบสำเนาเก่า",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "snooping protocol ตรวจอะไร?",
+          "options": [
+            "bus reads/writes",
+            "disk sectors",
+            "register file",
+            "page offset"
+          ],
+          "correct": 0,
+          "answer": "bus reads/writes",
+          "pages": "หน้า 98–101"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "directory-based protocol เก็บอะไร?",
+          "answer": "sharing status ของ blocks ใน cache/memory",
+          "pages": "หน้า 98–101"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หลัง A invalidate X แล้ว B อ่าน X จะเกิดอะไร?",
+          "answer": "B cache miss แล้วได้ค่าที่อัปเดตจาก owner ตามตัวอย่าง",
+          "pages": "หน้า 98–101"
+        }
+      ],
+      "figures": [
+        "fig-98",
+        "fig-99",
+        "fig-100",
+        "fig-101"
+      ]
+    },
+    {
+      "id": "memory-consistency",
+      "title": "Memory Consistency และลำดับการมองเห็น writes",
+      "level": "core",
+      "pages": "หน้า 102",
+      "reason": "เป็นนิยาม หลักการ สูตร ขั้นตอน หรือกลไกหลักที่ใช้ต่อยอดในบท",
+      "summary": "Memory consistency ถามว่า write ของ processor หนึ่งจะถูก processor อื่นมองเห็นเมื่อใด โดย “เห็น” หมายถึง read คืนค่าที่เขียน. ภายใต้สมมติฐานของสไลด์ write เสร็จเมื่อทุก processor เห็นแล้ว และ processor ไม่สลับลำดับ write กับ access อื่น. จึงถ้า P เขียน X แล้ว Y ทุก processor ที่เห็นค่าใหม่ของ Y จะเห็นค่าใหม่ของ X ด้วย.",
+      "remember": [
+        "“seen” = read คืน written value (หน้า 102)",
+        "write completes เมื่อทุก processor เห็นตาม assumptions ของสไลด์ (หน้า 102)",
+        "P เขียน X ก่อน Y → เห็น Y ใหม่แล้วต้องเห็น X ใหม่ (หน้า 102)"
+      ],
+      "terms": [
+        "memory consistency",
+        "write visibility",
+        "write ordering"
+      ],
+      "example": "ใช้สถานการณ์ X ก่อน Y หน้า 102 ตรวจว่า observation ของอีก processor สอดคล้องสมมติฐานหรือไม่",
+      "confusion": "coherence หน้า 99 เน้นค่าและลำดับการเขียนของ X เดียว; consistency หน้า 102 ถามการมองเห็น write ของ X และ Y",
+      "mnemonic": "เห็น Y ใหม่ ต้องเห็น X ใหม่",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "คำว่า seen หมายถึงอะไร?",
+          "options": [
+            "read คืนค่าที่เขียน",
+            "write เริ่มต้น",
+            "cache miss",
+            "disk เสร็จ"
+          ],
+          "correct": 0,
+          "answer": "read คืนค่าที่เขียน",
+          "pages": "หน้า 102"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สไลด์กำหนดว่า write complete เมื่อใด?",
+          "answer": "เมื่อทุก processor เห็น write นั้น",
+          "pages": "หน้า 102"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "P เขียน X แล้ว Y; ถ้าอีก core เห็น Y ใหม่ ต้องเห็นอะไร?",
+          "answer": "X ใหม่ด้วย ภายใต้สมมติฐานหน้า 102",
+          "pages": "หน้า 102"
+        }
+      ],
+      "figures": [
+        "fig-102"
+      ]
+    },
+    {
+      "id": "real-systems",
+      "title": "ARM/Intel cache, 2-level TLB และ system instructions",
+      "level": "important",
+      "pages": "หน้า 103–107",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "สไลด์ยก ARM Cortex-A53 และ Intel Core i7 เพื่อดู multilevel on-chip caches กับ 2-level TLB organization จากภาพ. ทั้งสองมี multi-banked cache เพื่อรองรับหลาย access ต่อ cycle เมื่อไม่ชน bank และมีแนวทาง requested-word-first, non-blocking cache, hit/miss under miss และ data prefetching. ตาราง RISC-V แสดงกลุ่ม fence, CSR access และ system instructions; DGEMM ผสาน cache blocking กับ subword parallelism.",
+      "remember": [
+        "ภาพ hierarchy ARM/Intel (หน้า 103) และ TLB สองระดับ (หน้า 104) ต้องดูตัวเลขจากภาพต้นฉบับ",
+        "multi-banked รองรับ multiple issue เมื่อไม่มี bank conflict (หน้า 105)",
+        "fence.i/fence/sfence.vm; CSR read/write/set/clear; ecall/ebreak/sret/wfi (หน้า 106)",
+        "DGEMM รวม cache blocking และ subword parallelism (หน้า 107)"
+      ],
+      "terms": [
+        "multi-banked cache",
+        "non-blocking cache",
+        "prefetching",
+        "fence",
+        "CSR",
+        "DGEMM"
+      ],
+      "example": "ภาพหน้า 103–104 เปรียบการจัด L1/L2 และ TLB; หน้า 107 แสดงแนว blocking ของ matrix multiply",
+      "confusion": "อย่าตีความว่า multi-bank รับหลายคำขอได้เสมอ: สไลด์กำกับเงื่อนไข no bank conflicts",
+      "mnemonic": "หลาย bank ต้องไม่ชน; DGEMM บล็อกข้อมูล",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "multi-banked cache ช่วย multiple access ภายใต้เงื่อนไขใด?",
+          "options": [
+            "ไม่มี bank conflicts",
+            "cache fully associative",
+            "ไม่มี TLB",
+            "disk idle"
+          ],
+          "correct": 0,
+          "answer": "ไม่มี bank conflicts",
+          "pages": "หน้า 103–107"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้า 106 จัด ecall อยู่ในกลุ่มใด?",
+          "answer": "System",
+          "pages": "หน้า 103–107"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "DGEMM หน้า 107 รวมเทคนิคใด?",
+          "answer": "cache blocking กับ subword parallelism",
+          "pages": "หน้า 103–107"
+        }
+      ],
+      "figures": [
+        "fig-103",
+        "fig-104",
+        "fig-105",
+        "fig-106",
+        "fig-107"
+      ]
+    },
+    {
+      "id": "pitfalls-conclusion",
+      "title": "Pitfalls และข้อสรุป Memory Hierarchy",
+      "level": "important",
+      "pages": "หน้า 108–111",
+      "reason": "เป็นตัวอย่างและการเปรียบเทียบที่สไลด์ใช้ประยุกต์หลักการ",
+      "summary": "การสับสน byte กับ word address เปลี่ยนตำแหน่ง mapping ใน cache; stride ใหญ่จากการวนแถว/คอลัมน์ผิดแบบทำให้ locality แย่. ใน multiprocessor ต้องคำนึง associativity ของ shared L2/L3; AMAT อย่างเดียวไม่สะท้อน out-of-order ที่มี non-blocked accesses. บทสรุปย้ำว่าลำดับชั้นและ caching อาศัย locality เพื่อให้ภาพเหมือน memory ทั้งเร็วและใหญ่.",
+      "remember": [
+        "32-byte cache, 4-byte blocks: byte 36 → block 1; word 36 → block 4 (หน้า 108)",
+        "large stride ลด locality (หน้า 108)",
+        "shared cache associativity น้อยกว่า core count อาจเกิด conflict misses (หน้า 109)",
+        "AMAT ไม่รวมผล non-blocked accesses ของ out-of-order; สไลด์แนะนำ simulation (หน้า 109)",
+        "segmentation และ VMM บน ISA ที่ไม่เอื้อต่อ virtualization เป็น pitfalls อีกสองข้อ (หน้า 110)"
+      ],
+      "terms": [
+        "byte/word address",
+        "stride",
+        "AMAT",
+        "non-blocked access",
+        "segmentation",
+        "VMM"
+      ],
+      "example": "byte 36: floor(36/4)=9, 9 mod 8=1; word 36: 36 mod 8=4 ตาม cache 8 blocks หน้า 108",
+      "confusion": "อย่าใช้ AMAT ตัวเดียวตัดสิน out-of-order CPU; และอย่าสลับหน่วย byte/word ก่อนคำนวณ block index",
+      "mnemonic": "หน่วยก่อน index; locality ก่อนความเร็ว",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "byte 36 ในตัวอย่างหน้า 108 map ไป cache block ใด?",
+          "options": [
+            "1",
+            "4",
+            "9",
+            "36"
+          ],
+          "correct": 0,
+          "answer": "1",
+          "pages": "หน้า 108–111"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ทำไม AMAT ไม่พอสำหรับ out-of-order processors?",
+          "answer": "ไม่รวมผลของ non-blocked accesses ตามหน้า 109",
+          "pages": "หน้า 108–111"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หลักการใดทำให้ caching ช่วยประสาน memory เร็วเล็กกับช้าใหญ่?",
+          "answer": "principle of locality ตามหน้า 111",
+          "pages": "หน้า 108–111"
+        }
+      ],
+      "figures": [
+        "fig-108",
+        "fig-109",
+        "fig-110",
+        "fig-111"
+      ]
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "1 · หลัก locality และเทคโนโลยี",
+      "text": "เริ่ม temporal/spatial locality, memory hierarchy, SRAM/DRAM, flash และ disk",
+      "pages": "หน้า 3–20",
+      "topic": "locality-hierarchy"
+    },
+    {
+      "title": "2 · Cache พื้นฐานและ mapping",
+      "text": "อ่าน block/tag/valid แล้วไล่ direct-mapped trace และ address fields",
+      "pages": "หน้า 21–34",
+      "topic": "cache-basics"
+    },
+    {
+      "title": "3 · Write, performance และ associativity",
+      "text": "แยก write policy ก่อนคำนวณ CPI/AMAT และเทียบ direct/n-way/fully",
+      "pages": "หน้า 35–56",
+      "topic": "cache-writes"
+    },
+    {
+      "title": "4 · Software และความน่าเชื่อถือ",
+      "text": "ต่อ locality ของโค้ด/blocked matrix แล้วทบทวน MTTF/Availability และ ECC",
+      "pages": "หน้า 57–68",
+      "topic": "software-blocking"
+    },
+    {
+      "title": "5 · Virtualization และ address translation",
+      "text": "ตาม VM/VMM → virtual memory/page table → TLB/page fault/protection",
+      "pages": "หน้า 69–86",
+      "topic": "virtual-machines"
+    },
+    {
+      "title": "6 · กรอบออกแบบและ controller",
+      "text": "สรุป placement/finding/replacement/write, ประเภท miss และ FSM",
+      "pages": "หน้า 87–97",
+      "topic": "memory-framework"
+    },
+    {
+      "title": "7 · Multiprocessor และข้อควรระวัง",
+      "text": "ปิดด้วย coherence/consistency ระบบตัวอย่าง และ pitfalls",
+      "pages": "หน้า 98–111",
+      "topic": "cache-coherence"
+    }
+  ],
+  "plan": [
+    {
+      "title": "รอบ 1 · วางแผนภาพรวม",
+      "task": "อ่านหน้า 3 และสรุป locality → hierarchy → cache → VM → multicore ด้วยภาษาตัวเอง",
+      "check": "อธิบายว่าทำไม cache ช่วยให้เหมือนมีหน่วยความจำใหญ่และเร็วได้",
+      "pages": "หน้า 3–8, 111"
+    },
+    {
+      "title": "รอบ 2 · ฝึก cache ทีละขั้น",
+      "task": "ไล่ block/tag/index/offset, direct trace, write policy, associativity และ CPI/AMAT พร้อมเปิดภาพขยาย",
+      "check": "ทำ trace หน้า 25–30 และ 48–49 รวมตัวอย่างหน้า 41–43 ได้",
+      "pages": "หน้า 21–56"
+    },
+    {
+      "title": "รอบ 3 · ระบบที่พึ่ง cache",
+      "task": "ทบทวน software blocking, dependability/ECC, VM/page table/TLB และ protection",
+      "check": "แยก TLB miss กับ page fault และคำนวณ availability ได้",
+      "pages": "หน้า 57–86"
+    },
+    {
+      "title": "รอบ 4 · วิเคราะห์ระบบหลาย core",
+      "task": "ใช้สี่คำถามของ hierarchy วิเคราะห์ miss/FSM/coherence/consistency และ pitfalls",
+      "check": "อธิบายเหตุผลของ invalidate และผลของ stride/byte-vs-word ได้",
+      "pages": "หน้า 87–111"
+    },
+    {
+      "title": "รอบ 5 · ทดสอบเว้นระยะ",
+      "task": "ทำคำถาม 3 ข้อต่อหัวข้อ สุ่ม quiz แล้วกลับไปอ่านเฉพาะข้อผิดในวันถัดไปตามเวลาที่มี",
+      "check": "ตอบครบทุกหัวข้อและชี้จุดหน้า 32/55 ที่ต้องตรวจต้นฉบับได้",
+      "pages": "หน้า 3–111"
+    }
+  ],
+  "cram": [
+    {
+      "title": "ถ้าเหลือ 3 วัน",
+      "text": "วัน 1 locality + cache mapping/write/trace หน้า 3–40; วัน 2 CPI/AMAT/associativity/ECC/VM/TLB หน้า 41–86; วัน 3 miss/FSM/coherence/pitfalls หน้า 87–111 และทำคำถาม"
+    },
+    {
+      "title": "ถ้าเหลือ 1 วัน",
+      "text": "เริ่ม cache mapping/trace/write หน้า 21–37 → CPI/AMAT/associativity หน้า 41–56 → VM/TLB หน้า 73–86 → miss/coherence หน้า 92–102 → สุ่มข้อผิด"
+    },
+    {
+      "title": "ถ้าเหลือ 3 ชั่วโมง",
+      "text": "0–45 นาที locality/cache mapping/write หน้า 4–37; 45–95 นาที CPI/AMAT/associativity หน้า 41–56; 95–140 นาที ECC/VM/TLB หน้า 63–86; 140–165 นาที miss/coherence หน้า 92–102; 165–180 นาที quiz และจุดหน้า 32/55"
+    }
+  ],
+  "strategyIntro": "ลำดับความสำคัญเพื่อทบทวนตั้งจากนิยาม สูตร กลไก และตัวอย่างที่สไลด์เน้นต่อเนื่อง; ไม่สามารถยืนยันความถี่ออกสอบจากไฟล์เดียว",
+  "strategy": [
+    {
+      "title": "ควรท่องจำ",
+      "text": "locality, hit/miss, tag/index/offset, write policies, AMAT/CPI, associativity, MTTF/MTTR/MTBF/Availability, SEC/DEC, TLB และประเภท miss (หน้า 4–8, 21–56, 63–68, 73–93)"
+    },
+    {
+      "title": "ควรฝึกโจทย์",
+      "text": "disk access 15k rpm, direct-map trace, address subdivision, CPI/AMAT, associative trace, L1/L2, availability และ byte/word mapping (หน้า 19, 25–32, 41–55, 64, 108)"
+    },
+    {
+      "title": "ควรเข้าใจแนวคิด",
+      "text": "software blocking, VM/page fault, protection, FSM, coherence/consistency, bank conflicts และ pitfalls (หน้า 57–62, 69–86, 94–111)"
+    },
+    {
+      "title": "เตรียมข้อสอบแบบผสม",
+      "text": "เลือกตอบศัพท์/แยก miss; อัตนัยอธิบายลำดับขั้น cache/VM/coherence; คำนวณ CPI/AMAT/mapping; วิเคราะห์ trace, diagram และจุดไม่สอดคล้องในต้นฉบับ"
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "Locality และ Memory Hierarchy",
+      "back": "Temporal: สิ่งที่ใช้ไม่นานมักถูกใช้ซ้ำ; Spatial: สิ่งที่อยู่ใกล้กันมักถูกใช้ต่อ (หน้า 4)",
+      "pages": "หน้า 3–8"
+    },
+    {
+      "front": "SRAM, DRAM และเทคนิคเพิ่ม bandwidth",
+      "back": "ตัวเลขหน้า 9 เป็นค่าตัวอย่างในสไลด์: SRAM 0.5–2.5ns; DRAM 50–70ns; disk 5–20ms",
+      "pages": "หน้า 9–14"
+    },
+    {
+      "front": "Flash: NOR, NAND และ wear leveling",
+      "back": "Flash ไม่หายเมื่อปิดไฟตามคำว่า nonvolatile (หน้า 15)",
+      "pages": "หน้า 15–16"
+    },
+    {
+      "front": "Disk sector และเวลาการเข้าถึง",
+      "back": "องค์ประกอบการเข้าถึง: queue, seek, rotation, transfer, controller (หน้า 18)",
+      "pages": "หน้า 17–20"
+    },
+    {
+      "front": "Cache lookup, direct mapping, tag และ valid",
+      "back": "Direct mapped: index = block address modulo #cache blocks (หน้า 23)",
+      "pages": "หน้า 21–24"
+    },
+    {
+      "front": "ไล่สถานะ 8-block direct-mapped cache",
+      "back": "22→binary 10 110→index110 miss ครั้งแรก; 26→11 010→index010 miss (หน้า 26–27)",
+      "pages": "หน้า 25–30"
+    },
+    {
+      "front": "Tag–Index–Offset และการคำนวณ block",
+      "back": "block address=floor(byte address/bytes per block) (หน้า 32)",
+      "pages": "หน้า 31–32"
+    },
+    {
+      "front": "ขนาด block กับการจัดการ cache miss",
+      "back": "larger block อาจลด miss จาก spatial locality แต่เพิ่ม miss penalty (หน้า 33)",
+      "pages": "หน้า 33–34"
+    },
+    {
+      "front": "Write-through, write-back และ write miss",
+      "back": "Write-through อัปเดต cache+memory; ตัวอย่าง base CPI1, stores10%, write100 cycles→CPI11 (หน้า 35)",
+      "pages": "หน้า 35–37"
+    },
+    {
+      "front": "Split cache และ main memory ที่รองรับ cache",
+      "back": "ตัวอย่าง FastMATH: I-cache/D-cache อย่างละ 16KB, 256 blocks×16 words/block; miss rate 0.4%/11.4% (หน้า 38)",
+      "pages": "หน้า 38–40"
+    },
+    {
+      "front": "Memory stall CPI และ AMAT",
+      "back": "memory stall cycles≈memory accesses/program×miss rate×miss penalty (หน้า 41)",
+      "pages": "หน้า 41–44"
+    },
+    {
+      "front": "Direct, n-way และ fully associative",
+      "back": "Fully associative: วางได้ทุก entry ต้องค้นพร้อมกันทุก entry (หน้า 45)",
+      "pages": "หน้า 45–47"
+    },
+    {
+      "front": "ตัวอย่าง access 0, 8, 0, 6, 8",
+      "back": "Direct mapped: 5 misses ใน 5 accesses (หน้า 48)",
+      "pages": "หน้า 48–50"
+    },
+    {
+      "front": "Replacement policy: LRU และ Random",
+      "back": "direct mapped ไม่มี choice ในการแทน (หน้า 52)",
+      "pages": "หน้า 51–52"
+    },
+    {
+      "front": "L1/L2 และตัวอย่าง CPI หลายระดับ",
+      "back": "L1 เล็ก/เร็ว; L2 ใหญ่/ช้ากว่า L1 แต่เร็วกว่า main memory (หน้า 53,56)",
+      "pages": "หน้า 53–56"
+    },
+    {
+      "front": "Advanced CPU, locality ของ software และ blocking",
+      "back": "out-of-order: dependent instructions รอ, independent instructions อาจเดินต่อ (หน้า 57)",
+      "pages": "หน้า 57–62"
+    },
+    {
+      "front": "Dependability: MTTF, MTTR, MTBF, Availability",
+      "back": "fault เป็น failure ของ component แต่อาจไม่ทำให้บริการล้ม (หน้า 63)",
+      "pages": "หน้า 63–64"
+    },
+    {
+      "front": "Hamming SEC และ SEC/DEC",
+      "back": "Hamming distance 2 ตรวจ 1-bit; distance 3 แก้ 1-bit/ตรวจ 2-bit (หน้า 65)",
+      "pages": "หน้า 65–68"
+    },
+    {
+      "front": "Virtual Machines, VMM และ privileged support",
+      "back": "VM ช่วย isolation และ resource sharing แต่มี performance impact (หน้า 69)",
+      "pages": "หน้า 69–72"
+    },
+    {
+      "front": "Virtual Memory, address translation และ page fault",
+      "back": "VM block เรียก page; translation miss เรียก page fault (หน้า 73)",
+      "pages": "หน้า 73–75"
+    },
+    {
+      "front": "Page table, PTE และ replacement/write-back",
+      "back": "Page table register ชี้ page table ใน physical memory; PTE indexed by virtual page number (หน้า 76)",
+      "pages": "หน้า 76–79"
+    },
+    {
+      "front": "TLB lookup, miss handler และ page fault handler",
+      "back": "TLB=Translation Look-aside Buffer; cache PTE ใน CPU (หน้า 80)",
+      "pages": "หน้า 80–84"
+    },
+    {
+      "front": "TLB/Cache interaction และ Memory Protection",
+      "back": "physical tag→translate ก่อน cache lookup (หน้า 85)",
+      "pages": "หน้า 85–86"
+    },
+    {
+      "front": "กรอบร่วมของ Memory Hierarchy",
+      "back": "Placement: direct 1 ที่, n-way n ที่ใน set, fully ที่ใดก็ได้ (หน้า 88)",
+      "pages": "หน้า 87–91"
+    },
+    {
+      "front": "Compulsory, Capacity, Conflict miss และ trade-offs",
+      "back": "Compulsory = first access (หน้า 92)",
+      "pages": "หน้า 92–93"
+    },
+    {
+      "front": "Cache Controller ด้วย Finite State Machine",
+      "back": "ตัวอย่าง: 32-bit byte address; tag 18, index 10, offset 4 (หน้า 94)",
+      "pages": "หน้า 94–97"
+    },
+    {
+      "front": "Cache Coherence และ invalidating snooping",
+      "back": "ตัวอย่าง CPU A/B อ่าน X=0 แล้ว A เขียน 1: cache B อาจยังมี 0 (หน้า 98)",
+      "pages": "หน้า 98–101"
+    },
+    {
+      "front": "Memory Consistency และลำดับการมองเห็น writes",
+      "back": "“seen” = read คืน written value (หน้า 102)",
+      "pages": "หน้า 102"
+    },
+    {
+      "front": "ARM/Intel cache, 2-level TLB และ system instructions",
+      "back": "ภาพ hierarchy ARM/Intel (หน้า 103) และ TLB สองระดับ (หน้า 104) ต้องดูตัวเลขจากภาพต้นฉบับ",
+      "pages": "หน้า 103–107"
+    },
+    {
+      "front": "Pitfalls และข้อสรุป Memory Hierarchy",
+      "back": "32-byte cache, 4-byte blocks: byte 36 → block 1; word 36 → block 4 (หน้า 108)",
+      "pages": "หน้า 108–111"
+    },
+    {
+      "front": "Temporal locality",
+      "back": "มีแนวโน้มใช้ข้อมูลเดิมอีกในเวลาใกล้กัน",
+      "pages": "หน้า 4"
+    },
+    {
+      "front": "Spatial locality",
+      "back": "มีแนวโน้มใช้ address ที่อยู่ใกล้ข้อมูลที่เพิ่งใช้",
+      "pages": "หน้า 4"
+    },
+    {
+      "front": "Hit / Miss",
+      "back": "พบ block ที่ระดับบน / ไม่พบและต้องไประดับล่าง",
+      "pages": "หน้า 7–8"
+    },
+    {
+      "front": "Miss penalty",
+      "back": "เวลาที่ต้องใช้ดึง block จากระดับล่างหลัง miss",
+      "pages": "หน้า 8"
+    },
+    {
+      "front": "SRAM / DRAM",
+      "back": "SRAM เร็วและแพงกว่า; DRAM ใช้เป็น main memory ใน hierarchy",
+      "pages": "หน้า 9–12"
+    },
+    {
+      "front": "Direct mapped",
+      "back": "แต่ละ memory block มีตำแหน่ง cache ได้หนึ่งตำแหน่ง",
+      "pages": "หน้า 22–24"
+    },
+    {
+      "front": "Tag / Index / Offset",
+      "back": "ตรวจ identity ของ block / เลือก entry-set / เลือกตำแหน่งภายใน block",
+      "pages": "หน้า 31–32"
+    },
+    {
+      "front": "Write-through",
+      "back": "เขียน cache และระดับล่าง",
+      "pages": "หน้า 35, 91"
+    },
+    {
+      "front": "Write-back",
+      "back": "เขียน cache ก่อน แล้วระดับล่างเมื่อ block ถูกแทน",
+      "pages": "หน้า 35, 91"
+    },
+    {
+      "front": "Write allocate",
+      "back": "เมื่อ write miss ดึง block เข้า cache ก่อนเขียน",
+      "pages": "หน้า 36–37"
+    },
+    {
+      "front": "AMAT",
+      "back": "Hit time + Miss rate × Miss penalty",
+      "pages": "หน้า 43"
+    },
+    {
+      "front": "n-way set associative",
+      "back": "block วางได้ n ตำแหน่งใน set ของตน",
+      "pages": "หน้า 45–47, 88"
+    },
+    {
+      "front": "LRU",
+      "back": "เลือกแทน entry ที่ไม่ถูกใช้นานที่สุด",
+      "pages": "หน้า 52, 90"
+    },
+    {
+      "front": "MTBF",
+      "back": "MTTF + MTTR ตามสไลด์",
+      "pages": "หน้า 63–64"
+    },
+    {
+      "front": "Availability",
+      "back": "MTTF / (MTTF + MTTR)",
+      "pages": "หน้า 64"
+    },
+    {
+      "front": "SEC / SEC-DED",
+      "back": "แก้ 1-bit error / แก้ 1-bit และตรวจ 2-bit error",
+      "pages": "หน้า 65–68"
+    },
+    {
+      "front": "Virtual Machine Monitor",
+      "back": "ชั้นที่จัดการและแยก VM จาก physical resources",
+      "pages": "หน้า 69–72"
+    },
+    {
+      "front": "Page fault",
+      "back": "virtual page ที่ต้องการไม่อยู่ใน physical memory",
+      "pages": "หน้า 74–75, 82–84"
+    },
+    {
+      "front": "PTE",
+      "back": "page table entry ที่ใช้แปล page และเก็บสถานะที่เกี่ยวข้อง",
+      "pages": "หน้า 76–79"
+    },
+    {
+      "front": "TLB",
+      "back": "cache ของ page table entries เพื่อเร่ง translation",
+      "pages": "หน้า 80"
+    },
+    {
+      "front": "Compulsory / Capacity / Conflict",
+      "back": "ครั้งแรก / cache รวมไม่พอ / block ชน set",
+      "pages": "หน้า 92"
+    },
+    {
+      "front": "Cache coherence",
+      "back": "ทำให้ core ต่าง ๆ เห็นค่าของ shared location ตามกติกา coherence",
+      "pages": "หน้า 98–101"
+    },
+    {
+      "front": "Memory consistency",
+      "back": "กติกาเวลาที่ write ถูก processor อื่นมองเห็น",
+      "pages": "หน้า 102"
+    },
+    {
+      "front": "FSM",
+      "back": "current state และ input กำหนด next state ของ controller",
+      "pages": "หน้า 96–97"
+    }
+  ]
+}

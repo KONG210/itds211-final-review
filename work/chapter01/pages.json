@@ -1,0 +1,174 @@
+[
+  {
+    "page": 1,
+    "text": "W.Suntiamorntut, Ph.D.\nComputer Architecture & OS\nI: Basic Computer Components & \nIntroduction to Computer Architecture \n"
+  },
+  {
+    "page": 2,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n•The structure and architecture of the computer systems;  \n•basic components of computers;  \n•data representations;  \n•the Assembly Language;  \n•memory system organization;  \n•the memory hierarchy; the cache memory;  \n•input and output systems;  \n•storage systems;  \n•computing units;  \n•the multiprocessor architecture;\n2"
+  },
+  {
+    "page": 3,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nDeﬁnition\nArchitecture (สถาปัตยกรรมคอมพิวเตอร์) refers to attributes of a system \nthat are visible to a programmer. These attributes have direct impact on \nthe logical execution of a program. (Instruction set, addressing modes, \ndata types) เกี่ยวข้องกับผู้ใช้ / โปรแกรมเมอร์เป็นหลัก\nOrganization (โครงสร้างการจัดระบบคอมพิวเตอร์) refers to the operational \nunits and their interconnections that realise the architectural \nspeciﬁcations  (คําสั่งถูกทําให้เกิดขึ้นจริงอย่างไรในระดับวงจร, cache, pipeline, \ndesign, bus width, clock speed) เกี่ยวข้องกับวิศวกรฮาร์ดแวร์ \nWHAT\nHOW\n3"
+  },
+  {
+    "page": 4,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nDeﬁning Computer Architecture\n■“Old” view of computer architecture: \n■Instruction Set Architecture (ISA) design \n■i.e. decisions regarding: \n■ registers, memory addressing, addressing modes, instruction \noperands, available operations, control flow instructions, \ninstruction encoding \n■“Real” computer architecture: \n■Specific requirements of the target machine \n■Design to maximize performance within constraints: \ncost, power, and availability \n■Includes ISA, microarchitecture, hardware\nCopyright © 2019, Elsevier Inc. All rights reserved.\nDefining Computer Architecture\n4"
+  },
+  {
+    "page": 5,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nClasses of Computers\nSupercomputers\nEmbedded Computers\nHigh-end scientiﬁc and engineering calculations\nHighest capability but represent a small fraction of the \noverall computer market\nHidden as components of systems\nStringent power/performance/cost constraints5"
+  },
+  {
+    "page": 6,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCloud Computing\nCloud Computing\n↭ Cloud Computing: a model for enabling ubiquitous,\nconvenient, on demand network access to a shared pool of\nconﬁgurable computing resources\n↭ Cloud networking: refers to the networks and network\nmanagement functionality that must be in place to enable\ncloud computing.\n↭ Cloud Storage: consists of database storage and\ndatabase applications hosted remotely on cloud servers\n6"
+  },
+  {
+    "page": 7,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCloud Services Models\n7"
+  },
+  {
+    "page": 8,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCloud Computing Beneﬁts\n8"
+  },
+  {
+    "page": 9,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nUnderstanding Performance\n9"
+  },
+  {
+    "page": 10,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nEight Great Ideas\nGreat Ideas in Computer Architecture\n10"
+  },
+  {
+    "page": 11,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nBelow Your Program\n11"
+  },
+  {
+    "page": 12,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nLevels of Program Code\n12\n"
+  },
+  {
+    "page": 13,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nComponents of Computers\n• Input Devices \n• Central Processing Unit (CPU) \n• Memory (RAM) \n• Storage Devices \n• Motherboard \n• Output Devices \n• Power Supply Unit \n• Graphics Processing Unit (GPU)\n13"
+  },
+  {
+    "page": 14,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nInside the Processor (CPU)\n• Control Unit \n• Controls the operation of the CPU \n• Arithmetic and Logic Unit (ALU) \n• Performs the computer’s data processing function \n• Registers \n• Provide storage internal to the CPU \n• CPU interconnection \n• Communication among the control unit, ALU and registers\n14"
+  },
+  {
+    "page": 15,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMachine Cycle\n15"
+  },
+  {
+    "page": 16,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nRegisters in CPU\n• Program counter (PC) \n• Instruction Register (IR) \n• Status register: status, ﬂags, \n16"
+  },
+  {
+    "page": 17,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCache Memory\n• Cache Level \n• L1 cache: fastest and smallest \n• L2 cache: next fastest and smallest\n17"
+  },
+  {
+    "page": 18,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCache Memory\n•  Multiple layers of memory between the processor and main memory \n• Is smaller and faster than main memory \n• Used to speed up memory access by placing in the cache data from \nmain memory that is likely to used in the near future \n• A greater performance improvement may be obtained by using \nmultiple levels of cache, with level 1 (L1) closest to the core and \nadditional levels (L2, L3, etc.) progressively farther from the core\n18"
+  },
+  {
+    "page": 19,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMulti-core VS Multi-thread\nมี hardware จริงทำงาน Virtual แบ่งการทำงาน\nHyper-Threading ของ Intel หรือ SMT ของ AMD19"
+  },
+  {
+    "page": 20,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMulti-core VS Multi-thread\n• Hardware ทางกายภาพมีอยู่จริง \n• รับงานชิ้นใหญ่มาประมวลผลแยกกัน\nแบบคู่ขนาน (parallel) \n• Core = จํานวนเชฟทําอาหารในครัว\n• เสมือนจริง (เทคนิคแบ่งการทํางาน) \n• จัดการงานเบื้องหลังและแบ่งงานย่อย\nป้อนให้ core \n• จํานวนแขนของเชฟแต่ละคน\nMulti-core Multi-thread\n20"
+  },
+  {
+    "page": 21,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nSimpliﬁed view of major elements of a multicore computer\n21"
+  },
+  {
+    "page": 22,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMotherboard with Two Intel Quad-Core Xeon Processors\n22"
+  },
+  {
+    "page": 23,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nInside the Processor \n23\nApple A5"
+  },
+  {
+    "page": 24,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nManufacturing ICs\n24"
+  },
+  {
+    "page": 25,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nIntel Core i7 Wafer\n25\n"
+  },
+  {
+    "page": 26,
+    "text": "Copyright © 2019, Elsevier Inc. All rights reserved. 26\nSingle Processor Performance\nIntroduction\n"
+  },
+  {
+    "page": 27,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nRISC vs CISC Architecture\n• RISC = Reduced Instruction Set Computing  \n• CISC = Complex Instruction Set Computing\n# mPC = microprogram counter, mPM = Microprocessor Mode\n27"
+  },
+  {
+    "page": 28,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nEmbedded Systems\n• The use of electronics and software within a product \n• Billions of computer systems are produced each year that are embedded \nwithin larger devices \n• Many devices that use electric power have an embedded computing system \n• Often embedded systems are tightly coupled to their environment  \n• Real-time constraints  \n• Multiple activities must managed simultaneously this imposes more \ncomplex real-time constraints\n28"
+  },
+  {
+    "page": 29,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nExample of Embedded system (processor)\n29"
+  },
+  {
+    "page": 30,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nARM Products\n30"
+  },
+  {
+    "page": 31,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMicrocontroller chip based on Cortex-M3\n• ARM : Cortex-M series processors - fast, highly \ndeterministic interrupt management, low power \nconsumption \n• Cortex-M3 : 16, 32-bit applications, has debug \nand trace features to enable software \ndevelopers to develop their applications quickly.\n31"
+  },
+  {
+    "page": 32,
+    "text": "Copyright © 2019, Elsevier Inc. All rights reserved. 32\nParallelism\n■Classes of parallelism in applications: \n■Data-Level Parallelism (DLP) \n■Task-Level Parallelism (TLP) \n■Classes of architectural parallelism: \n■Instruction-Level Parallelism (ILP) \n■Vector architectures/Graphic Processor Units (GPUs) \n■Thread-Level Parallelism \n■Request-Level Parallelism\nClasses of Computers"
+  },
+  {
+    "page": 33,
+    "text": "Copyright © 2019, Elsevier Inc. All rights reserved. 33\nFlynn’s Taxonomy\n■ Single instruction stream, single data stream (SISD) \n■ Single instruction stream, multiple data streams (SIMD) \n■ Vector architectures \n■ Multimedia extensions \n■ Graphics processor units \n■ Multiple instruction streams, single data stream (MISD) \n■ No commercial implementation \n■ Multiple instruction streams, multiple data streams \n(MIMD) \n■ Tightly-coupled MIMD \n■ Loosely-coupled MIMD\nClasses of Computers"
+  },
+  {
+    "page": 34,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nSystem Level Architecture Patterns\n• Monolithic - Single uniﬁed system \n• Client-server - Split between requesting and serving machines \n• Distributed systems - computation spread across networked machines \n• Micro services - modular, independently deployable services (more of a \nsoftware architecture pattern)\n34"
+  },
+  {
+    "page": 35,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nPerformance\n"
+  },
+  {
+    "page": 36,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nRelative Performance\n36\n"
+  },
+  {
+    "page": 37,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMeasuring Execution Time\n37\n"
+  },
+  {
+    "page": 38,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nMeasuring Execution Time\n38\n"
+  },
+  {
+    "page": 39,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCPU Time\n39\n"
+  },
+  {
+    "page": 40,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCPU Time Example\n40\n"
+  },
+  {
+    "page": 41,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nInstruction Count and CPI\n41\n"
+  },
+  {
+    "page": 42,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCPI Example\n42\n"
+  },
+  {
+    "page": 43,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nQ & A\n"
+  }
+]

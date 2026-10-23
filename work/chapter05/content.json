@@ -1,0 +1,2089 @@
+{
+  "source": "itds-211_comp_arch_Chapter05.pdf",
+  "sourcePageCount": 52,
+  "course": "ITDS-211 · Computer Architecture & Operating System",
+  "instructor": "W. Suntiamorntut, Ph.D.",
+  "chapter": "Chapter05 · I/O Systems",
+  "description": "จาก I/O module สู่ programmed/interrupt-driven I/O, DMA, DCA/DDIO, I/O channel และตัวอย่างการเชื่อมต่อ",
+  "notice": "เลขหน้าคือหน้า PDF 1–52; หน้า 40 เป็นโจทย์รายงานกลุ่ม และหน้า 41–48 เป็นหัวข้อรายงานตามสไลด์ ตัวเลขบางจุดในหน้า 30, 46, 49 ต้องตรวจต้นฉบับ",
+  "purpose": "บทนี้เรียนเพื่อเข้าใจว่า processor, I/O module, อุปกรณ์ภายนอก, memory และ cache ประสานการรับส่งข้อมูลอย่างไร โดยเทียบเวลารอและทางเดินข้อมูลของ programmed, interrupt-driven, DMA และ DCA/DDIO แล้วมองการขยายระบบด้วย I/O channels และตัวอย่าง interfaces",
+  "purposePages": "หน้า 2–3, 6–9, 24–39, 41–51",
+  "objectiveNote": "วัตถุประสงค์รายบทที่ระบุโดยตรง: ต้องตรวจสอบจากต้นฉบับ; เป้าหมายต่อไปนี้สรุปจากหัวข้อและแผนภาพในสไลด์",
+  "flashcardNote": "Flashcards ยึดชื่อส่วนประกอบ กลไก สัญญาณ และนิยามจากสไลด์; ตัวเลขเทคโนโลยีเป็นข้อมูลประจำเอกสาร ไม่ใช่สเปกปัจจุบัน",
+  "goals": [
+    {
+      "text": "ระบุองค์ประกอบ external device และ I/O module พร้อมหน้าที่ของแต่ละส่วน",
+      "pages": "หน้า 3–7"
+    },
+    {
+      "text": "เปรียบเทียบ programmed, interrupt-driven และ DMA ทั้งเวลารอและทางเดินข้อมูล รวม I/O addressing/commands",
+      "pages": "หน้า 8–14, 24–30"
+    },
+    {
+      "text": "ไล่ interrupt, ระบุ requester/priority และอธิบายผลของ cache ต่อ network I/O พร้อม DCA/DDIO",
+      "pages": "หน้า 15–23, 31–37"
+    },
+    {
+      "text": "อ่าน I/O channels และแยกบทบาท interfaces/IBM channel ที่เป็นตัวอย่างในสไลด์",
+      "pages": "หน้า 38–39, 41–51"
+    }
+  ],
+  "limits": [
+    "อ่านและตรวจภาพครบ 52 หน้า: หน้า 1 ปก, หน้า 2 Course Outline, หน้า 52 Q&A; เนื้อหาหลักหน้า 3–39 และตัวอย่างหน้า 41–51",
+    "หน้า 40 เป็น Assignment ให้รายงานกลุ่ม 9 เรื่อง และหน้า 41–48 เป็นหัวข้อรายงาน; ไม่มีหลักฐานว่าส่วนนี้มีน้ำหนักข้อสอบเท่าใด",
+    "ไม่มี Chapter Objectives แบบรายการชัดเจนหรือข้อสอบเก่า: ต้องตรวจสอบจากต้นฉบับ; การจัดระดับเป็นการจัดเวลาอ่าน",
+    "หน้า 21–22 ใช้ชื่อ Intel 8255A แต่ภาพหน้า 23 ใช้ 82C55A; อ่านชื่อรุ่นตามหน้าต้นฉบับ",
+    "หน้า 30 ตาราง Intel 8237A status แถว D4–D7 พิมพ์ Channel 0 request ซ้ำ: ต้องตรวจสอบจากต้นฉบับ",
+    "หน้า 46 คำอธิบาย SATA วาง 6 Gbps กับ 300 Mbps ต่อ device โดยไม่แจกเงื่อนไข: ต้องตรวจสอบจากต้นฉบับก่อนใช้คำนวณ",
+    "หน้า 49 ภาพ IBM EC12 เขียน ≤60 และ ≤1024 partitions/system คนละตำแหน่ง: ต้องตรวจสอบจากต้นฉบับ",
+    "อัตราและคำว่า current ในหน้า 31, 41–48 เป็นคำในสไลด์ ไม่ใช่ข้อมูลสเปกหรือสถานะเทคโนโลยีปัจจุบัน",
+    "Chapter05 ไม่มีตัวอย่างโจทย์คำนวณแยกเป็นข้อในสไลด์ จึงเน้นคำถามเลือกตอบ อัตนัย และวิเคราะห์ภาพ/ทางเดินข้อมูล"
+  ],
+  "figures": [
+    {
+      "id": "fig-3",
+      "page": 3,
+      "file": "slide-003.png",
+      "title": "Generic Model of an I/O Module · หน้า 3",
+      "caption": "ผัง I/O module เชื่อม address/data/control lines ของ system bus กับ peripheral links (itds-211_comp_arch_Chapter05.pdf, หน้า 3)"
+    },
+    {
+      "id": "fig-4",
+      "page": 4,
+      "file": "slide-004.png",
+      "title": "External Devices · หน้า 4",
+      "caption": "ภาพสไลด์เรื่อง External Devices สำหรับทบทวนหัวข้อ I/O module และ external device (itds-211_comp_arch_Chapter05.pdf, หน้า 4)"
+    },
+    {
+      "id": "fig-5",
+      "page": 5,
+      "file": "slide-005.png",
+      "title": "Block Diagram of an External Device · หน้า 5",
+      "caption": "ผัง external device แยก control logic, buffer และ transducer (itds-211_comp_arch_Chapter05.pdf, หน้า 5)"
+    },
+    {
+      "id": "fig-6",
+      "page": 6,
+      "file": "slide-006.png",
+      "title": "The major functions for an I/O module fall into the · หน้า 6",
+      "caption": "ภาพสไลด์เรื่อง The major functions for an I/O module fall into the สำหรับทบทวนหัวข้อ หน้าที่และโครงสร้างภายใน I/O module (itds-211_comp_arch_Chapter05.pdf, หน้า 6)"
+    },
+    {
+      "id": "fig-7",
+      "page": 7,
+      "file": "slide-007.png",
+      "title": "Block Diagram of an I/O Module · หน้า 7",
+      "caption": "ผัง I/O module มี data registers, status/control registers และ device interface logic (itds-211_comp_arch_Chapter05.pdf, หน้า 7)"
+    },
+    {
+      "id": "fig-8",
+      "page": 8,
+      "file": "slide-008.png",
+      "title": "Programmed I/O · หน้า 8",
+      "caption": "ภาพสไลด์เรื่อง Programmed I/O สำหรับทบทวนหัวข้อ Programmed I/O, Interrupt-driven I/O และ DMA (itds-211_comp_arch_Chapter05.pdf, หน้า 8)"
+    },
+    {
+      "id": "fig-9",
+      "page": 9,
+      "file": "slide-009.png",
+      "title": "Summary of I/O Techniques · หน้า 9",
+      "caption": "ตารางสรุปทางเดินข้อมูลของ programmed, interrupt-driven และ DMA (itds-211_comp_arch_Chapter05.pdf, หน้า 9)"
+    },
+    {
+      "id": "fig-10",
+      "page": 10,
+      "file": "slide-010.png",
+      "title": "I/O Commands · หน้า 10",
+      "caption": "ภาพสไลด์เรื่อง I/O Commands สำหรับทบทวนหัวข้อ คำสั่ง Control, Test, Read, Write (itds-211_comp_arch_Chapter05.pdf, หน้า 10)"
+    },
+    {
+      "id": "fig-11",
+      "page": 11,
+      "file": "slide-011.png",
+      "title": "Three Techniques for Input of a Block of Data · หน้า 11",
+      "caption": "ผังสามเทคนิคการรับ block: CPU รอ/ทำงานอื่น/ให้ DMA โอน (itds-211_comp_arch_Chapter05.pdf, หน้า 11)"
+    },
+    {
+      "id": "fig-12",
+      "page": 12,
+      "file": "slide-012.png",
+      "title": "I/O Instructions · หน้า 12",
+      "caption": "ภาพสไลด์เรื่อง I/O Instructions สำหรับทบทวนหัวข้อ I/O instructions, Memory-mapped และ Isolated I/O (itds-211_comp_arch_Chapter05.pdf, หน้า 12)"
+    },
+    {
+      "id": "fig-13",
+      "page": 13,
+      "file": "slide-013.png",
+      "title": "I/O Mapping Summary · หน้า 13",
+      "caption": "ภาพสไลด์เรื่อง I/O Mapping Summary สำหรับทบทวนหัวข้อ I/O instructions, Memory-mapped และ Isolated I/O (itds-211_comp_arch_Chapter05.pdf, หน้า 13)"
+    },
+    {
+      "id": "fig-14",
+      "page": 14,
+      "file": "slide-014.png",
+      "title": "Memory-Mapped and Isolated I/O · หน้า 14",
+      "caption": "ตัวอย่าง keyboard เปรียบ memory-mapped address 516/517 กับ isolated I/O operand 5 (itds-211_comp_arch_Chapter05.pdf, หน้า 14)"
+    },
+    {
+      "id": "fig-15",
+      "page": 15,
+      "file": "slide-015.png",
+      "title": "Interrupt-driven I/O และการเก็บ/คืนสถานะ · หน้า 15",
+      "caption": "ภาพสไลด์เรื่อง Interrupt-driven I/O และการเก็บ/คืนสถานะ สำหรับทบทวนหัวข้อ Interrupt-driven I/O และการเก็บ/คืนสถานะ (itds-211_comp_arch_Chapter05.pdf, หน้า 15)"
+    },
+    {
+      "id": "fig-16",
+      "page": 16,
+      "file": "slide-016.png",
+      "title": "Simple Interrupt Processing · หน้า 16",
+      "caption": "ผัง simple interrupt: จบคำสั่ง เก็บ PSW/PC ไป ISR แล้วคืน state (itds-211_comp_arch_Chapter05.pdf, หน้า 16)"
+    },
+    {
+      "id": "fig-17",
+      "page": 17,
+      "file": "slide-017.png",
+      "title": "Changes in Memory and Registers for an Interrupt · หน้า 17",
+      "caption": "ภาพก่อนและหลัง interrupt ใน main memory, control stack และ registers (itds-211_comp_arch_Chapter05.pdf, หน้า 17)"
+    },
+    {
+      "id": "fig-18",
+      "page": 18,
+      "file": "slide-018.png",
+      "title": "Design Issues · หน้า 18",
+      "caption": "ภาพสไลด์เรื่อง Design Issues สำหรับทบทวนหัวข้อ ปัญหา priority และวิธีระบุ device ที่ interrupt (itds-211_comp_arch_Chapter05.pdf, หน้า 18)"
+    },
+    {
+      "id": "fig-19",
+      "page": 19,
+      "file": "slide-019.png",
+      "title": "Device Identiﬁcation · หน้า 19",
+      "caption": "สี่วิธีระบุ I/O module ที่ร้องขอ interrupt (itds-211_comp_arch_Chapter05.pdf, หน้า 19)"
+    },
+    {
+      "id": "fig-20",
+      "page": 20,
+      "file": "slide-020.png",
+      "title": "Use of the 82C59A Interrupt Controller · หน้า 20",
+      "caption": "82C59A slave controllers ส่ง INT ผ่าน master ไปยัง 80386 (itds-211_comp_arch_Chapter05.pdf, หน้า 20)"
+    },
+    {
+      "id": "fig-21",
+      "page": 21,
+      "file": "slide-021.png",
+      "title": "Intel 8255A Programmable Peripheral Interface · หน้า 21",
+      "caption": "ภาพสไลด์เรื่อง Intel 8255A Programmable Peripheral Interface สำหรับทบทวนหัวข้อ Intel 8255A/82C55A และ control word (itds-211_comp_arch_Chapter05.pdf, หน้า 21)"
+    },
+    {
+      "id": "fig-22",
+      "page": 22,
+      "file": "slide-022.png",
+      "title": "Intel 8255A Control Word · หน้า 22",
+      "caption": "รูปแบบ control word ของ Intel 8255A สำหรับ mode set และ bit set/reset (itds-211_comp_arch_Chapter05.pdf, หน้า 22)"
+    },
+    {
+      "id": "fig-23",
+      "page": 23,
+      "file": "slide-023.png",
+      "title": "Keyboard / Display Interface to 82C55A · หน้า 23",
+      "caption": "ภาพ keyboard/display interface ต่อ Port A/B/C ของ 82C55A (itds-211_comp_arch_Chapter05.pdf, หน้า 23)"
+    },
+    {
+      "id": "fig-24",
+      "page": 24,
+      "file": "slide-024.png",
+      "title": "Drawbacks of Programmed and Interrupt-Driven I/O · หน้า 24",
+      "caption": "ภาพสไลด์เรื่อง Drawbacks of Programmed and Interrupt-Driven I/O สำหรับทบทวนหัวข้อ ข้อจำกัดของ I/O ผ่าน CPU และเหตุผลใช้ DMA (itds-211_comp_arch_Chapter05.pdf, หน้า 24)"
+    },
+    {
+      "id": "fig-25",
+      "page": 25,
+      "file": "slide-025.png",
+      "title": "Typical DMA Block Diagram · หน้า 25",
+      "caption": "DMA block diagram: data count, data/address registers และ control logic (itds-211_comp_arch_Chapter05.pdf, หน้า 25)"
+    },
+    {
+      "id": "fig-26",
+      "page": 26,
+      "file": "slide-026.png",
+      "title": "DMA and Interrupt Breakpoints During an Instruction Cycle · หน้า 26",
+      "caption": "ตำแหน่ง DMA breakpoints และ interrupt breakpoint ใน instruction cycle (itds-211_comp_arch_Chapter05.pdf, หน้า 26)"
+    },
+    {
+      "id": "fig-27",
+      "page": 27,
+      "file": "slide-027.png",
+      "title": "Alternative DMA Conﬁgurations · หน้า 27",
+      "caption": "แผนภาพ DMA สาม configuration: detached, integrated และ I/O bus (itds-211_comp_arch_Chapter05.pdf, หน้า 27)"
+    },
+    {
+      "id": "fig-28",
+      "page": 28,
+      "file": "slide-028.png",
+      "title": "8237 DMA Usage of System Bus · หน้า 28",
+      "caption": "สัญญาณ DREQ/DACK และ HRQ/HLDA ของตัวอย่าง 8237 DMA (itds-211_comp_arch_Chapter05.pdf, หน้า 28)"
+    },
+    {
+      "id": "fig-29",
+      "page": 29,
+      "file": "slide-029.png",
+      "title": "Alternative DMA configurations และ Intel 8237A · หน้า 29",
+      "caption": "ภาพสไลด์เรื่อง Alternative DMA configurations และ Intel 8237A สำหรับทบทวนหัวข้อ Alternative DMA configurations และ Intel 8237A (itds-211_comp_arch_Chapter05.pdf, หน้า 29)"
+    },
+    {
+      "id": "fig-30",
+      "page": 30,
+      "file": "slide-030.png",
+      "title": "Table 7.2 · หน้า 30",
+      "caption": "ตาราง Intel 8237A registers; status แถว D4–D7 มี Channel 0 request ซ้ำ: ต้องตรวจสอบจากต้นฉบับ (itds-211_comp_arch_Chapter05.pdf, หน้า 30)"
+    },
+    {
+      "id": "fig-31",
+      "page": 31,
+      "file": "slide-031.png",
+      "title": "Direct Cache Access (DCA) · หน้า 31",
+      "caption": "ภาพสไลด์เรื่อง Direct Cache Access (DCA) สำหรับทบทวนหัวข้อ Direct Cache Access (DCA) และภาพ Xeon (itds-211_comp_arch_Chapter05.pdf, หน้า 31)"
+    },
+    {
+      "id": "fig-32",
+      "page": 32,
+      "file": "slide-032.png",
+      "title": "Xeon E5-2600/4600 Chip Architecture · หน้า 32",
+      "caption": "สถาปัตยกรรม Xeon E5-2600/4600 ตัวอย่าง cache และ I/O data path (itds-211_comp_arch_Chapter05.pdf, หน้า 32)"
+    },
+    {
+      "id": "fig-33",
+      "page": 33,
+      "file": "slide-033.png",
+      "title": "Cache-Related Performance Issues · หน้า 33",
+      "caption": "ภาพสไลด์เรื่อง Cache-Related Performance Issues สำหรับทบทวนหัวข้อ Packet traffic, buffers และ cache-related performance (itds-211_comp_arch_Chapter05.pdf, หน้า 33)"
+    },
+    {
+      "id": "fig-34",
+      "page": 34,
+      "file": "slide-034.png",
+      "title": "Cache-Related Performance Issues · หน้า 34",
+      "caption": "ภาพสไลด์เรื่อง Cache-Related Performance Issues สำหรับทบทวนหัวข้อ Packet traffic, buffers และ cache-related performance (itds-211_comp_arch_Chapter05.pdf, หน้า 34)"
+    },
+    {
+      "id": "fig-35",
+      "page": 35,
+      "file": "slide-035.png",
+      "title": "Packet Traffic Steps: · หน้า 35",
+      "caption": "ตารางขั้น incoming/outgoing packet traffic (itds-211_comp_arch_Chapter05.pdf, หน้า 35)"
+    },
+    {
+      "id": "fig-36",
+      "page": 36,
+      "file": "slide-036.png",
+      "title": "Direct Cache Access Strategies · หน้า 36",
+      "caption": "DCA prefetch hint เทียบกับ cache injection/Direct Data I/O (itds-211_comp_arch_Chapter05.pdf, หน้า 36)"
+    },
+    {
+      "id": "fig-37",
+      "page": 37,
+      "file": "slide-037.png",
+      "title": "Comparison of DMA and DDIO · หน้า 37",
+      "caption": "ผัง normal DMA กับ DDIO สำหรับ transfer to memory/cache และ to I/O (itds-211_comp_arch_Chapter05.pdf, หน้า 37)"
+    },
+    {
+      "id": "fig-38",
+      "page": 38,
+      "file": "slide-038.png",
+      "title": "Evolution of the I/O Function · หน้า 38",
+      "caption": "ภาพสไลด์เรื่อง Evolution of the I/O Function สำหรับทบทวนหัวข้อ วิวัฒนาการ I/O function และ I/O channel (itds-211_comp_arch_Chapter05.pdf, หน้า 38)"
+    },
+    {
+      "id": "fig-39",
+      "page": 39,
+      "file": "slide-039.png",
+      "title": "I/O Channel Architecture · หน้า 39",
+      "caption": "I/O channel architecture เปรียบ selector กับ multiplexor (itds-211_comp_arch_Chapter05.pdf, หน้า 39)"
+    },
+    {
+      "id": "fig-41",
+      "page": 41,
+      "file": "slide-041.png",
+      "title": "1. Universal Serial Bus (USB) · หน้า 41",
+      "caption": "ภาพสไลด์เรื่อง 1. Universal Serial Bus (USB) สำหรับทบทวนหัวข้อ USB generations และ host-controller tree (itds-211_comp_arch_Chapter05.pdf, หน้า 41)"
+    },
+    {
+      "id": "fig-42",
+      "page": 42,
+      "file": "slide-042.png",
+      "title": "2. FireWire Serial Bus (1999 - 2000) · หน้า 42",
+      "caption": "ภาพสไลด์เรื่อง 2. FireWire Serial Bus (1999 - 2000) สำหรับทบทวนหัวข้อ FireWire และ SCSI ในชุดตัวอย่าง (itds-211_comp_arch_Chapter05.pdf, หน้า 42)"
+    },
+    {
+      "id": "fig-43",
+      "page": 43,
+      "file": "slide-043.png",
+      "title": "3. SCSI · หน้า 43",
+      "caption": "ภาพสไลด์เรื่อง 3. SCSI สำหรับทบทวนหัวข้อ FireWire และ SCSI ในชุดตัวอย่าง (itds-211_comp_arch_Chapter05.pdf, หน้า 43)"
+    },
+    {
+      "id": "fig-44",
+      "page": 44,
+      "file": "slide-044.png",
+      "title": "4. Thunderbolt · หน้า 44",
+      "caption": "ภาพสไลด์เรื่อง 4. Thunderbolt สำหรับทบทวนหัวข้อ Thunderbolt และ InfiniBand (itds-211_comp_arch_Chapter05.pdf, หน้า 44)"
+    },
+    {
+      "id": "fig-45",
+      "page": 45,
+      "file": "slide-045.png",
+      "title": "5. InfiniBand · หน้า 45",
+      "caption": "ภาพสไลด์เรื่อง 5. InfiniBand สำหรับทบทวนหัวข้อ Thunderbolt และ InfiniBand (itds-211_comp_arch_Chapter05.pdf, หน้า 45)"
+    },
+    {
+      "id": "fig-46",
+      "page": 46,
+      "file": "slide-046.png",
+      "title": "connecting peripherals of a · หน้า 46",
+      "caption": "ภาพ PCI Express และ SATA; ตัวเลข 6 Gbps กับ 300 Mbps ต่อ device ต้องตรวจสอบจากต้นฉบับ (itds-211_comp_arch_Chapter05.pdf, หน้า 46)"
+    },
+    {
+      "id": "fig-47",
+      "page": 47,
+      "file": "slide-047.png",
+      "title": "8. Ethernet · หน้า 47",
+      "caption": "ภาพสไลด์เรื่อง 8. Ethernet สำหรับทบทวนหัวข้อ Ethernet และ Wi-Fi ในชุดตัวอย่าง (itds-211_comp_arch_Chapter05.pdf, หน้า 47)"
+    },
+    {
+      "id": "fig-48",
+      "page": 48,
+      "file": "slide-048.png",
+      "title": "9. Wi-Fi · หน้า 48",
+      "caption": "ภาพสไลด์เรื่อง 9. Wi-Fi สำหรับทบทวนหัวข้อ Ethernet และ Wi-Fi ในชุดตัวอย่าง (itds-211_comp_arch_Chapter05.pdf, หน้า 48)"
+    },
+    {
+      "id": "fig-49",
+      "page": 49,
+      "file": "slide-049.png",
+      "title": "IBM EC12 I/O Channel Subsystem Structure · หน้า 49",
+      "caption": "IBM EC12 channel subsystems; จำนวน partitions ด้านบน/ล่างไม่ตรงกัน: ต้องตรวจสอบจากต้นฉบับ (itds-211_comp_arch_Chapter05.pdf, หน้า 49)"
+    },
+    {
+      "id": "fig-50",
+      "page": 50,
+      "file": "slide-050.png",
+      "title": "Figure 7.20 · หน้า 50",
+      "caption": "ภาพตู้ IBM zEC12 I/O frames พร้อมป้าย PCIe drawer, I/O cage และ processor books (itds-211_comp_arch_Chapter05.pdf, หน้า 50)"
+    },
+    {
+      "id": "fig-51",
+      "page": 51,
+      "file": "slide-051.png",
+      "title": "IBM EC12 I/O System Structure · หน้า 51",
+      "caption": "ภาพ IBM EC12 books ผ่าน PCIe/InfiniBand ไปยัง I/O controllers (itds-211_comp_arch_Chapter05.pdf, หน้า 51)"
+    }
+  ],
+  "topics": [
+    {
+      "id": "io-model",
+      "title": "I/O module และ external device",
+      "level": "core",
+      "pages": "หน้า 3–5",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "I/O module เชื่อม system bus กับ peripheral devices ผ่าน address, data และ control lines. External device แลกข้อมูลกับสิ่งแวดล้อมผ่าน link ไปยัง I/O module และแบ่งเป็น human readable, machine readable กับ communication. ภาพอุปกรณ์แสดง control logic, buffer และ transducer ที่แปลงข้อมูลระหว่างอุปกรณ์กับสิ่งแวดล้อม.",
+      "remember": [
+        "System bus มี address/data/control lines ต่อ I/O module (หน้า 3)",
+        "External devices มี 3 หมวด: human readable, machine readable, communication (หน้า 4)",
+        "อุปกรณ์ตัวอย่างมี control logic, buffer, transducer พร้อม data/status/control signals (หน้า 5)"
+      ],
+      "terms": [
+        "I/O module",
+        "system bus",
+        "peripheral device",
+        "control logic",
+        "buffer",
+        "transducer"
+      ],
+      "example": "ตามลูกศรหน้า 5: ข้อมูลจากสิ่งแวดล้อมผ่าน transducer/buffer ไปเป็น data bits ของ I/O module",
+      "confusion": "อย่าสับสน I/O module ที่เชื่อม bus กับ external device ที่แปลง/รับส่งข้อมูลจากสิ่งแวดล้อม",
+      "mnemonic": "bus → module → device → environment",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "อะไรเชื่อม system bus กับ peripheral?",
+          "options": [
+            "I/O module",
+            "transducer",
+            "application buffer",
+            "ISR"
+          ],
+          "correct": 0,
+          "answer": "I/O module",
+          "pages": "หน้า 3–5"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สามกลุ่ม external device ในสไลด์คืออะไร?",
+          "answer": "human readable, machine readable และ communication",
+          "pages": "หน้า 3–5"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพหน้า 5 แยกหน้าที่ control logic กับ transducer อย่างไร?",
+          "answer": "control logic รับสัญญาณควบคุม/รายงานสถานะ; transducer แปลงข้อมูลที่เกี่ยวกับสิ่งแวดล้อม",
+          "pages": "หน้า 3–5"
+        }
+      ],
+      "figures": [
+        "fig-3",
+        "fig-4",
+        "fig-5"
+      ]
+    },
+    {
+      "id": "io-functions",
+      "title": "หน้าที่และโครงสร้างภายใน I/O module",
+      "level": "core",
+      "pages": "หน้า 6–7",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "I/O module ประสานการไหลของข้อมูลและเวลา สื่อสารกับ processor และ device จัด buffer ให้ความเร็วต่างกัน และตรวจ error. ภาพโครงสร้างมี data registers, status/control registers, I/O logic และ external-device interface logic เชื่อมกับ system bus และอุปกรณ์.",
+      "remember": [
+        "Control and timing ประสาน traffic; processor communication ถอด command รับ address/data/status (หน้า 6)",
+        "Device communication ส่ง command/status/data; buffering ชดเชยความเร็ว; error detection รายงานข้อผิดพลาด (หน้า 6)",
+        "Data registers และ status/control registers แยกหน้าที่ใน I/O module (หน้า 7)"
+      ],
+      "terms": [
+        "control and timing",
+        "processor communication",
+        "device communication",
+        "data buffering",
+        "error detection",
+        "data register"
+      ],
+      "example": "อ่านภาพหน้า 7 จาก data/address/control lines ไปยัง I/O logic แล้วออก external-device interface logic",
+      "confusion": "buffering เป็นหนึ่งในหน้าที่ I/O module; ไม่ใช่การแทนที่ register ทุกชนิด",
+      "mnemonic": "คุม–คุย CPU–คุย device–พักข้อมูล–ตรวจผิด",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "หน้าที่ใดชดเชยความเร็วระหว่าง device กับ memory?",
+          "options": [
+            "Data buffering",
+            "Address recognition",
+            "Bus arbitration",
+            "Software poll"
+          ],
+          "correct": 0,
+          "answer": "Data buffering",
+          "pages": "หน้า 6–7"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้าที่หลักห้ากลุ่มของ I/O module คืออะไร?",
+          "answer": "control/timing, processor communication, device communication, data buffering และ error detection",
+          "pages": "หน้า 6–7"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "data register ต่างจาก status/control register ในภาพหน้า 7 อย่างไร?",
+          "answer": "ช่องแรกเก็บข้อมูล; อีกช่องเก็บสถานะหรือการควบคุมตามชื่อในภาพ",
+          "pages": "หน้า 6–7"
+        }
+      ],
+      "figures": [
+        "fig-6",
+        "fig-7"
+      ]
+    },
+    {
+      "id": "io-techniques",
+      "title": "Programmed I/O, Interrupt-driven I/O และ DMA",
+      "level": "core",
+      "pages": "หน้า 8–9",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "Programmed I/O ให้ processor สั่งและรอ I/O module จนเสร็จ จึงเสียเวลาหาก processor เร็วกว่าอุปกรณ์. Interrupt-driven I/O ให้ processor ทำงานอื่นระหว่างรอ แล้ว module แจ้งเมื่อเสร็จ. DMA ให้ I/O module กับ main memory แลกข้อมูลโดยตรงโดยไม่ให้ processor อยู่ในทางเดินข้อมูล.",
+      "remember": [
+        "Programmed: processor control และ wait (หน้า 8)",
+        "Interrupt-driven: สั่งแล้วทำงานต่อ; module interrupt เมื่อเสร็จ (หน้า 8)",
+        "DMA: I/O-to-memory โดยตรง ต่างจากสองวิธีที่ผ่าน processor (หน้า 8–9)"
+      ],
+      "terms": [
+        "programmed I/O",
+        "interrupt-driven I/O",
+        "direct memory access (DMA)",
+        "polling"
+      ],
+      "example": "ตารางหน้า 9 จัด programmed/interrupt-driven เป็น I/O-to-memory ผ่าน processor; DMA เป็น direct transfer",
+      "confusion": "interrupt ช่วยให้ CPU ไม่ต้องรอเฉย ๆ แต่ทางเดิน data ยังผ่าน processor ในตารางหน้า 9; DMA เปลี่ยนทางเดิน data",
+      "mnemonic": "รอเอง–ให้เรียก–ส่งตรง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "เทคนิคใดโอนข้อมูล I/O↔memory โดยตรง?",
+          "options": [
+            "DMA",
+            "Programmed I/O",
+            "Interrupt-driven I/O",
+            "Software poll"
+          ],
+          "correct": 0,
+          "answer": "DMA",
+          "pages": "หน้า 8–9"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Programmed ต่างจาก interrupt-driven อย่างไรเมื่อรอ device?",
+          "answer": "programmed รอ; interrupt-driven ไปทำงานอื่นและถูกแจ้งเมื่อ device พร้อม",
+          "pages": "หน้า 8–9"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้าต้องแยก interrupt-driven กับ DMA จากตารางหน้า 9 ใช้เกณฑ์ใด?",
+          "answer": "ดูว่า data transfer ผ่าน processor หรือเป็น direct I/O-to-memory",
+          "pages": "หน้า 8–9"
+        }
+      ],
+      "figures": [
+        "fig-8",
+        "fig-9"
+      ],
+      "comparison": {
+        "headers": [
+          "เทคนิค",
+          "CPU ระหว่างรอ",
+          "ทางเดินข้อมูล"
+        ],
+        "rows": [
+          [
+            "Programmed",
+            "รอ",
+            "ผ่าน processor"
+          ],
+          [
+            "Interrupt-driven",
+            "ทำงานอื่นจน interrupt",
+            "ผ่าน processor"
+          ],
+          [
+            "DMA",
+            "ช่วยตั้งต้น/จบงาน",
+            "I/O↔memory โดยตรง"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "io-commands",
+      "title": "คำสั่ง Control, Test, Read, Write",
+      "level": "core",
+      "pages": "หน้า 10",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "I/O module รับคำสั่งจาก processor ได้สี่ชนิด. Control เปิดใช้และบอกอุปกรณ์ให้ทำงาน, Test ตรวจเงื่อนไขสถานะ, Read นำข้อมูลจาก peripheral เข้าสู่ internal buffer และ Write นำข้อมูลจาก data bus ไปส่งให้อุปกรณ์.",
+      "remember": [
+        "Control = activate/tell peripheral what to do",
+        "Test = test status conditions",
+        "Read = peripheral→internal buffer",
+        "Write = data bus→peripheral"
+      ],
+      "terms": [
+        "Control",
+        "Test",
+        "Read",
+        "Write",
+        "internal buffer"
+      ],
+      "example": "แยกทิศข้อมูล: Read เข้ามาใน I/O module; Write ออกจาก data bus ไป peripheral",
+      "confusion": "Test ตรวจสถานะ ไม่ใช่อ่าน data item จาก peripheral; Read ต่างจาก Test",
+      "mnemonic": "คุม–เช็ก–รับ–ส่ง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "คำสั่งใดตรวจ status condition?",
+          "options": [
+            "Test",
+            "Read",
+            "Control",
+            "Write"
+          ],
+          "correct": 0,
+          "answer": "Test",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Read กับ Write มีทิศข้อมูลอย่างไร?",
+          "answer": "Read peripheral→internal buffer; Write data bus→peripheral",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้า processor ต้องเปิด peripheral ก่อนโอนข้อมูล ใช้คำสั่งประเภทใด?",
+          "answer": "Control",
+          "pages": "หน้า 10"
+        }
+      ],
+      "figures": [
+        "fig-10"
+      ]
+    },
+    {
+      "id": "input-flow",
+      "title": "ผังการรับ block ของข้อมูลด้วยสามเทคนิค",
+      "level": "important",
+      "pages": "หน้า 11",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "ผังหน้า 11 วาง programmed, interrupt-driven และ DMA ข้างกันเพื่อเทียบลำดับการรับ block. สองแบบแรกยังให้ CPU อ่าน word จาก I/O module และเขียนลง memory; programmed วนตรวจ status ขณะ interrupt-driven ทำงานอื่นระหว่างรอ. DMA รับคำสั่งเป็น block แล้วมี interrupt/status เมื่อสิ้นสุดการโอน.",
+      "remember": [
+        "Programmed: issue read → read/check status ซ้ำ → CPU read word → CPU write memory (หน้า 11)",
+        "Interrupt-driven: CPU ทำอย่างอื่นระหว่างรอ แต่ยัง read word/write memory หลัง interrupt (หน้า 11)",
+        "DMA: issue read block → CPU ทำอย่างอื่น → รับ completion interrupt/status (หน้า 11)"
+      ],
+      "terms": [
+        "status check",
+        "block read",
+        "completion interrupt",
+        "CPU-to-memory transfer"
+      ],
+      "example": "ไล่สามคอลัมน์หน้า 11 แล้วทำเครื่องหมายว่าช่วงใด CPU เป็นผู้ย้าย word",
+      "confusion": "interrupt-driven ไม่เท่ากับ DMA: ผังกลางยังมี CPU→memory write word",
+      "mnemonic": "ดูว่าใครย้าย word",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ผังใดให้ CPU วน read status เมื่อยังไม่พร้อม?",
+          "options": [
+            "Programmed I/O",
+            "DMA",
+            "DCA",
+            "DDIO"
+          ],
+          "correct": 0,
+          "answer": "Programmed I/O",
+          "pages": "หน้า 11"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ผัง interrupt-driven มีส่วนที่ยังเหมือน programmed อย่างไร?",
+          "answer": "CPU ยังอ่าน word จาก module แล้วเขียน word ลง memory",
+          "pages": "หน้า 11"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "DMA ในผังหน้า 11 ต่างตรงคำสั่งเริ่มอย่างไร?",
+          "answer": "เริ่มด้วย read block command แล้ว DMA จัดการโอน block",
+          "pages": "หน้า 11"
+        }
+      ],
+      "figures": [
+        "fig-11"
+      ]
+    },
+    {
+      "id": "io-addressing",
+      "title": "I/O instructions, Memory-mapped และ Isolated I/O",
+      "level": "core",
+      "pages": "หน้า 12–14",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "แต่ละ I/O device มี identifier/address และ module ตีความ address lines เพื่อรับคำสั่งของตน. Memory-mapped I/O ใช้ address space ร่วมกับ memory จึงใช้คำสั่งอ่าน/เขียนแบบ memory; isolated I/O แยก address space และมีคำสั่ง/สัญญาณเลือก I/O เฉพาะ. ภาพ keyboard หน้า 14 แสดง register ที่ address 516/517 เทียบกับ instruction Load I/O/Test I/O/In ของ isolated I/O.",
+      "remember": [
+        "Memory-mapped: address space ร่วม, read/write lines เดียว, memory access commands ใช้ได้ (หน้า 12–13)",
+        "Isolated: separate address spaces, I/O-or-memory select lines, special I/O commands (หน้า 13)",
+        "Keyboard example memory-mapped ใช้ input data register 516, status/control 517 (หน้า 14)"
+      ],
+      "terms": [
+        "device address",
+        "memory-mapped I/O",
+        "isolated I/O",
+        "status/control register",
+        "I/O select line"
+      ],
+      "example": "เทียบสองคอลัมน์หน้า 14: ทางซ้ายใช้ load/store address 516/517, ทางขวาใช้ Load I/O, Test I/O, In กับ operand 5",
+      "confusion": "เลข 516/517 และ operand 5 เป็นตัวอย่างของคนละ address space/รูปแบบคำสั่ง ไม่ใช่ค่าที่ต้องเท่ากัน",
+      "mnemonic": "mapped ใช้ address ร่วม; isolated แยก",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แบบใดแชร์ address space กับ memory?",
+          "options": [
+            "Memory-mapped",
+            "Isolated",
+            "DMA",
+            "Vectored"
+          ],
+          "correct": 0,
+          "answer": "Memory-mapped",
+          "pages": "หน้า 12–14"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "isolated I/O ต้องใช้อะไรต่างจาก memory-mapped?",
+          "answer": "address space แยกและ special I/O commands/selection lines",
+          "pages": "หน้า 12–14"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพหน้า 14 keyboard status/control register อยู่ address ใดในตัวอย่าง memory-mapped?",
+          "answer": "517",
+          "pages": "หน้า 12–14"
+        }
+      ],
+      "figures": [
+        "fig-12",
+        "fig-13",
+        "fig-14"
+      ],
+      "comparison": {
+        "headers": [
+          "แบบ",
+          "Address space",
+          "คำสั่ง"
+        ],
+        "rows": [
+          [
+            "Memory-mapped",
+            "ร่วมกับ memory",
+            "memory read/write"
+          ],
+          [
+            "Isolated",
+            "แยกจาก memory",
+            "special I/O commands"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "interrupt-processing",
+      "title": "Interrupt-driven I/O และการเก็บ/คืนสถานะ",
+      "level": "core",
+      "pages": "หน้า 15–17",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "Interrupt-driven I/O ให้ processor ออกคำสั่งแล้วทำงานอื่นจน I/O module พร้อมจึงขอ interrupt. ในผัง simple interrupt processor จบ current instruction, acknowledge, เก็บ PSW กับ PC บน control stack แล้วโหลด PC ของ routine ใหม่. Software เก็บ state ที่เหลือ ประมวลผล interrupt แล้วคืน state, PSW และ PC เดิมเพื่อทำงานต่อ.",
+      "remember": [
+        "CPU จบคำสั่งปัจจุบันก่อนตอบ interrupt (หน้า 16)",
+        "เก็บ PSW/PC บน control stack แล้ว load new PC ตาม interrupt (หน้า 16)",
+        "Software save/process/restore state; ภาพหน้า 17 แสดง memory/register ก่อนและหลัง return (หน้า 16–17)"
+      ],
+      "terms": [
+        "interrupt",
+        "acknowledgement",
+        "PC",
+        "PSW",
+        "control stack",
+        "ISR"
+      ],
+      "example": "ไล่ลูกศรหน้า 16 จาก hardware ไป software และตาม PC/stack ในภาพหน้า 17",
+      "confusion": "แยกการเก็บ PSW/PC โดย processor กับการเก็บ remainder of process state ใน software ตามผัง; อย่าบอกว่า interrupt เริ่มกลางคำสั่งที่ยังไม่จบ",
+      "mnemonic": "จบคำสั่ง–เก็บ PC/PSW–บริการ–คืน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ก่อนเข้า routine ใหม่ processor เก็บอะไรบน control stack?",
+          "options": [
+            "PSW และ PC",
+            "DMA count",
+            "I/O buffer",
+            "cache tag"
+          ],
+          "correct": 0,
+          "answer": "PSW และ PC",
+          "pages": "หน้า 15–17"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ลำดับ simple interrupt หลังกำเนิด request คืออะไร?",
+          "answer": "จบ current instruction, acknowledge, เก็บ PSW/PC, โหลด PC ใหม่, เก็บ state ที่เหลือ, service, restore",
+          "pages": "หน้า 15–17"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดต้องคืน PC/PSW เดิม?",
+          "answer": "เพื่อกลับไปประมวลผลต่อจากจุดที่ถูก interrupt ตามภาพหน้า 16–17",
+          "pages": "หน้า 15–17"
+        }
+      ],
+      "figures": [
+        "fig-15",
+        "fig-16",
+        "fig-17"
+      ]
+    },
+    {
+      "id": "interrupt-identification",
+      "title": "ปัญหา priority และวิธีระบุ device ที่ interrupt",
+      "level": "core",
+      "pages": "หน้า 18–19",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "เมื่อมี I/O modules หลายตัว processor ต้องรู้ว่าใครขอ interrupt และเมื่อมีหลาย request ต้องตัดสินใจลำดับที่จัดการ. สไลด์ยกสี่วิธีระบุแหล่ง: multiple interrupt lines, software poll, daisy chain แบบ vectored และ bus arbitration แบบ vectored. Software poll ใช้ routine ตรวจ module ทีละตัว ส่วน vectored ส่ง identifier/vector เพื่อพาไปยัง device-service routine.",
+      "remember": [
+        "สอง design issues: identify requester และเลือกจัดการเมื่อ interrupts หลายตัว (หน้า 18)",
+        "Software poll ต้องไล่ตรวจ module และกินเวลา; daisy chain ส่ง acknowledge ผ่าน module (หน้า 19)",
+        "Bus arbitration: module ได้ bus ก่อน, processor acknowledge, module วาง vector บน data lines (หน้า 19)"
+      ],
+      "terms": [
+        "multiple interrupt lines",
+        "software poll",
+        "daisy chain",
+        "bus arbitration",
+        "vectored interrupt",
+        "vector"
+      ],
+      "example": "ตาราง 4 ช่องหน้า 19: จับคู่ชื่อวิธีกับสัญญาณ/ลำดับของมัน",
+      "confusion": "คำว่า vector ในสไลด์คือ address หรือ identifier ที่ใช้ชี้ routine ไม่ใช่ตัวข้อมูล I/O ที่รับส่ง",
+      "mnemonic": "ใครขอ? ใครก่อน? poll หรือ vector",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "วิธีใดให้ routine ไล่ถามแต่ละ I/O module?",
+          "options": [
+            "Software poll",
+            "Daisy chain",
+            "DMA",
+            "Memory-mapped"
+          ],
+          "correct": 0,
+          "answer": "Software poll",
+          "pages": "หน้า 18–19"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สองคำถามออกแบบ interrupt หน้า 18 คืออะไร?",
+          "answer": "ระบุ device ที่ร้องขอ และเลือก interrupt ที่จะจัดการเมื่อมีหลายตัว",
+          "pages": "หน้า 18–19"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "bus arbitration แบบ vectored ส่ง vector ผ่านอะไรหลัง acknowledge?",
+          "answer": "data lines",
+          "pages": "หน้า 18–19"
+        }
+      ],
+      "figures": [
+        "fig-18",
+        "fig-19"
+      ],
+      "comparison": {
+        "headers": [
+          "วิธี",
+          "ระบุผู้ร้องขอ"
+        ],
+        "rows": [
+          [
+            "Multiple lines",
+            "แยก interrupt line"
+          ],
+          [
+            "Software poll",
+            "routine ถาม module ทีละตัว"
+          ],
+          [
+            "Daisy chain",
+            "acknowledge ผ่าน chain แล้วใช้ vector"
+          ],
+          [
+            "Bus arbitration",
+            "ผู้ได้ bus ส่ง vector บน data lines"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "interrupt-controller-example",
+      "title": "82C59A interrupt controller แบบ master/slave",
+      "level": "extra",
+      "pages": "หน้า 20",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "ภาพหน้า 20 ยกการต่อ external devices เข้ากับ slave 82C59A หลายตัว แล้ว slave ส่ง INT ไปยัง IR inputs ของ master. Master ส่ง INT ไปยัง INTR ของ processor 80386. นี่เป็นตัวอย่างโครงสร้าง interrupt controller ในสไลด์ ไม่ใช่ข้อกำหนดของทุกระบบ.",
+      "remember": [
+        "Slave รับ external-device lines IR0–IR7 (หน้า 20)",
+        "INT ของ slave เข้าสู่ master; INT ของ master เข้าสู่ INTR ของ processor (หน้า 20)",
+        "ภาพยก 80386 และ 82C59A เป็นตัวอย่างระบบ (หน้า 20)"
+      ],
+      "terms": [
+        "82C59A",
+        "master",
+        "slave",
+        "IR0–IR7",
+        "INT",
+        "INTR"
+      ],
+      "example": "ตามเส้นจาก external device 00 ผ่าน slave ตัวบน, master แล้วถึง processor",
+      "confusion": "อย่าสลับ INT output ของ controller กับ INTR input ของ processor ในภาพนี้",
+      "mnemonic": "device → slave → master → CPU",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "INT ของ master ต่อเข้าขาใดของ 80386 ในภาพ?",
+          "options": [
+            "INTR",
+            "DREQ",
+            "HLDA",
+            "PSW"
+          ],
+          "correct": 0,
+          "answer": "INTR",
+          "pages": "หน้า 20"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "slave controller ในภาพมี input อะไร?",
+          "answer": "IR0–IR7 จาก external devices",
+          "pages": "หน้า 20"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดรูปนี้จึงเรียกว่า master/slave?",
+          "answer": "slave รวม request จาก devices แล้วส่งต่อให้ master ซึ่งแจ้ง processor",
+          "pages": "หน้า 20"
+        }
+      ],
+      "figures": [
+        "fig-20"
+      ]
+    },
+    {
+      "id": "ppi-8255",
+      "title": "Intel 8255A/82C55A และ control word",
+      "level": "important",
+      "pages": "หน้า 21–23",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "ตัวอย่าง programmable peripheral interface แสดง Port A, Port B และ Port C ที่แบ่ง upper/lower พร้อม data-bus buffer และ read/write control logic. Control word หน้า 22 ตั้ง mode และทิศ input/output ของ ports หรือเลือก bit set/reset ใน Port C. ภาพหน้า 23 แสดงการใช้ Port A รับ keyboard, Port B ส่ง display และ Port C ทำ handshake/interrupt.",
+      "remember": [
+        "8255A block diagram มี Port A/B อย่างละ 8 บิต และ Port C upper/lower อย่างละ 4 บิต (หน้า 21)",
+        "Control word: D7=1 ใช้ mode set; D7=0 ใช้ bit set/reset ของ Port C (หน้า 22)",
+        "ตัวอย่าง keyboard↔Port A, display↔Port B, Port C ใช้ ready/acknowledge/interrupt (หน้า 23)"
+      ],
+      "terms": [
+        "8255A",
+        "82C55A",
+        "control word",
+        "mode set",
+        "bit set/reset",
+        "Port A/B/C"
+      ],
+      "example": "เทียบ (a) mode definition กับ (b) bit definition หน้า 22 แล้วตามการต่อจริงหน้า 23",
+      "confusion": "หน้า 21–22 เรียก 8255A แต่หน้า 23 เรียก 82C55A; ชื่อรุ่นในภาพต้องอ่านตามแต่ละสไลด์ ไม่รวมเป็นเลขเดียวโดยเดา",
+      "mnemonic": "A รับ keyboard, B ส่ง display, C คุมสัญญาณในภาพ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "D7=0 ใน control word หน้า 22 ใช้ทำอะไร?",
+          "options": [
+            "Bit set/reset Port C",
+            "Mode set",
+            "DMA request",
+            "Interrupt acknowledge"
+          ],
+          "correct": 0,
+          "answer": "Bit set/reset Port C",
+          "pages": "หน้า 21–23"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Port C แบ่งอย่างไรใน block diagram?",
+          "answer": "upper 4 bits กับ lower 4 bits",
+          "pages": "หน้า 21–23"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ในตัวอย่างหน้า 23 Port B ต่อกับอะไร?",
+          "answer": "display output port",
+          "pages": "หน้า 21–23"
+        }
+      ],
+      "figures": [
+        "fig-21",
+        "fig-22",
+        "fig-23"
+      ]
+    },
+    {
+      "id": "dma-motivation",
+      "title": "ข้อจำกัดของ I/O ผ่าน CPU และเหตุผลใช้ DMA",
+      "level": "core",
+      "pages": "หน้า 24",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "Programmed และ interrupt-driven I/O มีข้อจำกัดร่วมคืออัตราโอนขึ้นกับความเร็วที่ processor ตรวจ/บริการ device และ processor ต้องรันหลายคำสั่งต่อการโอนแต่ละครั้ง. เมื่อย้ายข้อมูลปริมาณมาก สไลด์จึงเสนอ direct memory access เพื่อให้โอนได้มีประสิทธิภาพกว่า.",
+      "remember": [
+        "Transfer rate ถูกจำกัดด้วยความเร็วตรวจ/บริการ device ของ processor (หน้า 24)",
+        "Processor ยังจัดการ transfer และรัน instructions ต่อครั้ง (หน้า 24)",
+        "Large data volume เป็นเหตุผลใช้ DMA (หน้า 24)"
+      ],
+      "terms": [
+        "I/O transfer rate",
+        "programmed I/O",
+        "interrupt-driven I/O",
+        "DMA"
+      ],
+      "example": "เชื่อมตารางหน้า 9 กับข้อเสียหน้า 24: ทั้งสองแบบแรกยังมี CPU ในเส้นทางการโอน",
+      "confusion": "interrupt ลดการรอว่าง แต่ไม่ได้ย้าย CPU ออกจากการโอนข้อมูลแต่ละ word ตามผังหน้า 11",
+      "mnemonic": "ข้อมูลมาก → ให้ DMA รับทางเดิน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อเสียร่วมของ programmed และ interrupt-driven คืออะไร?",
+          "options": [
+            "CPU จัดการ transfer",
+            "ไม่มี I/O module",
+            "ไม่มี device address",
+            "ใช้แต่ bus แยก"
+          ],
+          "correct": 0,
+          "answer": "CPU จัดการ transfer",
+          "pages": "หน้า 24"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใดสไลด์เสนอ DMA สำหรับข้อมูลจำนวนมาก?",
+          "answer": "ลดภาระ CPU ที่ต้อง test/service และรันหลายคำสั่งต่อ I/O transfer",
+          "pages": "หน้า 24"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ข้อเสียนี้สัมพันธ์กับผังรับ block หน้า 11 อย่างไร?",
+          "answer": "สองวิธีแรกยังให้ CPU อ่าน word และเขียน memory",
+          "pages": "หน้า 24"
+        }
+      ],
+      "figures": [
+        "fig-24"
+      ]
+    },
+    {
+      "id": "dma-controller",
+      "title": "DMA block diagram และ breakpoint ใน instruction cycle",
+      "level": "core",
+      "pages": "หน้า 25–26",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "DMA controller ในภาพมี data count, data register, address register และ control logic พร้อม request/acknowledge, interrupt, read/write signals. ภาพ instruction cycle แยก DMA breakpoints ที่อยู่ระหว่าง processor cycles หลายจุด กับ interrupt breakpoint หลัง store result ก่อนขั้น process interrupt. หมายเหตุภาษาไทยบนสไลด์อธิบาย DMA แทรกเกี่ยวกับ hardware bus โดยตรง.",
+      "remember": [
+        "data count/address/data register และ control logic ใน DMA module (หน้า 25)",
+        "DMA breakpoints ปรากฏหลายจุดใน instruction cycle; interrupt breakpoint ปรากฏก่อน process interrupt (หน้า 26)",
+        "อ่าน request, acknowledge, read/write, interrupt ตามลูกศรของ DMA controller (หน้า 25)"
+      ],
+      "terms": [
+        "DMA controller",
+        "data count",
+        "address register",
+        "DMA breakpoint",
+        "interrupt breakpoint"
+      ],
+      "example": "ตามภาพหน้า 26: จุด DMA มีหลัง fetch/decode/execute ตามลูกศร; interrupt อยู่หลัง store result",
+      "confusion": "อย่ากล่าวว่า DMA ต้องรอ interrupt checkpoint จุดเดียว; ภาพแยก DMA กับ interrupt breakpoint",
+      "mnemonic": "DMA ดู bus หลายจุด; interrupt หลังคำสั่ง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "DMA controller มี register ใดบอกตำแหน่ง memory?",
+          "options": [
+            "Address register",
+            "PSW",
+            "Status register",
+            "Port C"
+          ],
+          "correct": 0,
+          "answer": "Address register",
+          "pages": "หน้า 25–26"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ภาพหน้า 25 แสดงองค์ประกอบหลักใดใน DMA module?",
+          "answer": "data count, data register, address register, control logic",
+          "pages": "หน้า 25–26"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "DMA breakpoint ต่างจาก interrupt breakpoint ในภาพหน้า 26 อย่างไร?",
+          "answer": "DMA อยู่ได้หลายจุดระหว่าง processor cycles; interrupt อยู่ก่อนขั้น process interrupt",
+          "pages": "หน้า 25–26"
+        }
+      ],
+      "figures": [
+        "fig-25",
+        "fig-26"
+      ]
+    },
+    {
+      "id": "dma-configurations",
+      "title": "Alternative DMA configurations และ Intel 8237A",
+      "level": "important",
+      "pages": "หน้า 27–30",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "ภาพหน้า 27 เทียบ DMA แยกบน single bus, DMA รวมกับ I/O บน single bus และแบบแยก I/O bus. ตัวอย่าง 8237 หน้า 28 แสดง DREQ/DACK ระหว่าง disk controller กับ DMA และ HRQ/HLDA ระหว่าง DMA กับ CPU. หน้า 29 ระบุว่า data ไม่เก็บใน DMA chip, มี 4 channels และทำ memory-to-memory ผ่าน register ได้; ตาราง register หน้า 30 มีรายการ status ซ้ำที่อ่านแล้วกำกวม.",
+      "remember": [
+        "สาม configuration: single-bus detached, single-bus integrated DMA-I/O, I/O bus (หน้า 27)",
+        "DREQ/DACK = DMA request/acknowledge; HRQ/HLDA = hold request/acknowledge (หน้า 28)",
+        "8237 มี 4 channels 0–3; data ไม่เก็บใน chip ระหว่าง transfer ตามคำอธิบาย (หน้า 29)",
+        "ตาราง Intel 8237A มี command/status/mode/masks; E/D และ TC มีคำขยายใต้ตาราง (หน้า 30)"
+      ],
+      "terms": [
+        "single-bus DMA",
+        "I/O bus",
+        "DREQ",
+        "DACK",
+        "HRQ",
+        "HLDA",
+        "terminal count",
+        "8237A"
+      ],
+      "example": "ตามสัญญาณหน้า 28: disk controller ขอ DMA ด้วย DREQ; DMA ขอ hold จาก CPU ด้วย HRQ; หลังยืนยันจึงใช้ bus ตามภาพ",
+      "confusion": "หน้า 29 พูด DMA ปกติระหว่าง I/O port-memory แต่ระบุข้อยกเว้น memory-to-memory ผ่าน register; หน้า 30 status แถว D4–D7 พิมพ์ Channel 0 request ซ้ำ: ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "DREQ ขอ DMA; HRQ ขอ bus",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "สัญญาณขอ DMA จาก device ชื่ออะไร?",
+          "options": [
+            "DREQ",
+            "DACK",
+            "HLDA",
+            "PSW"
+          ],
+          "correct": 0,
+          "answer": "DREQ",
+          "pages": "หน้า 27–30"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สามโครงสร้าง DMA ในหน้า 27 คืออะไร?",
+          "answer": "single-bus detached, single-bus integrated DMA-I/O และ I/O bus",
+          "pages": "หน้า 27–30"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "แถวใดใน status column หน้า 30 ชวนตรวจต้นฉบับ?",
+          "answer": "D4–D7 พิมพ์ Channel 0 request ซ้ำ",
+          "pages": "หน้า 27–30"
+        }
+      ],
+      "figures": [
+        "fig-27",
+        "fig-28",
+        "fig-29",
+        "fig-30"
+      ]
+    },
+    {
+      "id": "dca-motivation",
+      "title": "Direct Cache Access (DCA) และภาพ Xeon",
+      "level": "important",
+      "pages": "หน้า 31–32",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "สไลด์นำ DCA ต่อจาก DMA เพราะปริมาณ network I/O ในตัวอย่างระบบสูงขึ้นจน DMA อย่างเดียวมีข้อจำกัดการขยายตัวตามคำอธิบาย. ภาพ Xeon E5-2600/4600 แสดง cores, L1/L2/L3 cache, PCIe/QPI และ memory controller hub เพื่อวางตำแหน่ง data path. ตัวเลข 10/100 Gbps และรุ่นชิปเป็นบริบทตัวอย่างในสไลด์.",
+      "remember": [
+        "แรงผลักในสไลด์คือ network data rate สูง เช่น 10/100-Gbps Ethernet และ Wi-Fi ระดับ gigabit (หน้า 31)",
+        "ภาพ Xeon มี cores 0–7, L1/L2 ต่อ core, L3 segments, PCIe/QPI และ memory controller hub (หน้า 32)",
+        "DCA ถูกเสนอหลังปัญหาการ scale ของ DMA ในกรณี network I/O (หน้า 31)"
+      ],
+      "terms": [
+        "Direct Cache Access (DCA)",
+        "network I/O",
+        "Xeon E5-2600/4600",
+        "PCIe",
+        "QPI",
+        "L3 cache"
+      ],
+      "example": "อ่านภาพหน้า 32 จาก PCIe สำหรับ I/O เข้าสู่วง cache และ cores; ใช้เพื่อเห็นจุดที่ cache เกี่ยวข้องกับ packet",
+      "confusion": "อย่าอ้างว่า 10/100 Gbps หรือสถาปัตยกรรม Xeon นี้เป็นสเปกปัจจุบัน; เป็นตัวอย่างจากสไลด์",
+      "mnemonic": "network เร็วขึ้น → data path ผ่าน cache สำคัญขึ้น",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "อะไรเป็นแรงผลักให้สไลด์พูดถึง DCA?",
+          "options": [
+            "network I/O data rates สูงขึ้น",
+            "keyboard ช้าลง",
+            "จำนวนคำสั่ง ISA ลด",
+            "disk ไม่มี sector"
+          ],
+          "correct": 0,
+          "answer": "network I/O data rates สูงขึ้น",
+          "pages": "หน้า 31–32"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ภาพหน้า 32 แสดง cache ระดับใดรอบ cores?",
+          "answer": "L1, L2 และ L3",
+          "pages": "หน้า 31–32"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดต้องมอง cache ในเส้นทาง network I/O?",
+          "answer": "packet ผ่าน memory/cache/core ตามสไลด์หน้า 33–34",
+          "pages": "หน้า 31–32"
+        }
+      ],
+      "figures": [
+        "fig-31",
+        "fig-32"
+      ]
+    },
+    {
+      "id": "packet-cache",
+      "title": "Packet traffic, buffers และ cache-related performance",
+      "level": "important",
+      "pages": "หน้า 33–35",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "Network traffic อยู่ในรูป packets/PDU; สไลด์ยก Ethernet ที่ครอบ IP/TCP และการทำงานของ NIC. ใน DMA scheme ขาออก application buffer ถูกคัดไป system buffer ใน main memory พร้อม TCP/IP headers ก่อน NIC นำไป; ขาเข้าก็มีการย้ายระหว่าง buffers. ขั้น incoming หน้า 35 มี DMA, NIC interrupt, retrieval, cache miss, header processing และ payload transfer.",
+      "remember": [
+        "Ethernet packet บรรทุก higher-level IP/TCP packet ตามลำดับชั้นที่สไลด์อธิบาย (หน้า 33)",
+        "Outgoing DMA path ใช้ application buffer→system buffer พร้อม headers→NIC (หน้า 34)",
+        "Incoming: packet arrives→DMA→NIC interrupts host→retrieve descriptors/headers→cache miss→process header→transfer payload (หน้า 35)",
+        "Outgoing: request→create packet→invoke output→DMA→NIC completion→driver frees buffer (หน้า 35)"
+      ],
+      "terms": [
+        "packet",
+        "PDU",
+        "Ethernet",
+        "IP",
+        "TCP",
+        "NIC",
+        "application buffer",
+        "system buffer",
+        "cache miss"
+      ],
+      "example": "ใช้ตารางสองคอลัมน์หน้า 35 เพื่อเทียบ incoming/outgoing; เชื่อมกับข้อความ buffer copy หน้า 34",
+      "confusion": "อย่าสรุปว่า DMA ไม่เกี่ยวกับ cache: หน้า 34–35 ระบุ core, main memory และ cache ล้วนอยู่ในทางเดิน",
+      "mnemonic": "packet ผ่าน buffer และ cache ก่อนถึงงานของ core",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "อุปกรณ์ใดส่ง packet ระหว่าง network กับ host ในสไลด์?",
+          "options": [
+            "NIC",
+            "PSW",
+            "8255 control word",
+            "ISR stack"
+          ],
+          "correct": 0,
+          "answer": "NIC",
+          "pages": "หน้า 33–35"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "outgoing DMA path ใช้ buffer ใดบ้าง?",
+          "answer": "application-assigned buffer และ system buffer ใน main memory",
+          "pages": "หน้า 33–35"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "incoming หลัง NIC interrupt มีขั้นใดที่ชี้ต้นทุน cache?",
+          "answer": "retrieve descriptors/headers แล้ว cache miss ก่อน process header",
+          "pages": "หน้า 33–35"
+        }
+      ],
+      "figures": [
+        "fig-33",
+        "fig-34",
+        "fig-35"
+      ]
+    },
+    {
+      "id": "dca-ddio",
+      "title": "DCA prefetch, cache injection และ DDIO",
+      "level": "core",
+      "pages": "หน้า 36–37",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "DCA แบบ prototype ในสไลด์ใช้กับ incoming network traffic: memory controller ส่ง prefetch hint เมื่อ data พร้อมใน system memory เพื่อให้ core ดึง packet จาก system buffer ล่วงหน้า. แนวที่ก้าวต่อไปคือหลีกเลี่ยง system buffer ใน main memory ผ่าน cache injection ซึ่งสไลด์เรียก Direct Data I/O (DDIO) ในสาย Xeon. ภาพหน้า 37 เทียบ DMA ที่โอนผ่าน main memory กับ DDIO ที่เข้าหรือออกผ่าน last-level cache.",
+      "remember": [
+        "DCA prototype เฉพาะ incoming; memory controller ส่ง prefetch hint ให้ core (หน้า 36)",
+        "cache injection/DDIO ลดการผ่าน system buffer ใน main memory (หน้า 36)",
+        "ภาพเปรียบ DMA transfer to/from memory กับ DDIO transfer to/from cache (หน้า 37)"
+      ],
+      "terms": [
+        "DCA",
+        "prefetch hint",
+        "system buffer",
+        "cache injection",
+        "Direct Data I/O (DDIO)",
+        "last-level cache"
+      ],
+      "example": "ดูภาพ (a)–(d) หน้า 37 แล้วตามลูกศรสีเขียวว่าข้อมูลผ่าน main memory หรือ last-level cache",
+      "confusion": "DCA prototype ที่อธิบาย incoming only ไม่ใช่ข้อจำกัดที่ระบุให้ DDIO ทุกกรณี; ภาพ DDIO มีทั้ง transfer to cache และ to I/O",
+      "mnemonic": "DCA เตรียม cache; DDIO ส่งผ่าน cache",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "prefetch hint ของ DCA prototype มาจากส่วนใด?",
+          "options": [
+            "memory controller",
+            "keyboard",
+            "control stack",
+            "8255A"
+          ],
+          "correct": 0,
+          "answer": "memory controller",
+          "pages": "หน้า 36–37"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "DDIO แตกต่างจาก normal DMA ในภาพหน้า 37 อย่างไร?",
+          "answer": "DDIO ใช้ last-level cache เป็นทางเดินข้อมูลแทนการผ่าน main memory ในภาพเปรียบ",
+          "pages": "หน้า 36–37"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "DCA prototype หน้า 36 ใช้กับ traffic ทิศใด?",
+          "answer": "incoming network traffic",
+          "pages": "หน้า 36–37"
+        }
+      ],
+      "figures": [
+        "fig-36",
+        "fig-37"
+      ],
+      "comparison": {
+        "headers": [
+          "กลไก",
+          "ทางเดิน/บทบาทในสไลด์"
+        ],
+        "rows": [
+          [
+            "Normal DMA",
+            "I/O ↔ main memory"
+          ],
+          [
+            "DCA prototype",
+            "data อยู่ system memory แล้วส่ง prefetch hint"
+          ],
+          [
+            "DDIO/cache injection",
+            "I/O ↔ last-level cache"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "io-evolution",
+      "title": "วิวัฒนาการ I/O function และ I/O channel",
+      "level": "core",
+      "pages": "หน้า 38–39",
+      "reason": "เป็นโครงสร้าง คำสั่ง ขั้นตอน หรือกลไกหลักที่สไลด์ใช้ต่อยอด",
+      "summary": "สไลด์เรียงวิวัฒนาการจาก CPU คุมอุปกรณ์ตรง → เพิ่ม I/O module แบบ programmed → interrupt → DMA → module เป็น processor เฉพาะทาง → module มี local memory จนทำงานได้คล้ายคอมพิวเตอร์ของตน. ภาพ I/O channel แยก selector channel กับ multiplexor channel โดยทั้งคู่เชื่อม memory/CPU กับ I/O controllers แต่จัดทางเชื่อมอุปกรณ์ต่างกัน.",
+      "remember": [
+        "6 ขั้นวิวัฒนาการเรียงจาก CPU direct control ถึง I/O module ที่มี local memory (หน้า 38)",
+        "Interrupt ลดเวลารอของ CPU; DMA ย้าย block โดย CPU ช่วยเริ่ม/จบตามคำอธิบาย (หน้า 38)",
+        "Selector กับ multiplexor channel เป็นสองสถาปัตยกรรมในภาพหน้า 39"
+      ],
+      "terms": [
+        "I/O function",
+        "I/O module",
+        "DMA",
+        "I/O channel",
+        "selector channel",
+        "multiplexor channel",
+        "local memory"
+      ],
+      "example": "จับคู่ขั้นที่ 2–4 หน้า 38 กับ programmed, interrupt และ DMA แล้วดูรูป selector/multiplexor หน้า 39",
+      "confusion": "อย่าคิดว่าทุกขั้นของวิวัฒนาการแทนของเดิมทั้งหมด; สไลด์เป็นลำดับการเพิ่มความสามารถของ module",
+      "mnemonic": "CPU คุม → module → interrupt → DMA → processor I/O",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "วิวัฒนาการขั้นใดให้ I/O module เข้าถึง memory โดยตรง?",
+          "options": [
+            "DMA",
+            "Programmed no interrupt",
+            "CPU direct",
+            "Software poll"
+          ],
+          "correct": 0,
+          "answer": "DMA",
+          "pages": "หน้า 38–39"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ลำดับหกขั้นในหน้า 38 สรุปอย่างไร?",
+          "answer": "CPU direct → module/programmed → interrupt → DMA → specialized I/O processor → module มี local memory",
+          "pages": "หน้า 38–39"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพหน้า 39 เทียบ channel สองชนิดใด?",
+          "answer": "selector และ multiplexor",
+          "pages": "หน้า 38–39"
+        }
+      ],
+      "figures": [
+        "fig-38",
+        "fig-39"
+      ]
+    },
+    {
+      "id": "usb",
+      "title": "USB generations และ host-controller tree",
+      "level": "important",
+      "pages": "หน้า 41",
+      "reason": "เป็นภาพเปรียบเทียบ ตัวอย่างการประยุกต์ หรือการเชื่อมกลไกหลัก",
+      "summary": "สไลด์ยก USB เป็นตัวอย่าง peripheral connection หลายรุ่น และแยก signaling rate ออกจาก usable data rate ใน SuperSpeed. ตัวเลขที่ให้มี USB 1.0 low/full 1.5/12 Mbps, USB 2.0 480 Mbps, USB 3.0 signaling 5 Gbps usable สูงสุด 4 Gbps, USB 3.1 Gen2 signaling 10 Gbps usable ตามสไลด์ 9.7 Gbps และ USB 3.2 Gen2x2 20 Gbps. Root host controller เชื่อมอุปกรณ์เป็น hierarchical tree.",
+      "remember": [
+        "USB 1.0 Low/Full Speed 1.5/12 Mbps; USB 2.0 480 Mbps (หน้า 41)",
+        "USB 3.0/3.1 Gen1 signaling 5 Gbps, usable สูงสุด 4 Gbps; Gen2 signaling 10 Gbps, usable ทฤษฎี 9.7 Gbps (หน้า 41)",
+        "USB 3.2 Gen2x2 20 Gbps; root host controller จัด tree topology (หน้า 41)"
+      ],
+      "terms": [
+        "USB",
+        "Low Speed",
+        "Full Speed",
+        "SuperSpeed",
+        "SuperSpeed+",
+        "signaling rate",
+        "usable data rate",
+        "root host controller"
+      ],
+      "example": "อ่านตัวเลขหน้า 41 โดยแยกความเร็วสัญญาณกับ usable data rate แล้วจับคู่ generation",
+      "confusion": "เลขเหล่านี้เป็นตัวเลขตามสไลด์/ยุคของเอกสาร ไม่ใช่สเปก USB ปัจจุบัน; อย่าสลับ signaling 5 Gbps กับ usable 4 Gbps",
+      "mnemonic": "ดูรุ่น–ดูหน่วย–แยก signaling/usable",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "USB 2.0 ในสไลด์ระบุ data rate เท่าไร?",
+          "options": [
+            "480 Mbps",
+            "12 Mbps",
+            "5 Gbps",
+            "20 Gbps"
+          ],
+          "correct": 0,
+          "answer": "480 Mbps",
+          "pages": "หน้า 41"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "USB 3.0 ในหน้า 41 แยก signaling กับ usable อย่างไร?",
+          "answer": "5 Gbps signaling; usable สูงสุด 4 Gbps เพราะ overhead ตามสไลด์",
+          "pages": "หน้า 41"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "อุปกรณ์ USB จัดเป็น topology แบบใดในหน้า 41?",
+          "answer": "hierarchical tree ภายใต้ root host controller",
+          "pages": "หน้า 41"
+        }
+      ],
+      "figures": [
+        "fig-41"
+      ]
+    },
+    {
+      "id": "firewire-scsi",
+      "title": "FireWire และ SCSI ในชุดตัวอย่าง",
+      "level": "extra",
+      "pages": "หน้า 42–43",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "FireWire ตามสไลด์คือ IEEE 1394 high-performance serial bus ที่ใช้ daisy chain และรองรับ hot plugging/automatic configuration. SCSI เป็น Small Computer System Interface สำหรับ peripheral โดยภาพรวมหน้า 43 กล่าวถึง shared parallel bus และการใช้กับ mass memory ใน enterprise. ทั้งสองหน้าเป็นตัวอย่างเทคโนโลยีที่ถูกจัดให้รายงานกลุ่ม.",
+      "remember": [
+        "FireWire: IEEE 1394, daisy chain สูงสุด 63 devices ต่อ port, hot plugging และ auto config (หน้า 42)",
+        "SCSI: shared bus แบบ parallel, 16 หรือ 32 devices ตาม generation, high-speed version สำหรับ mass memory (หน้า 43)",
+        "SCSI ย่อจาก Small Computer System Interface (หน้า 43)"
+      ],
+      "terms": [
+        "FireWire",
+        "IEEE 1394",
+        "daisy chain",
+        "hot plugging",
+        "SCSI",
+        "parallel bus"
+      ],
+      "example": "เทียบ serial daisy chain ของ FireWire หน้า 42 กับ shared parallel bus ของ SCSI หน้า 43",
+      "confusion": "ข้อเปรียบเทียบนี้อ้างเฉพาะระบบ/รุ่นในสไลด์; อย่าถือว่าเป็นคำแนะนำเลือกใช้อุปกรณ์ปัจจุบัน",
+      "mnemonic": "FireWire serial chain; SCSI parallel shared",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "SCSI ย่อจากอะไร?",
+          "options": [
+            "Small Computer System Interface",
+            "Serial Cache System Interface",
+            "System Control Signal Input",
+            "Single Channel Serial I/O"
+          ],
+          "correct": 0,
+          "answer": "Small Computer System Interface",
+          "pages": "หน้า 42–43"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "FireWire ในสไลด์มีคุณสมบัติต่ออุปกรณ์โดยไม่ปิดเครื่องว่าอะไร?",
+          "answer": "hot plugging",
+          "pages": "หน้า 42–43"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "FireWire กับ SCSI ในสไลด์ต่างรูป bus อย่างไร?",
+          "answer": "FireWire serial daisy chain; SCSI shared parallel bus",
+          "pages": "หน้า 42–43"
+        }
+      ],
+      "figures": [
+        "fig-42",
+        "fig-43"
+      ],
+      "comparison": {
+        "headers": [
+          "ตัวอย่าง",
+          "รูปแบบในสไลด์",
+          "จุดเด่นที่ให้"
+        ],
+        "rows": [
+          [
+            "FireWire",
+            "serial daisy chain",
+            "hot plugging/auto config"
+          ],
+          [
+            "SCSI",
+            "shared parallel bus",
+            "mass memory/enterprise"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "thunderbolt-infiniband",
+      "title": "Thunderbolt และ InfiniBand",
+      "level": "extra",
+      "pages": "หน้า 44–45",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "Thunderbolt ในสไลด์รวม data, video, audio และ power ในสายเชื่อม peripheral เดียว พร้อมตัวเลขตัวอย่าง 10 Gbps ต่อทิศและ 10 W. InfiniBand ถูกวางสำหรับ high-end server และ storage area networking ผ่าน fabric ของ switches/links เพื่อเชื่อม server, storage และ network devices. ตัวเลขความเร็วและขนาดระบบเป็นข้อมูลตามสไลด์.",
+      "remember": [
+        "Thunderbolt รวม data/video/audio/power และระบุ 10 Gbps แต่ละทิศ, 10 W ตามสไลด์ (หน้า 44)",
+        "InfiniBand มุ่ง high-end server, storage area networking และ switch-based fabric (หน้า 45)",
+        "สไลด์ยก IBM zEnterprise และสูงสุด 64,000 devices เป็นบริบทตัวอย่าง (หน้า 45)"
+      ],
+      "terms": [
+        "Thunderbolt",
+        "InfiniBand",
+        "fabric",
+        "switch-based architecture",
+        "storage area network"
+      ],
+      "example": "ใช้หัวข้อการใช้งานเทียบ: Thunderbolt ต่อ peripherals; InfiniBand เชื่อมระบบ server/storage จำนวนมากใน fabric",
+      "confusion": "ตัวเลข 10 Gbps/10 W และ 64,000 เป็นข้อมูลในเอกสาร ไม่ใช่ข้อเท็จจริงอัปเดตของเทคโนโลยี",
+      "mnemonic": "Thunderbolt รวมสาย; InfiniBand รวม fabric",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "เทคโนโลยีใดในหน้า 45 ใช้ switch-based fabric?",
+          "options": [
+            "InfiniBand",
+            "Thunderbolt",
+            "SCSI",
+            "USB 1.0"
+          ],
+          "correct": 0,
+          "answer": "InfiniBand",
+          "pages": "หน้า 44–45"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Thunderbolt ในหน้า 44 รวมสัญญาณใด?",
+          "answer": "data, video, audio และ power",
+          "pages": "หน้า 44–45"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "InfiniBand เหมาะกับงานกลุ่มใดตามหน้า 45?",
+          "answer": "high-end servers และ storage area networking",
+          "pages": "หน้า 44–45"
+        }
+      ],
+      "figures": [
+        "fig-44",
+        "fig-45"
+      ]
+    },
+    {
+      "id": "pcie-sata",
+      "title": "PCI Express และ SATA",
+      "level": "extra",
+      "pages": "หน้า 46",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "สไลด์ยก PCI Express เป็น high-speed bus สำหรับเชื่อม peripherals หลายชนิดและความเร็ว. SATA ย่อจาก Serial Advanced Technology Attachment และใช้เป็น interface สำหรับ disk storage systems. ตัวเลข data rate ในหน้า 46 เป็นตัวอย่างตามเอกสารและควรอ่านเป็นข้อมูลประจำสไลด์.",
+      "remember": [
+        "PCI Express: high-speed bus สำหรับ peripherals หลายประเภท/ความเร็ว (หน้า 46)",
+        "SATA = Serial Advanced Technology Attachment; interface สำหรับ disk storage (หน้า 46)",
+        "สไลด์ให้ตัวเลขสูงสุด 6 Gbps และ 300 Mbps ต่อ device ในคำอธิบาย SATA: ต้องตรวจสอบจากต้นฉบับก่อนใช้คำนวณหรืออ้างเป็นสเปก (หน้า 46)"
+      ],
+      "terms": [
+        "PCI Express",
+        "PCIe",
+        "SATA",
+        "Serial Advanced Technology Attachment"
+      ],
+      "example": "ดูภาพการ์ด PCIe และสาย/drive SATA หน้า 46 เพื่อแยกบริบทการใช้งาน",
+      "confusion": "หน้า 46 วาง 6 Gbps กับ 300 Mbps ต่อ device ในหัวข้อ SATA โดยไม่อธิบายเงื่อนไขที่ทำให้ต่างกัน: ต้องตรวจสอบจากต้นฉบับ; อย่าอนุมานรุ่นหรือความเร็วจริง",
+      "mnemonic": "PCIe ต่อ peripherals; SATA ต่อ disk",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "SATA ย่อจากอะไร?",
+          "options": [
+            "Serial Advanced Technology Attachment",
+            "System Address Transfer Architecture",
+            "Storage Array Timing Access",
+            "Serial Application Transfer Address"
+          ],
+          "correct": 0,
+          "answer": "Serial Advanced Technology Attachment",
+          "pages": "หน้า 46"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "PCI Express ใช้เชื่อมอะไรตามหน้า 46?",
+          "answer": "peripherals หลายชนิดและหลายความเร็ว",
+          "pages": "หน้า 46"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ตัวเลข SATA สองค่าใดในหน้า 46 ต้องตรวจเงื่อนไขก่อนใช้?",
+          "answer": "6 Gbps กับ 300 Mbps ต่อ device: ต้องตรวจสอบจากต้นฉบับ",
+          "pages": "หน้า 46"
+        }
+      ],
+      "figures": [
+        "fig-46"
+      ]
+    },
+    {
+      "id": "ethernet-wifi",
+      "title": "Ethernet และ Wi-Fi ในชุดตัวอย่าง",
+      "level": "extra",
+      "pages": "หน้า 47–48",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "Ethernet ในสไลด์เป็น wired networking ที่เปลี่ยนจาก bus-based ไป switch-based โดยมี central switch เชื่อมอุปกรณ์. Wi-Fi เป็น wireless Internet access ที่เชื่อมอุปกรณ์หลายประเภทและพัฒนามาตรฐาน IEEE 802.11 ต่อเนื่อง. ตัวเลข 100 Gbps Ethernet และ 802.11ac 3.2 Gbps เป็นตัวอย่างที่สไลด์ให้ ณ ช่วงของเอกสาร.",
+      "remember": [
+        "Ethernet: wired, bus-based → switch-based central switch; ตัวเลขในสไลด์สูงสุด 100 Gbps (หน้า 47)",
+        "Wi-Fi: wireless Internet access; IEEE 802.11; สไลด์ระบุ 802.11ac (2014) สูงสุด 3.2 Gbps (หน้า 48)",
+        "หน้า 40 จัด Ethernet และ Wi-Fi อยู่ในชุดหัวข้อรายงานกลุ่ม"
+      ],
+      "terms": [
+        "Ethernet",
+        "wired network",
+        "central switch",
+        "Wi-Fi",
+        "IEEE 802.11",
+        "802.11ac"
+      ],
+      "example": "เทียบลูกศร/ภาพหน้า 47 Ethernet cable กับหน้า 48 wireless devices",
+      "confusion": "อย่าใช้คำว่า “current version” จากหน้า 48 เป็นคำบอกเวอร์ชันปัจจุบัน ณ วันนี้; เป็นถ้อยคำในสไลด์",
+      "mnemonic": "Ethernet มีสาย/สวิตช์; Wi-Fi ไร้สาย/802.11",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "เทคโนโลยีใดเป็น predominant wireless Internet access ในสไลด์?",
+          "options": [
+            "Wi-Fi",
+            "Ethernet",
+            "SATA",
+            "PCIe"
+          ],
+          "correct": 0,
+          "answer": "Wi-Fi",
+          "pages": "หน้า 47–48"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Ethernet เปลี่ยน topology ตามสไลด์อย่างไร?",
+          "answer": "จาก bus-based เป็น switch-based มี central switch",
+          "pages": "หน้า 47–48"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ตัวเลข “current version 802.11ac” ควรตีความอย่างไร?",
+          "answer": "เป็นคำของสไลด์หน้า 48 ไม่ใช่สถานะเทคโนโลยีปัจจุบัน",
+          "pages": "หน้า 47–48"
+        }
+      ],
+      "figures": [
+        "fig-47",
+        "fig-48"
+      ]
+    },
+    {
+      "id": "ibm-channel-example",
+      "title": "ตัวอย่าง IBM EC12 I/O channel subsystem",
+      "level": "extra",
+      "pages": "หน้า 49–51",
+      "reason": "เป็นอุปกรณ์หรือเทคโนโลยีตัวอย่างที่สไลด์ให้รายละเอียดประกอบ",
+      "summary": "ภาพท้ายบทแสดง IBM EC12 channel subsystem, ตู้ I/O frames และการเชื่อม books ผ่าน PCIe/InfiniBand ไปยัง I/O controllers/channels. หน้า 49 ให้ตัวเลข partitions, channel subsystems และ channels ในภาพ แต่ข้อความจำนวน partitions สูงสุดด้านบนกับด้านล่างไม่ตรงกัน. จึงใช้ภาพทบทวนความสัมพันธ์เชิงโครงสร้างโดยไม่สรุปจำนวน partitions ที่ขัดกัน.",
+      "remember": [
+        "หน้า 49 มี 4 channel subsystems และระบุไม่เกิน 256 channels ต่อ subsystem ในภาพ",
+        "หน้า 50 ภาพตู้แสดง PCIe drawer, I/O cage, processor books, InfiniBand/PCIe interconnects",
+        "หน้า 51 เชื่อม 4 books กับ PCIe switches และ InfiniBand multiplexors เพื่อไป controllers/channels"
+      ],
+      "terms": [
+        "IBM EC12",
+        "channel subsystem",
+        "partition",
+        "channel",
+        "PCIe I/O drawer",
+        "InfiniBand multiplexer"
+      ],
+      "example": "ตามแผนภาพหน้า 51 จาก book→PCIe/HCA→switch/multiplexer→controller/channel",
+      "confusion": "หน้า 49 ด้านบนเขียน ≤60 partitions/system แต่ด้านล่างเขียน ≤1024 partitions/system: ต้องตรวจสอบจากต้นฉบับ; ห้ามนำตัวเลขใดเป็นคำตอบแน่นอน",
+      "mnemonic": "book → channel subsystem → channel → device",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "หน้า 49 แสดง channel subsystem กี่ชุด?",
+          "options": [
+            "4",
+            "8",
+            "15",
+            "256"
+          ],
+          "correct": 0,
+          "answer": "4 ชุด",
+          "pages": "หน้า 49–51"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ภาพหน้า 51 แสดงเส้นทาง I/O ผ่านส่วนใด?",
+          "answer": "books ไป PCIe/HCA แล้วผ่าน switch/multiplexer สู่ controllers/channels",
+          "pages": "หน้า 49–51"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "จำนวน partitions ต่อ system หน้า 49 สรุปได้หรือไม่?",
+          "answer": "ต้องตรวจสอบจากต้นฉบับ เพราะภาพเขียน ≤60 และ ≤1024 ขัดกัน",
+          "pages": "หน้า 49–51"
+        }
+      ],
+      "figures": [
+        "fig-49",
+        "fig-50",
+        "fig-51"
+      ]
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "1 · โครงสร้าง I/O",
+      "text": "เริ่ม system bus–module–external device แล้วจำห้าหน้าที่ของ I/O module",
+      "pages": "หน้า 3–7",
+      "topic": "io-model"
+    },
+    {
+      "title": "2 · คำสั่งและทางเดินข้อมูล",
+      "text": "เทียบ programmed/interrupt-driven/DMA, command 4 ชนิด และ addressing สองแบบ",
+      "pages": "หน้า 8–14",
+      "topic": "io-techniques"
+    },
+    {
+      "title": "3 · Interrupt",
+      "text": "ไล่ PC/PSW/ISR แล้วตอบว่า device ใดร้องขอและจัด priority อย่างไร",
+      "pages": "หน้า 15–23",
+      "topic": "interrupt-processing"
+    },
+    {
+      "title": "4 · DMA",
+      "text": "จับข้อจำกัดสองวิธีแรก → DMA controller/breakpoints/configurations/8237",
+      "pages": "หน้า 24–30",
+      "topic": "dma-motivation"
+    },
+    {
+      "title": "5 · Cache กับ network I/O",
+      "text": "ตาม packet buffers/cache miss ก่อนเทียบ DCA prefetch กับ DDIO cache injection",
+      "pages": "หน้า 31–37",
+      "topic": "dca-motivation"
+    },
+    {
+      "title": "6 · ระบบใหญ่และ interfaces",
+      "text": "จบด้วยวิวัฒนาการ/channel แล้วอ่านหน้า 41–51 ในฐานะตัวอย่างและหัวข้อรายงาน",
+      "pages": "หน้า 38–51",
+      "topic": "io-evolution"
+    }
+  ],
+  "plan": [
+    {
+      "title": "รอบ 1 · ผังภาพรวม",
+      "task": "อ่านหน้า 3–9 แล้ววาดเส้นทาง bus→I/O module→device กับเปรียบ 3 เทคนิค",
+      "check": "บอกได้ว่า CPU รอหรือไม่ และ data ผ่าน CPU หรือไม่ในแต่ละเทคนิค",
+      "pages": "หน้า 3–9"
+    },
+    {
+      "title": "รอบ 2 · Trace คำสั่งและ interrupt",
+      "task": "ไล่ Control/Test/Read/Write, memory-mapped/isolated และภาพ interrupt หน้า 16–19",
+      "check": "เล่าลำดับเก็บ/คืน PC/PSW และวิธีระบุ requester ได้",
+      "pages": "หน้า 10–19"
+    },
+    {
+      "title": "รอบ 3 · Trace DMA",
+      "task": "อ่านข้อจำกัดหน้า 24 แล้วตาม data count/address, breakpoint, DREQ/DACK/HRQ/HLDA และ configurations",
+      "check": "ชี้ผู้ขอ DMA, ผู้ขอ bus และทางเดิน block ได้",
+      "pages": "หน้า 24–30"
+    },
+    {
+      "title": "รอบ 4 · Cache/Channel/ตัวอย่าง",
+      "task": "ตาม incoming/outgoing packet, DCA/DDIO, I/O channel แล้วทวนกลุ่ม interface ตามบทบาท",
+      "check": "อธิบาย buffer copy กับ cache injection และแยก wired/wireless/storage/server interfaces ได้จากสไลด์",
+      "pages": "หน้า 31–51"
+    },
+    {
+      "title": "รอบ 5 · ทดสอบเว้นระยะ",
+      "task": "ตอบ 3 ข้อต่อหัวข้อแล้วสุ่ม Quiz; วันถัดไปทวนข้อที่ผิดและเปิดภาพสไลด์ต้นทาง",
+      "check": "ตอบครบหัวข้อสำคัญและชี้หน้า 30/46/49 ที่ต้องตรวจต้นฉบับได้",
+      "pages": "หน้า 3–51"
+    }
+  ],
+  "cram": [
+    {
+      "title": "ถ้าเหลือ 3 วัน",
+      "text": "วัน 1 module/สามเทคนิค/commands/mapping หน้า 3–14; วัน 2 interrupt/DMA หน้า 15–30; วัน 3 DCA/channel/interfaces หน้า 31–51 พร้อม Quiz"
+    },
+    {
+      "title": "ถ้าเหลือ 1 วัน",
+      "text": "เรียงสามเทคนิค/ผังหน้า 8–11 → mapping/interrupt หน้า 12–19 → DMA หน้า 24–30 → DCA/DDIO หน้า 33–37 → interface เฉพาะศัพท์ที่ยังสับสน หน้า 41–51"
+    },
+    {
+      "title": "ถ้าเหลือ 3 ชั่วโมง",
+      "text": "0–35 นาทีโครงสร้าง/สามเทคนิค หน้า 3–11; 35–70 นาที mapping/interrupt หน้า 12–19; 70–125 นาที DMA หน้า 24–30; 125–155 นาที DCA/DDIO/channel หน้า 31–39; 155–180 นาที interface key terms/Quiz"
+    }
+  ],
+  "strategyIntro": "หัวข้อกลไกและผังการโอนข้อมูลมีน้ำหนักในการทบทวนมากกว่าตัวเลขรุ่น interface เพราะเป็นฐานต่อเนื่องในสไลด์; ไม่มีข้อสอบเก่า จึงไม่ยืนยันความถี่ออกสอบ",
+  "strategy": [
+    {
+      "title": "ควรท่องจำ",
+      "text": "I/O module functions, สาม I/O techniques, Control/Test/Read/Write, memory-mapped/isolated, PC/PSW, interrupt identification, DREQ/DACK/HRQ/HLDA (หน้า 6–19, 25–29)"
+    },
+    {
+      "title": "ควรฝึกโจทย์",
+      "text": "ไล่ผังรับ block หน้า 11, keyboard addressing หน้า 14, simple interrupt หน้า 16–17, DMA breakpoints/configurations หน้า 26–28 และ DMA/DDIO หน้า 37"
+    },
+    {
+      "title": "ควรเข้าใจแนวคิด",
+      "text": "เหตุผลใช้ DMA, packet buffer/cache miss, DCA prefetch versus DDIO cache injection, I/O channel evolution (หน้า 24, 31–39)"
+    },
+    {
+      "title": "เตรียมข้อสอบแบบผสม",
+      "text": "เลือกตอบจับคู่คำศัพท์/สัญญาณ; อัตนัยอธิบาย sequence; วิเคราะห์ผังและทางเดิน data. สไลด์ไม่มีโจทย์คำนวณแยก จึงไม่สร้างโจทย์ตัวเลขที่ไม่มีในเอกสาร"
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "I/O module และ external device",
+      "back": "System bus มี address/data/control lines ต่อ I/O module (หน้า 3)",
+      "pages": "หน้า 3–5"
+    },
+    {
+      "front": "หน้าที่และโครงสร้างภายใน I/O module",
+      "back": "Control and timing ประสาน traffic; processor communication ถอด command รับ address/data/status (หน้า 6)",
+      "pages": "หน้า 6–7"
+    },
+    {
+      "front": "Programmed I/O, Interrupt-driven I/O และ DMA",
+      "back": "Programmed: processor control และ wait (หน้า 8)",
+      "pages": "หน้า 8–9"
+    },
+    {
+      "front": "คำสั่ง Control, Test, Read, Write",
+      "back": "Control = activate/tell peripheral what to do",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "ผังการรับ block ของข้อมูลด้วยสามเทคนิค",
+      "back": "Programmed: issue read → read/check status ซ้ำ → CPU read word → CPU write memory (หน้า 11)",
+      "pages": "หน้า 11"
+    },
+    {
+      "front": "I/O instructions, Memory-mapped และ Isolated I/O",
+      "back": "Memory-mapped: address space ร่วม, read/write lines เดียว, memory access commands ใช้ได้ (หน้า 12–13)",
+      "pages": "หน้า 12–14"
+    },
+    {
+      "front": "Interrupt-driven I/O และการเก็บ/คืนสถานะ",
+      "back": "CPU จบคำสั่งปัจจุบันก่อนตอบ interrupt (หน้า 16)",
+      "pages": "หน้า 15–17"
+    },
+    {
+      "front": "ปัญหา priority และวิธีระบุ device ที่ interrupt",
+      "back": "สอง design issues: identify requester และเลือกจัดการเมื่อ interrupts หลายตัว (หน้า 18)",
+      "pages": "หน้า 18–19"
+    },
+    {
+      "front": "82C59A interrupt controller แบบ master/slave",
+      "back": "Slave รับ external-device lines IR0–IR7 (หน้า 20)",
+      "pages": "หน้า 20"
+    },
+    {
+      "front": "Intel 8255A/82C55A และ control word",
+      "back": "8255A block diagram มี Port A/B อย่างละ 8 บิต และ Port C upper/lower อย่างละ 4 บิต (หน้า 21)",
+      "pages": "หน้า 21–23"
+    },
+    {
+      "front": "ข้อจำกัดของ I/O ผ่าน CPU และเหตุผลใช้ DMA",
+      "back": "Transfer rate ถูกจำกัดด้วยความเร็วตรวจ/บริการ device ของ processor (หน้า 24)",
+      "pages": "หน้า 24"
+    },
+    {
+      "front": "DMA block diagram และ breakpoint ใน instruction cycle",
+      "back": "data count/address/data register และ control logic ใน DMA module (หน้า 25)",
+      "pages": "หน้า 25–26"
+    },
+    {
+      "front": "Alternative DMA configurations และ Intel 8237A",
+      "back": "สาม configuration: single-bus detached, single-bus integrated DMA-I/O, I/O bus (หน้า 27)",
+      "pages": "หน้า 27–30"
+    },
+    {
+      "front": "Direct Cache Access (DCA) และภาพ Xeon",
+      "back": "แรงผลักในสไลด์คือ network data rate สูง เช่น 10/100-Gbps Ethernet และ Wi-Fi ระดับ gigabit (หน้า 31)",
+      "pages": "หน้า 31–32"
+    },
+    {
+      "front": "Packet traffic, buffers และ cache-related performance",
+      "back": "Ethernet packet บรรทุก higher-level IP/TCP packet ตามลำดับชั้นที่สไลด์อธิบาย (หน้า 33)",
+      "pages": "หน้า 33–35"
+    },
+    {
+      "front": "DCA prefetch, cache injection และ DDIO",
+      "back": "DCA prototype เฉพาะ incoming; memory controller ส่ง prefetch hint ให้ core (หน้า 36)",
+      "pages": "หน้า 36–37"
+    },
+    {
+      "front": "วิวัฒนาการ I/O function และ I/O channel",
+      "back": "6 ขั้นวิวัฒนาการเรียงจาก CPU direct control ถึง I/O module ที่มี local memory (หน้า 38)",
+      "pages": "หน้า 38–39"
+    },
+    {
+      "front": "USB generations และ host-controller tree",
+      "back": "USB 1.0 Low/Full Speed 1.5/12 Mbps; USB 2.0 480 Mbps (หน้า 41)",
+      "pages": "หน้า 41"
+    },
+    {
+      "front": "FireWire และ SCSI ในชุดตัวอย่าง",
+      "back": "FireWire: IEEE 1394, daisy chain สูงสุด 63 devices ต่อ port, hot plugging และ auto config (หน้า 42)",
+      "pages": "หน้า 42–43"
+    },
+    {
+      "front": "Thunderbolt และ InfiniBand",
+      "back": "Thunderbolt รวม data/video/audio/power และระบุ 10 Gbps แต่ละทิศ, 10 W ตามสไลด์ (หน้า 44)",
+      "pages": "หน้า 44–45"
+    },
+    {
+      "front": "PCI Express และ SATA",
+      "back": "PCI Express: high-speed bus สำหรับ peripherals หลายประเภท/ความเร็ว (หน้า 46)",
+      "pages": "หน้า 46"
+    },
+    {
+      "front": "Ethernet และ Wi-Fi ในชุดตัวอย่าง",
+      "back": "Ethernet: wired, bus-based → switch-based central switch; ตัวเลขในสไลด์สูงสุด 100 Gbps (หน้า 47)",
+      "pages": "หน้า 47–48"
+    },
+    {
+      "front": "ตัวอย่าง IBM EC12 I/O channel subsystem",
+      "back": "หน้า 49 มี 4 channel subsystems และระบุไม่เกิน 256 channels ต่อ subsystem ในภาพ",
+      "pages": "หน้า 49–51"
+    },
+    {
+      "front": "I/O module",
+      "back": "เชื่อม system bus กับ peripheral devices",
+      "pages": "หน้า 3"
+    },
+    {
+      "front": "External device 3 กลุ่ม",
+      "back": "human readable, machine readable, communication",
+      "pages": "หน้า 4"
+    },
+    {
+      "front": "Transducer",
+      "back": "ส่วนแปลงข้อมูลระหว่างอุปกรณ์กับสิ่งแวดล้อมในภาพ",
+      "pages": "หน้า 5"
+    },
+    {
+      "front": "I/O module functions",
+      "back": "control/timing, processor/device communication, buffering, error detection",
+      "pages": "หน้า 6"
+    },
+    {
+      "front": "Programmed I/O",
+      "back": "processor สั่งและรอ I/O operation ให้เสร็จ",
+      "pages": "หน้า 8"
+    },
+    {
+      "front": "Interrupt-driven I/O",
+      "back": "สั่ง I/O แล้วทำงานอื่น; module interrupt เมื่อเสร็จ",
+      "pages": "หน้า 8, 15"
+    },
+    {
+      "front": "DMA",
+      "back": "I/O module กับ main memory แลกข้อมูลตรงโดยไม่ให้ processor อยู่ในทางเดินข้อมูล",
+      "pages": "หน้า 8–9"
+    },
+    {
+      "front": "Control/Test/Read/Write",
+      "back": "สั่งงาน/ตรวจสถานะ/รับเข้า buffer/ส่งออกจาก data bus",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "Memory-mapped I/O",
+      "back": "memory และ devices แชร์ address space",
+      "pages": "หน้า 12–14"
+    },
+    {
+      "front": "Isolated I/O",
+      "back": "แยก address space และมี I/O commands เฉพาะ",
+      "pages": "หน้า 13–14"
+    },
+    {
+      "front": "PC/PSW ก่อน ISR",
+      "back": "processor เก็บบน control stack ก่อนโหลด PC ใหม่",
+      "pages": "หน้า 16"
+    },
+    {
+      "front": "Vectored interrupt",
+      "back": "ใช้ vector ชี้ device-service routine",
+      "pages": "หน้า 19"
+    },
+    {
+      "front": "DREQ/DACK",
+      "back": "DMA request / DMA acknowledge ในภาพ 8237",
+      "pages": "หน้า 28"
+    },
+    {
+      "front": "HRQ/HLDA",
+      "back": "HOLD request / HOLD acknowledge ในภาพ 8237",
+      "pages": "หน้า 28"
+    },
+    {
+      "front": "8237 channels",
+      "back": "4 ช่อง หมายเลข 0, 1, 2, 3",
+      "pages": "หน้า 29"
+    },
+    {
+      "front": "DCA prototype",
+      "back": "memory controller ส่ง prefetch hint สำหรับ incoming network traffic",
+      "pages": "หน้า 36"
+    },
+    {
+      "front": "DDIO",
+      "back": "ตัวอย่าง cache injection ให้ I/O transfer ผ่าน last-level cache",
+      "pages": "หน้า 36–37"
+    },
+    {
+      "front": "Selector/Multiplexor",
+      "back": "I/O channel architectures สองแบบในแผนภาพ",
+      "pages": "หน้า 39"
+    },
+    {
+      "front": "USB root host controller",
+      "back": "เชื่อมอุปกรณ์เป็น hierarchical tree ตามสไลด์",
+      "pages": "หน้า 41"
+    },
+    {
+      "front": "FireWire",
+      "back": "IEEE 1394 serial bus, daisy chain และ hot plugging",
+      "pages": "หน้า 42"
+    },
+    {
+      "front": "SCSI",
+      "back": "Small Computer System Interface; shared parallel bus ตามสไลด์",
+      "pages": "หน้า 43"
+    },
+    {
+      "front": "SATA",
+      "back": "Serial Advanced Technology Attachment สำหรับ disk storage",
+      "pages": "หน้า 46"
+    },
+    {
+      "front": "Ethernet/Wi-Fi",
+      "back": "wired switch-based / wireless IEEE 802.11 ตามสไลด์",
+      "pages": "หน้า 47–48"
+    }
+  ]
+}

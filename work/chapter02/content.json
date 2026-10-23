@@ -1,0 +1,2017 @@
+{
+  "source": "itds-211_comp_arch_Chapter02.pdf",
+  "sourcePageCount": 46,
+  "course": "ITDS-211 · Computer Architecture & Operating System",
+  "instructor": "W.Suntiamorntut, Ph.D.",
+  "chapter": "Chapter02 · Computer Systems, Computer Functions, Processor Structure and Function",
+  "description": "จากโมเดลเครื่องและ Bus ไปสู่ MARIE Instruction Processing และ Interrupt",
+  "notice": "เนื้อหาบทนี้มีแผนภาพและตารางคำสั่งจำนวนมาก ควรเปิดภาพต้นฉบับประกอบ โดยเฉพาะ RTL, ADD 105 และ Interrupt มีสองจุดที่สไลด์ขัดกันเองและทำเครื่องหมายให้ตรวจสอบแล้ว",
+  "purpose": "บทนี้เชื่อมภาพระบบคอมพิวเตอร์กับการทำงานทีละคำสั่ง: โมเดลและ bus พาข้อมูลไปยัง CPU/memory, MARIE ช่วยอ่าน register/ISA/RTL และส่วน interrupt อธิบายว่าระบบหยุดงานปัจจุบันไปบริการเหตุอื่นแล้วกลับมาทำต่ออย่างไร",
+  "purposePages": "หน้า 3–15, 17–45",
+  "objectiveNote": "วัตถุประสงค์รายบทที่ระบุโดยตรง: ต้องตรวจสอบจากต้นฉบับ สไลด์ไม่มีรายการ Chapter Objectives แยกชัดเจน; เป้าหมายต่อไปนี้สรุปจากเนื้อหา",
+  "flashcardNote": "Flashcard ใช้เฉพาะศัพท์ ขั้นตอน รหัส และตัวอย่างที่ปรากฏใน Chapter02; จุดที่สไลด์ขัดกันเองระบุให้ตรวจสอบ",
+  "goals": [
+    {
+      "text": "เปรียบเทียบ Von Neumann/Harvard และแยก bus lines กับวิธี arbitration",
+      "pages": "หน้า 3–7"
+    },
+    {
+      "text": "ติดตาม instruction cycle, PC/IR และข้อมูลผ่าน register ของระบบและ MARIE",
+      "pages": "หน้า 10–20, 28–29"
+    },
+    {
+      "text": "อ่าน MARIE ISA, bit pattern, RTL และ trace ADD 105 พร้อมแยกจุดขัดกันของเอกสาร",
+      "pages": "หน้า 21–27, 35–36"
+    },
+    {
+      "text": "อธิบายเหตุ/กลุ่ม interrupt, ISR, masking, I/O wait และ sequential/nested handling",
+      "pages": "หน้า 30–34, 37–45"
+    }
+  ],
+  "limits": [
+    "อ่านครบ 46 หน้า: หน้า 1 ปก หน้า 2 Course Outline หน้า 16 เปิดหัวข้อ Simple Computer Function และหน้า 46 Q & A ไม่มีเนื้อหาวิชาที่ต้องตั้งคำถามเพิ่ม",
+    "ไม่พบรายการ Chapter Objectives แยกโดยตรง: ต้องตรวจสอบจากต้นฉบับ เป้าหมายข้างต้นเป็นสรุปจากเนื้อหา",
+    "หน้า 21 เขียน MARIE มี 13 instructions แต่หน้า 22 แสดง 9 รายการเท่านั้น; รายชื่ออีก 4 รายการต้องตรวจสอบจากต้นฉบับ",
+    "หน้า 24 ระบุ SKIPCOND field 10 เมื่อ AC > 0 แต่หน้า 27 RTL ให้ 11: ต้องตรวจสอบจากต้นฉบับ",
+    "หน้า 35 binary Store 106 เริ่ม 0100 ขณะที่ hex เป็น 4106 และตารางหน้า 22 ให้ Store opcode 0010: ต้องตรวจสอบจากต้นฉบับ",
+    "ภาพเครื่องสมมติหน้า 14 เป็นคนละ instruction table กับ MARIE หน้า 22; แยกรหัสสองชุดไว้ชัดเจน",
+    "สไลด์หน้า 34 ไม่อธิบาย interrupt-driven I/O เชิงลึก และไม่มีข้อสอบเก่าหรือน้ำหนักสอบ จึงไม่อ้างว่าหัวข้อใดออกแน่นอน"
+  ],
+  "figures": [
+    {
+      "id": "models-von",
+      "page": 3,
+      "file": "slide-03.png",
+      "title": "Von Neumann model",
+      "caption": "ภาพ CPU, memory และการเก็บโปรแกรม/ข้อมูลร่วมกัน"
+    },
+    {
+      "id": "models-harvard",
+      "page": 4,
+      "file": "slide-04.png",
+      "title": "Harvard model",
+      "caption": "ภาพแยก instruction memory กับ data memory"
+    },
+    {
+      "id": "bus-lines",
+      "page": 5,
+      "file": "slide-05.png",
+      "title": "เส้นของ Bus",
+      "caption": "ภาพ CPU–Memory–I/O พร้อม Address/Data/Control bus"
+    },
+    {
+      "id": "multipoint-bus",
+      "page": 6,
+      "file": "slide-06.png",
+      "title": "Multipoint bus",
+      "caption": "อุปกรณ์หลายตัวใช้ bus เดียวร่วมกัน"
+    },
+    {
+      "id": "bus-arbitration",
+      "page": 7,
+      "file": "slide-07.png",
+      "title": "Bus arbitration 4 แบบ",
+      "caption": "รายชื่อ self-detection, collision-detection, daisy chain และ centralized parallel"
+    },
+    {
+      "id": "hardware-software",
+      "page": 8,
+      "file": "slide-08.png",
+      "title": "Hardware/Software approaches",
+      "caption": "แผนภาพ sequence ใน hardware เทียบ instruction interpreter"
+    },
+    {
+      "id": "registers",
+      "page": 10,
+      "file": "slide-10.png",
+      "title": "MAR/MBR/I/OAR/I/OBR",
+      "caption": "ภาพหน้าที่ register ฝั่ง memory และ I/O"
+    },
+    {
+      "id": "top-level",
+      "page": 11,
+      "file": "slide-11.png",
+      "title": "Computer components",
+      "caption": "CPU, main memory และ I/O module ผ่าน system bus"
+    },
+    {
+      "id": "basic-cycle",
+      "page": 12,
+      "file": "slide-12.png",
+      "title": "Basic instruction cycle",
+      "caption": "Fetch/Execute วนจน HALT"
+    },
+    {
+      "id": "hypothetical-program",
+      "page": 14,
+      "file": "slide-14.png",
+      "title": "เครื่องสมมติ: Load–Add–Store",
+      "caption": "ภาพ 6 ขั้น 0003 + 0002 = 0005; เป็นคนละ ISA กับ MARIE"
+    },
+    {
+      "id": "state-diagram",
+      "page": 15,
+      "file": "slide-15.png",
+      "title": "Instruction cycle state diagram",
+      "caption": "สถานะ fetch, decode, operand, operation, store"
+    },
+    {
+      "id": "marie-architecture",
+      "page": 18,
+      "file": "slide-18.png",
+      "title": "MARIE architecture",
+      "caption": "แผนผัง register, ALU, CPU และ main memory"
+    },
+    {
+      "id": "marie-datapath",
+      "page": 20,
+      "file": "slide-20.png",
+      "title": "MARIE data path",
+      "caption": "ภาพการเชื่อม register และ bus"
+    },
+    {
+      "id": "marie-isa",
+      "page": 22,
+      "file": "slide-22.png",
+      "title": "MARIE instruction format",
+      "caption": "ภาพ opcode/address และตาราง 9 คำสั่งที่เห็น"
+    },
+    {
+      "id": "load-bits",
+      "page": 23,
+      "file": "slide-23.png",
+      "title": "LOAD bit pattern",
+      "caption": "Opcode 1 และ address 3 ใน IR"
+    },
+    {
+      "id": "skipcond-bits",
+      "page": 24,
+      "file": "slide-24.png",
+      "title": "SKIPCOND bit pattern",
+      "caption": "หน้า 24 บอก field 10 เมื่อ AC > 0; ขัดกับหน้า 27"
+    },
+    {
+      "id": "rtl",
+      "page": 26,
+      "file": "slide-26.png",
+      "title": "RTL ของ LOAD และ ADD",
+      "caption": "ลำดับ MAR, MBR, AC ที่สไลด์ระบุ"
+    },
+    {
+      "id": "skipcond-rtl",
+      "page": 27,
+      "file": "slide-27.png",
+      "title": "RTL ของ SKIPCOND",
+      "caption": "หน้า 27 บอก field 11 เมื่อ AC > 0; ขัดกับหน้า 24"
+    },
+    {
+      "id": "marie-fetch-flow",
+      "page": 29,
+      "file": "slide-29.png",
+      "title": "MARIE fetch–decode–execute",
+      "caption": "Flowchart แบบมี/ไม่มี operand"
+    },
+    {
+      "id": "interrupt-branch",
+      "page": 31,
+      "file": "slide-31.png",
+      "title": "Interrupt เพิ่มในวงจร",
+      "caption": "แผนภาพการตรวจและ process interrupt"
+    },
+    {
+      "id": "isr-flow",
+      "page": 32,
+      "file": "slide-32.png",
+      "title": "ขั้นตอนเข้า ISR",
+      "caption": "save state, vector table, branch, restore"
+    },
+    {
+      "id": "interrupt-masking",
+      "page": 33,
+      "file": "slide-33.png",
+      "title": "Maskable/Nonmaskable",
+      "caption": "คำอธิบายการปิด interrupts และประเภทที่ยังต้องทำ"
+    },
+    {
+      "id": "marie-program",
+      "page": 35,
+      "file": "slide-35.png",
+      "title": "โปรแกรม MARIE 100–106",
+      "caption": "ตาราง mnemonic/binary/hex; Store 106 มีจุดขัดกัน"
+    },
+    {
+      "id": "marie-add-trace",
+      "page": 36,
+      "file": "slide-36.png",
+      "title": "Trace ADD 105",
+      "caption": "ค่าของ PC/IR/MAR/MBR/AC ทีละขั้น"
+    },
+    {
+      "id": "interrupt-classes",
+      "page": 37,
+      "file": "slide-37.png",
+      "title": "Classes of interrupts",
+      "caption": "ตาราง Program/Timer/I/O/Hardware failure"
+    },
+    {
+      "id": "control-flow",
+      "page": 38,
+      "file": "slide-38.png",
+      "title": "Program flow กับ interrupt",
+      "caption": "แผนภาพ without/with interrupt"
+    },
+    {
+      "id": "interrupt-cycle",
+      "page": 40,
+      "file": "slide-40.png",
+      "title": "Instruction cycle with interrupts",
+      "caption": "เพิ่มการตรวจ interrupt หลัง execute"
+    },
+    {
+      "id": "short-wait",
+      "page": 41,
+      "file": "slide-41.png",
+      "title": "Short I/O wait",
+      "caption": "timing เปรียบเทียบกรณีมี/ไม่มี interrupt"
+    },
+    {
+      "id": "long-wait",
+      "page": 42,
+      "file": "slide-42.png",
+      "title": "Long I/O wait",
+      "caption": "timing แสดงช่วง processor waits ที่ยังเหลือ"
+    },
+    {
+      "id": "state-with-interrupt",
+      "page": 43,
+      "file": "slide-43.png",
+      "title": "State diagram with interrupt",
+      "caption": "เพิ่ม interrupt check และ interrupt"
+    },
+    {
+      "id": "multiple-interrupts",
+      "page": 44,
+      "file": "slide-44.png",
+      "title": "Sequential/Nested interrupts",
+      "caption": "เส้นทาง control ของ handler X/Y"
+    },
+    {
+      "id": "multiple-timeline",
+      "page": 45,
+      "file": "slide-45.png",
+      "title": "ตัวอย่างเวลา multiple interrupts",
+      "caption": "Printer/Communication/Disk ISR ที่ t=10–40"
+    }
+  ],
+  "topics": [
+    {
+      "id": "computer-models",
+      "title": "Von Neumann และ Harvard Computer Model",
+      "level": "core",
+      "pages": "หน้า 3–4",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "Von Neumann model ใช้ stored program โดย memory เก็บทั้งโปรแกรมและข้อมูล และอ้างตำแหน่งด้วย address มากกว่าชนิดของเนื้อหา; สไลด์ระบุการเข้าถึง/ทำงานแบบ sequential หรือ linear. Harvard model แยก memory และ bus สำหรับ instructions กับ data เพื่อลด bottleneck แต่เพิ่มความซับซ้อน. สไลด์ยกแนวทางผสมที่แยกแบบ Harvard ที่ L1 cache แต่ใช้แบบ Von Neumann ที่ main memory.",
+      "remember": [
+        "Von Neumann: stored program; program/data อยู่ใน memory และระบุตำแหน่งด้วย address (หน้า 3)",
+        "Harvard: instruction/data ใช้ memory และ bus แยกกัน (หน้า 4)",
+        "Hybrid ในสไลด์: Harvard-style ที่ L1; Von Neumann ที่ main memory (หน้า 4)"
+      ],
+      "terms": [
+        "stored program = แนวคิดให้ memory เก็บ program และ data",
+        "address = หมายเลขตำแหน่งใน memory",
+        "instruction memory / data memory; L1 cache / main memory"
+      ],
+      "example": "เทียบแผนภาพหน้า 3–4 แล้วชี้ว่าทางเดินของ instructions กับ data แยกกันหรือใช้ร่วมกันในแต่ละโมเดล",
+      "confusion": "อย่าสรุปว่าเครื่องผสมต้องแยก main memory ด้วย; หน้า 4 ระบุ main memory เป็น Von Neumann ในตัวอย่าง",
+      "mnemonic": "Von Neumann เก็บร่วม; Harvard แยกทาง; Hybrid แยก L1 แต่รวม main memory",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "โมเดลใดแยก memory และ bus สำหรับ instructions กับ data?",
+          "options": [
+            "Harvard",
+            "Von Neumann",
+            "MARIE RTL",
+            "Daisy chain"
+          ],
+          "correct": 0,
+          "answer": "Harvard model ตามหน้า 4",
+          "pages": "หน้า 4"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "stored program ในหน้า 3 หมายถึงอะไร?",
+          "answer": "Memory เก็บทั้ง program และ data และเข้าถึงด้วยตำแหน่ง address",
+          "pages": "หน้า 3"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Hybrid ที่สไลด์ยกตัวอย่างใช้สองโมเดลที่ระดับใด?",
+          "answer": "Harvard-style ที่ L1 cache และ Von Neumann ที่ main memory",
+          "pages": "หน้า 4"
+        }
+      ],
+      "figures": [
+        "models-von",
+        "models-harvard"
+      ],
+      "comparison": {
+        "headers": [
+          "โมเดล",
+          "หน่วยความจำ/ทางเดิน",
+          "ข้อสังเกตตามสไลด์"
+        ],
+        "rows": [
+          [
+            "Von Neumann",
+            "โปรแกรมกับข้อมูลอยู่ใน memory",
+            "stored program; sequential/linear"
+          ],
+          [
+            "Harvard",
+            "instructions/data แยก memory และ bus",
+            "ลด bottleneck แต่ซับซ้อนขึ้น"
+          ],
+          [
+            "Hybrid ตัวอย่าง",
+            "แยกที่ L1; รวมที่ main memory",
+            "ใช้สองแนวทางคนละระดับ"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "bus-lines",
+      "title": "Bus และเส้น Data / Control / Address",
+      "level": "core",
+      "pages": "หน้า 5–6",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "สไลด์แบ่ง bus ที่พบบ่อยเป็น point-to-point กับ multipoint และระบุว่า bus มี data, control และ address lines. Data lines ส่ง bits ระหว่างอุปกรณ์; control lines กำหนดทิศทางการไหลและจังหวะที่อุปกรณ์ใช้ bus; address lines ระบุ source หรือ destination. Multipoint bus เป็นทรัพยากรที่ใช้ร่วมกัน จึงมี protocol ใน hardware เพื่อควบคุมการเข้าถึง.",
+      "remember": [
+        "point-to-point และ multipoint เป็น bus สองแบบที่สไลด์กล่าวถึง",
+        "data lines ส่ง bits; control lines คุมทิศทาง/สิทธิ์ใช้; address lines ระบุตำแหน่งต้นทาง/ปลายทาง",
+        "multipoint เป็น shared resource และควบคุมการเข้าถึงด้วย hardware protocols"
+      ],
+      "terms": [
+        "Bus = ทางเชื่อมอุปกรณ์ที่ประกอบด้วย data/control/address lines ตามหน้า 5",
+        "Multipoint bus = bus ที่หลายอุปกรณ์ใช้ร่วมกันตามหน้า 6"
+      ],
+      "example": "ใช้ภาพหน้า 5 ชี้เส้น address, data, control ระหว่าง CPU, memory และ I/O แล้วดูภาพ multipoint หน้า 6",
+      "confusion": "address line บอกตำแหน่ง source/destination ไม่ได้ขน bits ของข้อมูลแทน data line",
+      "mnemonic": "Data ขนบิต; Control คุมใช้; Address บอกที่",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "เส้นใดระบุตำแหน่ง source หรือ destination?",
+          "options": [
+            "Address lines",
+            "Data lines",
+            "Clock period",
+            "IR"
+          ],
+          "correct": 0,
+          "answer": "Address lines กำหนดตำแหน่งตามหน้า 5",
+          "pages": "หน้า 5"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Control lines มีหน้าที่อะไรตามหน้า 5?",
+          "answer": "กำหนดทิศทางข้อมูลและเวลาที่แต่ละอุปกรณ์เข้าถึง bus",
+          "pages": "หน้า 5"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไม multipoint bus จึงต้องมี protocol?",
+          "answer": "เพราะหลายอุปกรณ์ใช้ทรัพยากรเดียวกัน ต้องควบคุมการเข้าถึงผ่าน protocol ใน hardware",
+          "pages": "หน้า 6"
+        }
+      ],
+      "figures": [
+        "bus-lines",
+        "multipoint-bus"
+      ],
+      "comparison": {
+        "headers": [
+          "Line",
+          "หน้าที่"
+        ],
+        "rows": [
+          [
+            "Data",
+            "ส่ง bits"
+          ],
+          [
+            "Control",
+            "กำหนดทิศทางและเวลาเข้าถึง bus"
+          ],
+          [
+            "Address",
+            "ระบุตำแหน่ง source/destination"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "bus-arbitration",
+      "title": "การชิงสิทธิ์ Bus (Bus Arbitration)",
+      "level": "core",
+      "pages": "หน้า 7",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "เมื่อระบบ master-slave มีอุปกรณ์มากกว่าหนึ่งตัวที่เป็น bus master ได้ คำขอใช้ bus พร้อมกันต้องผ่าน arbitration. สไลด์ให้ 4 แบบ: distributed self-detection, distributed collision-detection, daisy chain และ centralized parallel. สองแบบแรกให้อุปกรณ์ตัดสินกันหรือทดลองใช้แล้วเริ่มใหม่เมื่อชนกัน; สองแบบหลังส่งสิทธิ์ตามลำดับความสำคัญหรือใช้วงจร arbitration กลาง.",
+      "remember": [
+        "มี bus masters หลายตัวพร้อมขอใช้ bus → ต้อง arbitrate",
+        "self-detection: devices ตัดสินกันเอง; collision-detection: ใครก็ลองใช้ ถ้าชนให้ลองใหม่",
+        "daisy chain: ส่ง permission จาก priority สูงไปต่ำ; centralized parallel: ต่อเข้าวงจร arbitration โดยตรง"
+      ],
+      "terms": [
+        "bus master = อุปกรณ์ที่ร้องขอ/ควบคุมการใช้ bus ในบริบทนี้",
+        "arbitration = การตัดสินสิทธิ์เมื่อมีคำขอพร้อมกัน"
+      ],
+      "example": "จับคู่ชื่อแต่ละกลุ่มกับวิธีตัดสินสิทธิ์ตาม bullet หน้า 7",
+      "confusion": "อย่าสลับ distributed self-detection กับ collision-detection; ชนกันแล้วลองใหม่เป็นแบบหลัง",
+      "mnemonic": "ตรวจเอง–ชนแล้วลองใหม่–ส่งสิทธิ์ต่อ–มีวงจรกลาง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แบบใดให้แต่ละอุปกรณ์ต่อเข้าวงจร arbitration โดยตรง?",
+          "options": [
+            "Centralized parallel",
+            "Daisy chain",
+            "Collision-detection",
+            "Self-detection"
+          ],
+          "correct": 0,
+          "answer": "Centralized parallel ตามหน้า 7",
+          "pages": "หน้า 7"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Daisy chain ส่งสิทธิ์อย่างไร?",
+          "answer": "จากอุปกรณ์ priority สูงสุดลงไปยังต่ำสุด",
+          "pages": "หน้า 7"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Distributed self-detection ต่างจาก collision-detection อย่างไร?",
+          "answer": "แบบแรกอุปกรณ์ตัดสินกันว่าใครได้ bus; แบบหลังอุปกรณ์ลองใช้ได้และลองใหม่หากข้อมูลชนกัน",
+          "pages": "หน้า 7"
+        }
+      ],
+      "figures": [
+        "bus-arbitration"
+      ]
+    },
+    {
+      "id": "hardware-software",
+      "title": "Hardware และ Software Approaches",
+      "level": "important",
+      "pages": "หน้า 8–9",
+      "reason": "เป็นตัวอย่างหรือแผนภาพเปรียบเทียบที่ช่วยใช้แนวคิดหลัก",
+      "summary": "ภาพหน้า 8 เปรียบเทียบการจัดลำดับฟังก์ชัน arithmetic/logic ใน hardware กับการส่ง instruction codes ให้ instruction interpreter คุมวงจรทั่วไปใน software approach. สไลด์หน้า 9 นิยาม software เป็นลำดับ codes/instructions ที่ hardware ส่วนหนึ่งแปลและสร้าง control signals. โปรแกรมใหม่จึงให้ลำดับคำสั่งใหม่แทนการต่อวงจรใหม่ทุกครั้ง และแยกองค์ประกอบหลักเป็น CPU กับ I/O components.",
+      "remember": [
+        "hardware approach ในภาพ: ลำดับฟังก์ชัน arithmetic/logic ทำใน hardware",
+        "software approach: instruction codes → interpreter → control signals → general-purpose functions",
+        "CPU มี instruction interpreter และ arithmetic/logic; I/O รับข้อมูล/คำสั่งและรายงานผล"
+      ],
+      "terms": [
+        "Software = sequence of codes/instructions ตามหน้า 9",
+        "instruction interpreter และ control signals ตามภาพหน้า 8"
+      ],
+      "example": "ไล่ลูกศรภาพหน้า 8 จาก instruction codes ผ่าน interpreter ไปยัง general-purpose functions",
+      "confusion": "สไลด์ไม่ได้ระบุว่า software ไม่ใช้ hardware; ระบุว่ามี hardware ส่วนหนึ่งตีความคำสั่ง",
+      "mnemonic": "เปลี่ยนโปรแกรมด้วย code; interpreter สร้างสัญญาณคุม",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Software approach ในภาพหน้า 8 ส่งสิ่งใดเข้า instruction interpreter?",
+          "options": [
+            "Instruction codes",
+            "Memory address only",
+            "Interrupt vector only",
+            "Bus priority"
+          ],
+          "correct": 0,
+          "answer": "Instruction codes ตามภาพ",
+          "pages": "หน้า 8"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สไลด์นิยาม software ว่าอย่างไร?",
+          "answer": "ลำดับ codes หรือ instructions ที่ hardware ส่วนหนึ่งตีความแล้วสร้าง control signals",
+          "pages": "หน้า 9"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดหน้า 9 จึงกล่าวว่าไม่ต้อง rewiring hardware ทุกโปรแกรม?",
+          "answer": "เพราะเปลี่ยนเป็นลำดับคำสั่งใหม่ที่ interpreter ตีความและควบคุมฟังก์ชันทั่วไป",
+          "pages": "หน้า 9"
+        }
+      ],
+      "figures": [
+        "hardware-software"
+      ]
+    },
+    {
+      "id": "top-level-registers",
+      "title": "องค์ประกอบระดับบนและ MAR / MBR / I/OAR / I/OBR",
+      "level": "core",
+      "pages": "หน้า 10–11",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "หน้า 11 แสดง CPU, main memory และ I/O module เชื่อมด้วย system bus. หน้า 10 แจกหน้าที่ register สำหรับติดต่อ memory และ I/O: MAR ชี้ address ที่จะอ่าน/เขียน, MBR เก็บข้อมูลที่อ่านมาหรือจะเขียน, I/OAR ระบุอุปกรณ์ I/O และ I/OBR แลกข้อมูลระหว่าง I/O module กับ CPU. ชื่อ register บอกได้ว่าเก็บ address หรือ data/buffer ของฝ่ายใด.",
+      "remember": [
+        "MAR = address ใน memory สำหรับ read/write; MBR = data เข้า/ออก memory",
+        "I/OAR = อุปกรณ์ I/O ที่เลือก; I/OBR = data แลกระหว่าง I/O module กับ CPU",
+        "ภาพ top-level: CPU, main memory, I/O module เชื่อมผ่าน system bus"
+      ],
+      "terms": [
+        "MAR = Memory Address Register",
+        "MBR = Memory Buffer Register",
+        "I/OAR = I/O Address Register",
+        "I/OBR = I/O Buffer Register"
+      ],
+      "example": "อ่านภาพหน้า 11 แล้ววางหน้าที่ register ทั้งสี่จากหน้า 10 ลงบนเส้นทาง CPU–Memory และ CPU–I/O",
+      "confusion": "MAR/MBR เป็นคู่ memory ส่วน I/OAR/I/OBR เป็นคู่ I/O; อย่าสลับ address กับ buffer",
+      "mnemonic": "ตัว A ชี้ที่; ตัว B บรรทุกข้อมูล — คู่ memory และ I/O",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Register ใดเก็บข้อมูลที่จะเขียนลง memory หรืออ่านขึ้นมา?",
+          "options": [
+            "MBR",
+            "MAR",
+            "I/OAR",
+            "PC"
+          ],
+          "correct": 0,
+          "answer": "MBR เป็น buffer ของข้อมูล memory",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "I/OAR ต่างจาก I/OBR อย่างไร?",
+          "answer": "I/OAR ระบุอุปกรณ์ I/O; I/OBR ใช้แลกข้อมูลระหว่าง I/O module และ CPU",
+          "pages": "หน้า 10"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพ top-level มีองค์ประกอบใดเชื่อมผ่าน system bus?",
+          "answer": "CPU, main memory และ I/O module",
+          "pages": "หน้า 11"
+        }
+      ],
+      "figures": [
+        "registers",
+        "top-level"
+      ],
+      "comparison": {
+        "headers": [
+          "Register",
+          "สิ่งที่เก็บ/ระบุ"
+        ],
+        "rows": [
+          [
+            "MAR",
+            "memory address"
+          ],
+          [
+            "MBR",
+            "data จาก/ไป memory"
+          ],
+          [
+            "I/OAR",
+            "I/O device"
+          ],
+          [
+            "I/OBR",
+            "data ระหว่าง I/O module กับ CPU"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "fetch-cycle",
+      "title": "Basic Instruction Cycle และ Fetch",
+      "level": "core",
+      "pages": "หน้า 12–13",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "วงจรคำสั่งพื้นฐานในหน้า 12 สลับ Fetch Cycle กับ Execute Cycle ไปจน HALT. ต้นแต่ละวงจร processor ดึง instruction จาก memory โดย PC ถือ address ของคำสั่งที่จะดึง; หลัง fetch จะเพิ่ม PC เพื่อชี้คำสั่งถัดไป. คำสั่งที่ดึงมาใส่ IR แล้ว processor ตีความและทำ action ที่ต้องการ.",
+      "remember": [
+        "ภาพหน้า 12: Fetch Next Instruction → Execute Instruction → วนหรือ HALT",
+        "PC ถือ address ของ instruction ที่จะ fetch ถัดไป และเพิ่มค่าหลัง fetch",
+        "IR รับ fetched instruction ก่อน processor แปลและปฏิบัติ"
+      ],
+      "terms": [
+        "PC = Program Counter",
+        "IR = Instruction Register",
+        "Fetch Cycle / Execute Cycle ตามหน้า 12–13"
+      ],
+      "example": "เริ่มจาก PC ในหน้า 13 แล้วชี้เส้นทาง fetch → IR → interpret/perform action ก่อนกลับไป fetch ถัดไป",
+      "confusion": "การเพิ่ม PC หลัง fetch เป็นการเดินตามลำดับ; แผนภาพและคำสั่งควบคุมอาจเปลี่ยนทางเดินได้ในหัวข้ออื่น",
+      "mnemonic": "PC ชี้ที่; IR ถือคำสั่ง; Fetch แล้ว Execute",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "PC ถืออะไรที่ต้น instruction cycle?",
+          "options": [
+            "Address ของ instruction ที่จะ fetch ถัดไป",
+            "ข้อมูลที่เพิ่ง output",
+            "ผล arithmetic ล่าสุด",
+            "หมายเลข I/O device"
+          ],
+          "correct": 0,
+          "answer": "PC ถือ address ของคำสั่งถัดไปตามหน้า 13",
+          "pages": "หน้า 13"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หลัง fetch processor ทำอะไรกับ PC และ IR?",
+          "answer": "เพิ่ม PC และนำ fetched instruction ไปไว้ใน IR",
+          "pages": "หน้า 13"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพ Basic Instruction Cycle แสดงการวนระหว่างขั้นใด?",
+          "answer": "Fetch Next Instruction และ Execute Instruction จน HALT",
+          "pages": "หน้า 12"
+        }
+      ],
+      "figures": [
+        "basic-cycle"
+      ]
+    },
+    {
+      "id": "hypothetical-machine",
+      "title": "ตัวอย่างเครื่องสมมติและการเดินโปรแกรม",
+      "level": "important",
+      "pages": "หน้า 14",
+      "reason": "เป็นตัวอย่างหรือแผนภาพเปรียบเทียบที่ช่วยใช้แนวคิดหลัก",
+      "summary": "ภาพหน้า 14 ใช้เครื่องสมมติที่แบ่ง instruction format เป็น opcode กับ address และแสดง PC, IR, AC. คำสั่ง 0001 โหลด memory เข้า AC, 0101 บวก memory เข้า AC และ 0010 เก็บ AC กลับ memory. ลำดับภาพใช้ค่าที่ address 940 = 0003 และ 941 = 0002 จน AC เป็น 0005 แล้วเก็บที่ 941; นี่เป็นตัวอย่างเครื่องสมมติในหน้านี้ ไม่ใช่ opcode table ของ MARIE หน้า 22.",
+      "remember": [
+        "instruction format ของเครื่องสมมติ: opcode bits 0–3 และ address bits 4–15",
+        "PC = address of instruction; IR = instruction being executed; AC = temporary storage",
+        "ตัวอย่าง 0003 + 0002 = 0005 แล้ว store ที่ address 941"
+      ],
+      "terms": [
+        "AC = Accumulator",
+        "Opcode = ส่วนรหัสการทำงาน; Address = ส่วนตำแหน่งตามภาพ",
+        "0001 Load, 0010 Store, 0101 Add — เฉพาะตัวอย่างหน้า 14"
+      ],
+      "example": "ไล่ 6 ช่องในภาพหน้า 14: fetch 1940 → AC รับ 0003; fetch 5941 → AC เป็น 0005; fetch 2941 → memory 941 เป็น 0005",
+      "confusion": "รหัส Add/Store ในเครื่องสมมติหน้า 14 ต่างจากรหัส MARIE หน้า 22; อย่านำสองชุดมาปน",
+      "mnemonic": "Load 3 → Add 2 → Store 5 ในภาพเครื่องสมมติ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ในเครื่องสมมติหน้า 14 รหัส 0101 ทำอะไร?",
+          "options": [
+            "Add to AC from Memory",
+            "Load AC from Memory",
+            "Store AC to Memory",
+            "Halt"
+          ],
+          "correct": 0,
+          "answer": "0101 เป็น Add ตาม partial opcode list",
+          "pages": "หน้า 14"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "เมื่อโหลด 0003 แล้วบวก 0002 ค่า AC ในภาพเป็นเท่าไร?",
+          "answer": "0003 + 0002 = 0005 ตาม Step 4",
+          "pages": "หน้า 14"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไมไม่ควรใช้รหัส 0101 นี้แทน Add ของ MARIE?",
+          "answer": "เป็นคนละเครื่อง/ตารางรหัส: หน้า 14 เป็น hypothetical machine ส่วนหน้า 22 เป็น MARIE ISA",
+          "pages": "หน้า 14, 22"
+        }
+      ],
+      "figures": [
+        "hypothetical-program"
+      ]
+    },
+    {
+      "id": "cycle-state",
+      "title": "Instruction Cycle State Diagram",
+      "level": "important",
+      "pages": "หน้า 15",
+      "reason": "เป็นตัวอย่างหรือแผนภาพเปรียบเทียบที่ช่วยใช้แนวคิดหลัก",
+      "summary": "ภาพ state diagram ขยาย fetch/execute เป็น instruction address calculation, instruction fetch, instruction operation decoding, operand address calculation/fetch, data operation และ operand address calculation/store. เส้นทาง operand fetch อาจวนเมื่อมี multiple operands และ store อาจวนเมื่อมี multiple results. เมื่อคำสั่งเสร็จ จะกลับไปคำนวณ address เพื่อ fetch คำสั่งถัดไป.",
+      "remember": [
+        "แกนภาพ: instruction fetch → decode → operand address/fetch → data operation → operand address/store",
+        "มีทางวน multiple operands และ multiple results",
+        "คำสั่งเสร็จแล้วกลับเส้น fetch next instruction"
+      ],
+      "terms": [
+        "Instruction Cycle State Diagram = ภาพสถานะละเอียดของ fetch/execute ตามหน้า 15",
+        "Operand fetch / Operand store = สถานะดึง/เก็บ operand ตามภาพ"
+      ],
+      "example": "ตามลูกศรจาก instruction fetch ไป data operation แล้วตรวจเส้นย้อนสำหรับหลาย operands/results",
+      "confusion": "ภาพไม่ได้บอกว่าทุกคำสั่งต้องผ่านทุกสถานะ; เส้นทางขึ้นกับ operand และผลลัพธ์",
+      "mnemonic": "Fetch คำสั่ง → Decode → Operand → Operate → Store/วน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "เส้นทางใดในภาพรองรับ multiple operands?",
+          "options": [
+            "วงกลับระหว่าง operand address calculation กับ operand fetch",
+            "กลับจาก HALT ไป START",
+            "ข้าม instruction fetch",
+            "ไป I/OAR"
+          ],
+          "correct": 0,
+          "answer": "ภาพวนที่ operand fetch สำหรับ multiple operands",
+          "pages": "หน้า 15"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หลัง instruction operation decoding ภาพไปยังกลุ่มสถานะใด?",
+          "answer": "operand address calculation และต่อไป operand fetch/data operation",
+          "pages": "หน้า 15"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไมจึงไม่ควรจำว่าทุกคำสั่งต้องผ่าน operand fetch และ store?",
+          "answer": "ภาพมีหลายเส้นทางตามลักษณะ operand/result ไม่ได้บังคับผ่านทุกสถานะ",
+          "pages": "หน้า 15"
+        }
+      ],
+      "figures": [
+        "state-diagram"
+      ]
+    },
+    {
+      "id": "marie-registers",
+      "title": "MARIE: Register 7 ตัวและขนาด",
+      "level": "core",
+      "pages": "หน้า 17–18",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "สไลด์แนะนำ MARIE ผ่าน register 7 ตัวและภาพ architecture. AC กับ MBR เป็น 16-bit; MAR กับ PC เป็น 12-bit; InREG กับ OutREG เป็น 8-bit; IR ถือ instruction ก่อน execute. หน้าที่หลักคือ AC เก็บ operand/เงื่อนไขตามสไลด์, MAR เก็บ address, MBR เก็บ data, PC ชี้คำสั่งถัดไป และ InREG/OutREG รับส่งข้อมูลอุปกรณ์.",
+      "remember": [
+        "AC/MBR = 16-bit; MAR/PC = 12-bit; InREG/OutREG = 8-bit",
+        "IR ถือ instruction ก่อน execute; สไลด์ไม่ได้ระบุความกว้าง IR เป็นตัวเลขในรายการหน้า 17",
+        "AC, MAR, MBR, PC, IR, InREG, OutREG รวม 7 ตัว"
+      ],
+      "terms": [
+        "AC = Accumulator",
+        "MAR = Memory Address Register; MBR = Memory Buffer Register",
+        "PC = Program Counter; IR = Instruction Register",
+        "InREG / OutREG = input/output register"
+      ],
+      "example": "ใช้แผนภาพหน้า 18 วาง register บริเวณ CPU, ALU, I/O และ main memory แล้วทวนหน้าที่หน้า 17",
+      "confusion": "คำบรรยาย AC หน้า 17 ใช้คำ “conditional operator” ซึ่งอาจทำให้งง; ให้ยึดข้อความและภาพต้นฉบับ ไม่เติมความหมายที่ไม่มี",
+      "mnemonic": "16: AC/MBR; 12: MAR/PC; 8: In/Out — IR ถือคำสั่ง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "คู่ใดเป็น 12-bit ตามหน้า 17?",
+          "options": [
+            "MAR และ PC",
+            "AC และ MBR",
+            "InREG และ OutREG",
+            "IR และ ALU"
+          ],
+          "correct": 0,
+          "answer": "MAR และ PC ระบุ 12-bit",
+          "pages": "หน้า 17"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "MBR ทำหน้าที่อะไรใน MARIE?",
+          "answer": "เก็บข้อมูลหลังดึงจาก memory หรือก่อนวางลง memory",
+          "pages": "หน้า 17"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "InREG กับ OutREG ต่างกันอย่างไร?",
+          "answer": "InREG ถือข้อมูลที่อ่านจาก input device; OutREG ถือข้อมูลที่พร้อมสำหรับ output device",
+          "pages": "หน้า 17"
+        }
+      ],
+      "figures": [
+        "marie-architecture"
+      ],
+      "comparison": {
+        "headers": [
+          "Register",
+          "ขนาดที่สไลด์ระบุ",
+          "หน้าที่หลัก"
+        ],
+        "rows": [
+          [
+            "AC",
+            "16-bit",
+            "เก็บ operand/เงื่อนไขตามคำอธิบาย"
+          ],
+          [
+            "MAR / PC",
+            "12-bit",
+            "address ใน memory / address ของคำสั่งถัดไป"
+          ],
+          [
+            "MBR",
+            "16-bit",
+            "data จาก/ไป memory"
+          ],
+          [
+            "InREG / OutREG",
+            "8-bit",
+            "input / output"
+          ],
+          [
+            "IR",
+            "ไม่ระบุตัวเลขในรายการ",
+            "instruction ก่อน execute"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "marie-datapath",
+      "title": "MARIE Architecture และ Data Path",
+      "level": "important",
+      "pages": "หน้า 18–20",
+      "reason": "เป็นตัวอย่างหรือแผนภาพเปรียบเทียบที่ช่วยใช้แนวคิดหลัก",
+      "summary": "ภาพ architecture แสดง register, ALU, control unit และ main memory ของ MARIE. Register เชื่อมกันและเชื่อม main memory ผ่าน common data bus โดยแต่ละอุปกรณ์บน bus มีหมายเลขเฉพาะซึ่งกำหนดบน control lines เมื่อจะให้ทำงาน. ยังมีทางเชื่อมแยกระหว่าง AC–MBR และ ALU–AC/MBR เพื่อถ่ายข้อมูลบางส่วนโดยไม่ใช้ main data bus; หน้า 20 วาด data path เชิงภาพ.",
+      "remember": [
+        "register และ main memory เชื่อมผ่าน common data bus",
+        "control lines ตั้ง unique number ของอุปกรณ์ที่จะทำงาน",
+        "ทางเชื่อมแยก AC/MBR/ALU ช่วย transfer โดยไม่ใช้ main bus"
+      ],
+      "terms": [
+        "Data path = เส้นทางข้อมูลตามภาพหน้า 20",
+        "common data bus / control lines ตามหน้า 19"
+      ],
+      "example": "เทียบ architecture หน้า 18 กับ data path หน้า 20 แล้วหาทาง main bus กับทางเชื่อมแยกของ ALU",
+      "confusion": "หมายเลขอุปกรณ์บน control lines ใช้ระบุ device ไม่ใช่ memory address จาก MAR โดยตรง",
+      "mnemonic": "บัสหลักเชื่อมทั้งหมด; ทางแยกช่วย AC–MBR–ALU",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ข้อใดถ่ายข้อมูลโดยไม่ใช้ main data bus ได้ตามหน้า 19?",
+          "options": [
+            "ทางเชื่อมแยก AC–MBR และ ALU–AC/MBR",
+            "เฉพาะ main memory",
+            "เฉพาะ OutREG ไป keyboard",
+            "ทุกอุปกรณ์โดยไม่ต้องมี bus"
+          ],
+          "correct": 0,
+          "answer": "หน้า 19 ระบุ separate connections",
+          "pages": "หน้า 19"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "MARIE เชื่อม registers กับ main memory ด้วยอะไร?",
+          "answer": "common data bus",
+          "pages": "หน้า 19"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หมายเลขเฉพาะของอุปกรณ์ใช้ตรงไหนเมื่อจะให้ทำงาน?",
+          "answer": "ตั้งบน control lines ตามหน้า 19",
+          "pages": "หน้า 19"
+        }
+      ],
+      "figures": [
+        "marie-datapath"
+      ]
+    },
+    {
+      "id": "marie-isa",
+      "title": "MARIE ISA และรูปแบบคำสั่ง",
+      "level": "core",
+      "pages": "หน้า 21–22",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ISA กำหนดรูปแบบ instructions และ primitive operations ที่เครื่องทำได้ จึงเป็น interface ระหว่าง hardware กับ software. หน้า 21 กล่าวว่า MARIE มี 13 instructions ส่วนหน้า 22 แสดงรูปแบบ 16-bit แบ่ง opcode bits 15–12 กับ address bits 11–0 และตาราง fundamental instructions ที่มองเห็น 9 รายการ. ต้องตรวจสอบจากต้นฉบับหากต้องการรายชื่อครบ 13 เพราะสไลด์หน้านี้ให้รายการเพียง 9.",
+      "remember": [
+        "ISA ระบุ instruction format และ primitive operations",
+        "รูปแบบ MARIE: opcode 4 bits (15–12) + address 12 bits (11–0)",
+        "ตารางหน้า 22: Load1, Store2, Add3, Subt4, Input5, Output6, Halt7, Skipcond8, Jump9"
+      ],
+      "terms": [
+        "ISA = Instruction Set Architecture",
+        "Opcode = bits 15–12; Address = bits 11–0 ในคำสั่ง 16-bit",
+        "Load/Store/Add/Subt/Input/Output/Halt/Skipcond/Jump ตามตารางหน้า 22"
+      ],
+      "example": "อ่านตารางหน้า 22 จับคู่เลข hex 1–9 กับ mnemonic และผลของคำสั่งที่ตารางบอก",
+      "confusion": "หน้า 21 เขียน 13 instructions แต่หน้า 22 มองเห็น 9 รายการ; รายการอีก 4 ตัวต้องตรวจสอบจากต้นฉบับ และห้ามแต่งเพิ่ม",
+      "mnemonic": "MARIE 16 บิต: 4 opcode + 12 address; ตารางที่เห็น 1–9",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ใน MARIE instruction bits 15–12 ใช้ทำอะไร?",
+          "options": [
+            "Opcode",
+            "Memory buffer",
+            "Input data",
+            "Interrupt priority"
+          ],
+          "correct": 0,
+          "answer": "ภาพหน้า 22 กำหนด bits 15–12 เป็น opcode",
+          "pages": "หน้า 22"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ISA เป็น interface ระหว่างสิ่งใด?",
+          "answer": "hardware และ software",
+          "pages": "หน้า 21"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดรายชื่อ 13 คำสั่งของ MARIE ยังต้องตรวจสอบจากต้นฉบับ?",
+          "answer": "หน้า 21 บอกว่ามี 13 แต่ตารางหน้า 22 แสดงเพียง 9 รายการ จึงไม่มีรายชื่อครบในสไลด์ที่เห็น",
+          "pages": "หน้า 21–22"
+        }
+      ],
+      "figures": [
+        "marie-isa"
+      ],
+      "comparison": {
+        "headers": [
+          "Hex",
+          "Mnemonic",
+          "ผลตามตารางหน้า 22"
+        ],
+        "rows": [
+          [
+            "1",
+            "Load X",
+            "AC ← memory[X]"
+          ],
+          [
+            "2",
+            "Store X",
+            "memory[X] ← AC"
+          ],
+          [
+            "3",
+            "Add X",
+            "บวก memory[X] เข้า AC"
+          ],
+          [
+            "4",
+            "Subt X",
+            "ลบ memory[X] จาก AC"
+          ],
+          [
+            "5/6",
+            "Input / Output",
+            "รับค่าเข้า AC / ส่งค่า AC ไป display"
+          ],
+          [
+            "7/8/9",
+            "Halt / Skipcond / Jump X",
+            "หยุด / ข้ามตามเงื่อนไข / ใส่ X ใน PC"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "marie-bit-pattern",
+      "title": "การอ่าน Bit Pattern: LOAD และ SKIPCOND",
+      "level": "core",
+      "pages": "หน้า 23–24",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ตัวอย่าง LOAD ใน IR หน้า 23 มี opcode 1 และ address 3 จึงเป็นการโหลดข้อมูลจากตำแหน่ง 3. ตัวอย่าง SKIPCOND หน้า 24 มี opcode 8 และ bits 11–10 เป็น 10; คำบรรยายหน้านั้นบอกว่าข้ามคำสั่งถัดไปหาก AC > 0. ทว่า RTL หน้า 27 เขียนกรณี AC > 0 ด้วย bits 11–10 = 11 ซึ่งขัดกับหน้า 24; เงื่อนไขรหัสนี้ต้องตรวจสอบจากต้นฉบับ.",
+      "remember": [
+        "LOAD: opcode 0001 / address 3 (หน้า 23)",
+        "SKIPCOND: opcode 1000 / bits 11–10 = 10 และคำบรรยาย AC > 0 (หน้า 24)",
+        "หน้า 27 ใช้ 11 สำหรับ AC > 0 จึงมีความไม่ตรงกัน"
+      ],
+      "terms": [
+        "IR[15–12] = opcode; IR[11–0] = address/field ตามรูปคำสั่ง",
+        "IR[11–10] = field เงื่อนไขในตัวอย่าง SKIPCOND"
+      ],
+      "example": "อ่านกลุ่ม 4 บิตแรกจากภาพหน้า 23–24 เป็น opcode แล้วดู 12 บิตถัดไป ก่อนเทียบคำบรรยายกับ RTL",
+      "confusion": "อย่าท่องว่า AC > 0 ต้องเป็น 10 หรือ 11 โดยไม่ระบุหน้าอ้างอิง: สไลด์สองหน้าขัดกัน ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "4 บิตหน้าเป็น opcode; SKIPCOND มีจุดขัดกันหน้า 24/27",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ภาพ LOAD หน้า 23 ระบุ address ใด?",
+          "options": [
+            "3",
+            "8",
+            "10",
+            "11"
+          ],
+          "correct": 0,
+          "answer": "ภาพและคำบรรยายระบุ address 3",
+          "pages": "หน้า 23"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้า 24 ระบุ bits 11–10 ของ SKIPCOND และเงื่อนไขอย่างไร?",
+          "answer": "ระบุ 10 และบอกว่าจะข้ามคำสั่งถัดไปเมื่อ AC > 0",
+          "pages": "หน้า 24"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดรหัสเงื่อนไข AC > 0 ต้องตรวจสอบ?",
+          "answer": "หน้า 24 เขียน 10 แต่ RTL หน้า 27 เขียน 11 สำหรับ AC > 0",
+          "pages": "หน้า 24, 27"
+        }
+      ],
+      "figures": [
+        "load-bits",
+        "skipcond-bits"
+      ]
+    },
+    {
+      "id": "rtl-load-add",
+      "title": "Microoperations และ RTL ของ LOAD / ADD",
+      "level": "core",
+      "pages": "หน้า 25–26",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "คำสั่งหนึ่งประกอบด้วย microoperations หลายขั้น และสไลด์ใช้ Register Transfer Language (RTL) ระบุลำดับการย้ายข้อมูล. M[X] คือค่าที่เก็บใน memory location X ส่วนลูกศร ← หมายถึงย้ายค่าไปยัง register หรือ memory location. LOAD X ทำ MAR ← X, MBR ← M[MAR], AC ← MBR; ADD X ใช้สองขั้นแรกเหมือนกัน แล้วทำ AC ← AC + MBR.",
+      "remember": [
+        "microoperations = ขั้นย่อยในหนึ่ง instruction",
+        "M[X] หมายถึงค่าจริงใน memory ที่ address X; ← คือการย้ายค่า",
+        "LOAD และ ADD ต่างที่ขั้นสุดท้าย: AC ← MBR เทียบกับ AC ← AC + MBR"
+      ],
+      "terms": [
+        "RTL = Register Transfer Language",
+        "M[X] = data at memory location X",
+        "MAR, MBR, AC ตามหน้า 25–26"
+      ],
+      "example": "เขียน LOAD/ADD 3 ขั้นจากสไลด์แล้วชี้ว่าต้องอ่าน memory ผ่าน MAR → MBR ก่อนปรับ AC",
+      "confusion": "อย่าสลับ LOAD กับ ADD: LOAD แทน AC ด้วย MBR ส่วน ADD เก็บ AC เดิมมาบวก MBR",
+      "mnemonic": "MAR ชี้ที่ → MBR รับค่า → AC แทนหรือบวก",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ขั้นสุดท้ายของ ADD X คือข้อใด?",
+          "options": [
+            "AC ← AC + MBR",
+            "AC ← MBR",
+            "MAR ← PC",
+            "PC ← PC + 1"
+          ],
+          "correct": 0,
+          "answer": "RTL ของ ADD หน้า 26 จบด้วย AC ← AC + MBR",
+          "pages": "หน้า 26"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "M[X] ใน MARIE RTL หมายถึงอะไร?",
+          "answer": "ค่าข้อมูลจริงที่เก็บใน memory location X",
+          "pages": "หน้า 25"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "LOAD X และ ADD X ต่างกันที่ microoperation สุดท้ายอย่างไร?",
+          "answer": "LOAD: AC ← MBR; ADD: AC ← AC + MBR",
+          "pages": "หน้า 26"
+        }
+      ],
+      "figures": [
+        "rtl"
+      ],
+      "formulas": [
+        {
+          "expr": "LOAD X: MAR ← X → MBR ← M[MAR] → AC ← MBR\nADD X: MAR ← X → MBR ← M[MAR] → AC ← AC + MBR",
+          "description": "ลำดับ microoperations ตามต้นฉบับ",
+          "pages": "หน้า 26"
+        }
+      ]
+    },
+    {
+      "id": "skipcond-rtl",
+      "title": "RTL ของ SKIPCOND และเงื่อนไข AC",
+      "level": "core",
+      "pages": "หน้า 24, 27",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "RTL หน้า 27 ให้ SKIPCOND เพิ่ม PC อีก 1 เมื่อเงื่อนไข AC ตรงกับ field ใน IR[11–10]: 00 กับ AC < 0, 01 กับ AC = 0 และ 11 กับ AC > 0. การเพิ่ม PC นี้คือการข้าม instruction ถัดไปในบริบทของคำสั่ง. แต่ภาพหน้า 24 เขียน field = 10 สำหรับ AC > 0; ต้องตรวจสอบจากต้นฉบับว่ารหัสใดถูกต้องก่อนใช้ตอบโจทย์.",
+      "remember": [
+        "หน้า 27: 00 → AC < 0; 01 → AC = 0; 11 → AC > 0",
+        "เมื่อเงื่อนไขจริง: PC ← PC + 1",
+        "หน้า 24 ระบุ 10 → AC > 0 ซึ่งขัดกับ RTL หน้า 27"
+      ],
+      "terms": [
+        "SKIPCOND = skip next instruction on condition",
+        "IR[11–10] = condition bits ในตัวอย่าง",
+        "PC ← PC + 1 ตาม RTL หน้า 27"
+      ],
+      "example": "เทียบตารางเงื่อนไขที่สรุปจาก RTL หน้า 27 กับ bit pattern และคำบรรยายหน้า 24 ทีละรายการ",
+      "confusion": "รหัสกรณี AC > 0 ขัดกันในสไลด์เอง; ต้องตรวจสอบจากต้นฉบับ ไม่แก้ด้วยความรู้นอกเอกสาร",
+      "mnemonic": "00 ติดลบ; 01 ศูนย์; กรณีบวกมีความขัดกัน 10/11",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RTL หน้า 27 ระบุ field ใดเมื่อ AC = 0?",
+          "options": [
+            "01",
+            "00",
+            "10",
+            "11"
+          ],
+          "correct": 0,
+          "answer": "หน้า 27 ให้ IR[11–10] = 01 แล้วทดสอบ AC = 0",
+          "pages": "หน้า 27"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "SKIPCOND ทำอะไรกับ PC เมื่อเงื่อนไขเป็นจริง?",
+          "answer": "PC ← PC + 1 เพื่อข้ามคำสั่งถัดไป",
+          "pages": "หน้า 27"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หน้า 24 กับ 27 ต่างกันตรงไหนในกรณี AC > 0?",
+          "answer": "หน้า 24 เขียน bits 11–10 = 10; หน้า 27 เขียน = 11 ต้องตรวจสอบจากต้นฉบับ",
+          "pages": "หน้า 24, 27"
+        }
+      ],
+      "figures": [
+        "skipcond-rtl"
+      ],
+      "formulas": [
+        {
+          "expr": "if IR[11–10] = 00 and AC < 0: PC ← PC + 1\nif IR[11–10] = 01 and AC = 0: PC ← PC + 1\nif IR[11–10] = 11 and AC > 0: PC ← PC + 1",
+          "description": "ถอด RTL หน้า 27 ตรงตามต้นฉบับ; กรณี AC > 0 ขัดกับคำบรรยายหน้า 24",
+          "pages": "หน้า 27"
+        }
+      ],
+      "comparison": {
+        "headers": [
+          "เงื่อนไข",
+          "รหัสที่ปรากฏ",
+          "สถานะ"
+        ],
+        "rows": [
+          [
+            "AC < 0",
+            "00 ใน RTL หน้า 27",
+            "ตรงในหน้า 27"
+          ],
+          [
+            "AC = 0",
+            "01 ใน RTL หน้า 27",
+            "ตรงในหน้า 27"
+          ],
+          [
+            "AC > 0",
+            "10 หน้า 24 / 11 หน้า 27",
+            "ต้องตรวจสอบจากต้นฉบับ"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "marie-processing",
+      "title": "MARIE Fetch–Decode–Execute และ Operand",
+      "level": "core",
+      "pages": "หน้า 28–29",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "Instruction processing ดึง instruction จาก memory เข้า IR แล้ว decode เพื่อกำหนดงาน. ถ้าต้องใช้ operand จาก memory จะนำค่ามาไว้ใน MBR ก่อน execute. Flowchart หน้า 29 แสดง PC → MAR, M[MAR] → IR พร้อมเพิ่ม PC, แยก opcode/address ระหว่าง decode, แล้วจึงดึง operand หากจำเป็นและ execute.",
+      "remember": [
+        "fetch: MAR ← PC; IR ← M[MAR]; PC เพิ่ม 1",
+        "decode: แยกส่วน instruction และวาง IR[11–0] ใน MAR ตามภาพ",
+        "operand ที่ต้องอ่าน: MBR ← M[MAR] แล้ว execute"
+      ],
+      "terms": [
+        "Fetch–Decode–Execute cycle = ชุดขั้นที่เครื่องทำเมื่อรันโปรแกรม",
+        "IR[11–0] = address field ตามภาพหน้า 29"
+      ],
+      "example": "ไล่ flowchart หน้า 29 สองทางหลังคำถาม “Instruction requires operand?” แล้วกลับไป fetch คำสั่งถัดไป",
+      "confusion": "อย่าคิดว่าทุก instruction ต้องอ่าน operand; ภาพมีทาง No ไป execute โดยตรง",
+      "mnemonic": "PC→MAR→IR; Decode; ถ้าต้องใช้จึง MBR; Execute",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "หาก instruction ต้องใช้ operand จาก memory ค่าจะไป register ใดก่อน execute?",
+          "options": [
+            "MBR",
+            "OutREG",
+            "I/OAR",
+            "flags register"
+          ],
+          "correct": 0,
+          "answer": "หน้า 28–29 ให้นำ operand เข้า MBR",
+          "pages": "หน้า 28–29"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ขั้น fetch ตาม flowchart หน้า 29 ใช้ PC และ MAR อย่างไร?",
+          "answer": "คัดลอก PC ไป MAR แล้วคัดลอก memory ณ MAR ไป IR และเพิ่ม PC",
+          "pages": "หน้า 29"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เมื่อ instruction ไม่ต้องใช้ operand flowchart ไปทางใด?",
+          "answer": "ข้ามการนำค่าเข้า MBR แล้วไป Execute the instruction",
+          "pages": "หน้า 29"
+        }
+      ],
+      "figures": [
+        "marie-fetch-flow"
+      ]
+    },
+    {
+      "id": "interrupt-entry",
+      "title": "Interrupt: เหตุเกิดและการเข้า ISR",
+      "level": "core",
+      "pages": "หน้า 30–32",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "สไลด์ระบุว่าการ interrupt หยุด/แทรก fetch-decode-execute cycle ได้ เช่น user break, การร้องขอ I/O และ critical error; แบ่ง hardware กับ software interrupt โดย software อาจเรียก OS system call. เมื่อมี interrupt วงจรเพิ่มขั้นตรวจและประมวลผล. ภาพหน้า 32 ให้ลำดับตรวจสัญญาณ → save variables/registers → หา ISR address ใน interrupt vector table → ใส่ address ใน PC และ branch ไป ISR → ทำงาน → restore แล้วกลับไปวงจรหลัก.",
+      "remember": [
+        "ตัวอย่างเหตุ: user break, I/O request, critical error",
+        "ISR = Interrupt Service Routine; vector table ใช้หา ISR address",
+        "ภาพ ISR ต้อง save/restore สถานะก่อนกลับไป fetch-decode-execute"
+      ],
+      "terms": [
+        "Hardware interrupt / Software interrupt ตามหน้า 30",
+        "ISR = Interrupt Service Routine",
+        "interrupt vector table ตามภาพหน้า 32"
+      ],
+      "example": "ทวนภาพหน้า 31 เพิ่ม interrupt step แล้วไล่ภาพหน้า 32 จาก signal ไป ISR และกลับโปรแกรม",
+      "confusion": "เหตุ interrupt กับ class ของ interrupt ในหน้า 37 เป็นคนละรายการจัดหมวด; อย่าปนเป็นคำจำกัดความเดียว",
+      "mnemonic": "พบสัญญาณ → เก็บสถานะ → หา ISR → ทำงาน → คืนสถานะ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ISR ย่อมาจากอะไรตามหน้า 32?",
+          "options": [
+            "Interrupt Service Routine",
+            "Instruction State Register",
+            "Input Signal Router",
+            "Interrupt System Rate"
+          ],
+          "correct": 0,
+          "answer": "คำขยายอยู่หน้า 32",
+          "pages": "หน้า 32"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ยก 2 เหตุ interrupt จากหน้า 30",
+          "answer": "เช่น user break และ I/O request; critical error ก็เป็นอีกเหตุหนึ่ง",
+          "pages": "หน้า 30"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไมต้อง save แล้ว restore variables/registers ตามภาพหน้า 32?",
+          "answer": "ภาพกำหนดให้เก็บสถานะก่อน branch ไป ISR และคืนก่อนกลับสู่วงจร fetch-decode-execute",
+          "pages": "หน้า 32"
+        }
+      ],
+      "figures": [
+        "interrupt-branch",
+        "isr-flow"
+      ]
+    },
+    {
+      "id": "masking-io",
+      "title": "Maskable/Nonmaskable และ I/O ของ MARIE",
+      "level": "core",
+      "pages": "หน้า 33–34",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ระบบทั่วไปมักปิด interrupts ระหว่างกำลังประมวลผล interrupt โดยตั้ง bit ใน flags register; interrupt ที่ถูกเพิกเฉยกรณีนี้เรียก maskable. Nonmaskable ต้องถูกประมวลผลเพื่อรักษาเสถียรภาพระบบ. หน้า 34 ระบุว่า MARIE ใช้ modified programmed I/O: output ไป OutREG และ CPU polls InREG จนมี input แล้วคัดลอกเข้า AC; รายละเอียด interrupt-driven I/O อยู่นอกขอบเขตสไลด์.",
+      "remember": [
+        "maskable ถูก ignore ได้ในสถานการณ์ที่ disable interrupts",
+        "nonmaskable ต้อง process เพื่อให้ระบบ stable",
+        "MARIE: output → OutREG; CPU polls InREG → AC เมื่อรับ input"
+      ],
+      "terms": [
+        "flags register bit ตามหน้า 33",
+        "polling = CPU ตรวจ InREG ซ้ำตามคำอธิบายหน้า 34",
+        "programmed I/O / interrupt-driven I/O เป็นชื่อแนวทางในหน้า 34"
+      ],
+      "example": "จับคู่ข้อเปรียบเทียบหน้า 33 และตามทางข้อมูล OutREG/InREG ในหน้า 34",
+      "confusion": "ไม่ขยายรายละเอียด interrupt-driven I/O เกินสไลด์ เพราะหน้า 34 ระบุว่าอยู่นอกขอบเขต",
+      "mnemonic": "Maskable อาจพัก; Nonmaskable ต้องทำ; MARIE polls InREG",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "MARIE รับ input อย่างไรตามหน้า 34?",
+          "options": [
+            "CPU polls InREG แล้วคัดลอกค่าเข้า AC",
+            "interrupt-driven I/O ที่สไลด์ลงรายละเอียด",
+            "อ่าน OutREG เข้า PC",
+            "อ่าน address จาก IR โดยตรง"
+          ],
+          "correct": 0,
+          "answer": "หน้า 34 ระบุ CPU polls InREG",
+          "pages": "หน้า 34"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Maskable กับ nonmaskable ต่างกันอย่างไร?",
+          "answer": "แบบแรกถูก ignore ได้เมื่อ disable interrupts; แบบหลังต้อง process เพื่อรักษาระบบให้ stable",
+          "pages": "หน้า 33"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไมไม่ควรอธิบายขั้น interrupt-driven I/O ละเอียดจากสไลด์นี้?",
+          "answer": "หน้า 34 บอกว่าอยู่นอกขอบเขต discussion และให้เพียง MARIE modified programmed I/O",
+          "pages": "หน้า 34"
+        }
+      ],
+      "figures": [
+        "interrupt-masking"
+      ],
+      "comparison": {
+        "headers": [
+          "ชนิด",
+          "ตามคำอธิบายหน้า 33"
+        ],
+        "rows": [
+          [
+            "Maskable",
+            "ถูกเพิกเฉยได้เมื่อ interrupts ถูกปิด"
+          ],
+          [
+            "Nonmaskable",
+            "ต้องประมวลผลเพื่อความเสถียร"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "marie-simple-program",
+      "title": "โปรแกรม MARIE 100–106 (hex) และ ADD 105",
+      "level": "core",
+      "pages": "หน้า 35–36",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ตารางหน้า 35 ให้โปรแกรมที่ address 100–103 เป็น Load 104, Add 105, Store 106, Halt และข้อมูลที่ 104 = 0023, 105 = FFE9, 106 = 0000 (hex). หน้า 36 ไล่คำสั่ง Add 105: เริ่ม PC 101, AC 0023; หลัง fetch/decode ได้ IR 3105, MAR 105, MBR FFE9 แล้ว execute ให้ AC 000C. อย่างไรก็ตาม binary contents ของ Store 106 ในหน้า 35 ขึ้นต้น 0100 ซึ่งไม่ตรงกับ hex 4106 และตาราง opcode Store = 0010 หน้า 22; ต้องตรวจสอบจากต้นฉบับ.",
+      "remember": [
+        "program address 100–103: Load 104 / Add 105 / Store 106 / Halt",
+        "ADD 105 trace: PC 101 → 102; IR 3105; MAR 105; MBR FFE9; AC 0023 → 000C",
+        "Store 106 มีความขัดกัน: binary 0100..., hex 4106, opcode Store ในหน้า 22 = 0010"
+      ],
+      "terms": [
+        "RTN = หัวคอลัมน์ Register Transfer Notation ในตารางหน้า 36",
+        "ค่าทุกตัวในตัวอย่างนี้เป็น hex ตามหน้า 35",
+        "IR/PC/MAR/MBR/AC เป็นคอลัมน์ register ใน trace"
+      ],
+      "example": "ตามตารางหน้า 36 ทีละแถว Fetch → Decode → Get operand → Execute และเทียบค่าก่อน/หลังของแต่ละ register",
+      "confusion": "อย่าคัดลอกรหัส Store แบบ binary จากหน้า 35 เป็นกฎโดยไม่ระบุความขัดกันกับ hex/table; ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "100 Load → 101 Add → 102 Store → 103 Halt; ADD จบ AC 000C",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ADD 105 ในตารางหน้า 36 อ่าน operand จาก address ใด?",
+          "options": [
+            "105",
+            "100",
+            "102",
+            "106"
+          ],
+          "correct": 0,
+          "answer": "แถว Get operand ชี้ address 105",
+          "pages": "หน้า 36"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "ตามตาราง ADD 105 ให้ AC 0023 บวก MBR FFE9 แล้ว AC เป็นค่าใด?",
+          "answer": "AC เป็น 000C ตามแถว Execute ในตารางหน้า 36",
+          "pages": "หน้า 36"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Store 106 มีจุดใดที่ต้องตรวจสอบ?",
+          "answer": "binary ขึ้นต้น 0100 แต่ hex เป็น 4106 และตาราง opcode หน้า 22 ให้ Store = 0010; สไลด์ไม่ตรงกัน",
+          "pages": "หน้า 22, 35"
+        }
+      ],
+      "figures": [
+        "marie-program",
+        "marie-add-trace"
+      ],
+      "worked": [
+        {
+          "title": "Trace ADD 105 จากต้นฉบับ",
+          "steps": [
+            "เริ่ม PC 101, IR 1104, MAR 104, MBR 0023, AC 0023",
+            "Fetch: MAR ← PC = 101; IR ← M[101] = 3105; PC ← 102",
+            "Decode: MAR ← IR[11–0] = 105",
+            "Get operand: MBR ← M[105] = FFE9",
+            "Execute: AC ← AC + MBR; ตารางให้ AC = 000C"
+          ],
+          "answer": "หลัง ADD 105: PC 102, IR 3105, MAR 105, MBR FFE9, AC 000C",
+          "pages": "หน้า 35–36"
+        }
+      ]
+    },
+    {
+      "id": "interrupt-classes",
+      "title": "Classes of Interrupts 4 กลุ่ม",
+      "level": "core",
+      "pages": "หน้า 37",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ตารางหน้า 37 แยก interrupt ตามแหล่ง/เหตุเป็น Program, Timer, I/O และ Hardware failure. Program เกิดจากเงื่อนไขระหว่าง execution เช่น overflow, division by zero, illegal instruction หรือ memory reference นอกพื้นที่ที่อนุญาต. Timer มาจาก timer ใน processor เพื่อให้งาน OS เกิดเป็นระยะ; I/O มาจาก controller เพื่อบอกการเสร็จงาน/ขอ service/แจ้ง error; Hardware failure เช่น power failure หรือ memory parity error.",
+      "remember": [
+        "4 classes: Program, Timer, I/O, Hardware failure",
+        "Program: overflow/divide by zero/illegal instruction/memory out of allowed range",
+        "Timer ให้ OS ทำหน้าที่เป็นระยะ; I/O controller แจ้ง completion/service/error",
+        "Hardware failure เช่น power failure และ memory parity error"
+      ],
+      "terms": [
+        "Program interrupt / Timer interrupt / I/O interrupt / Hardware failure ตามตารางหน้า 37"
+      ],
+      "example": "จัดตัวอย่างในตารางหน้า 37 ลงสี่กลุ่ม โดยใช้เกณฑ์แหล่งกำเนิดตามสไลด์",
+      "confusion": "I/O request ในหน้า 30 เป็นตัวอย่างเหตุ interrupt; หน้า 37 ให้รายละเอียด class I/O โดย controller",
+      "mnemonic": "โปรแกรมผิด–Timer นัด–I/O แจ้ง–Hardware เสีย",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Division by zero อยู่ใน class ใดตามตาราง?",
+          "options": [
+            "Program",
+            "Timer",
+            "I/O",
+            "Hardware failure"
+          ],
+          "correct": 0,
+          "answer": "เป็นตัวอย่าง Program interrupt",
+          "pages": "หน้า 37"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Timer interrupt มีประโยชน์ตามตารางอย่างไร?",
+          "answer": "ทำให้ OS ปฏิบัติบางหน้าที่เป็นระยะ",
+          "pages": "หน้า 37"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "I/O กับ Hardware failure ต่างกันตามแหล่งกำเนิดอย่างไร?",
+          "answer": "I/O มาจาก I/O controller; Hardware failure มาจากความล้มเหลว เช่นไฟดับหรือ memory parity error",
+          "pages": "หน้า 37"
+        }
+      ],
+      "figures": [
+        "interrupt-classes"
+      ],
+      "comparison": {
+        "headers": [
+          "Class",
+          "ที่มา/ตัวอย่าง"
+        ],
+        "rows": [
+          [
+            "Program",
+            "เงื่อนไขจากการรันคำสั่ง เช่น divide by zero"
+          ],
+          [
+            "Timer",
+            "timer ใน processor เพื่อให้ OS ทำงานเป็นระยะ"
+          ],
+          [
+            "I/O",
+            "I/O controller แจ้งเสร็จงาน/ขอ service/error"
+          ],
+          [
+            "Hardware failure",
+            "power failure หรือ memory parity error"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "interrupt-control-flow",
+      "title": "Program Flow และ Instruction Cycle เมื่อมี Interrupt",
+      "level": "core",
+      "pages": "หน้า 38–40, 43",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "ภาพหน้า 38 เปรียบเทียบการเดินโปรแกรมขณะมี I/O โดยไม่มี interrupt กับมี interrupt; แบบหลังเปลี่ยนไปทำ interrupt handler แล้วกลับงานผู้ใช้. หน้า 39 วาดการย้าย control จาก user program ไป interrupt handler และกลับไปจุดต่อ. หน้า 40 เพิ่ม interrupt cycle หลัง execute เมื่อเปิด interrupts; state diagram หน้า 43 เพิ่ม interrupt check และ interrupt ก่อนกลับไป fetch คำสั่งถัดไป.",
+      "remember": [
+        "หน้า 38–39: handler รับ control ชั่วคราวแล้วกลับ user program",
+        "หน้า 40: check for interrupts หลัง execute เมื่อ interrupts enabled; หาก disabled เดินต่อ",
+        "หน้า 43: interrupt check ต่อจากการทำงานคำสั่ง ก่อน fetch รอบใหม่"
+      ],
+      "terms": [
+        "Interrupt handler = ชุดการทำงานที่รับ control ระหว่าง interrupt ตามภาพ",
+        "Interrupt cycle / Interrupt check ตามภาพหน้า 40, 43"
+      ],
+      "example": "วาดเส้นลูกศร user program → handler → user program จากหน้า 39 แล้วใส่ตำแหน่ง check จากหน้า 40/43",
+      "confusion": "การกลับโปรแกรมไม่ได้แปลว่ารันเริ่มต้นใหม่; ภาพแสดงกลับจุดต่อของ user program",
+      "mnemonic": "Execute → ตรวจ interrupt → handler (ถ้ามี) → กลับไป fetch",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ภาพ Instruction Cycle with Interrupts วาง Check for Interrupts หลังขั้นใด?",
+          "options": [
+            "Execute Instruction",
+            "START",
+            "Fetch Next Instruction ก่อนเริ่ม",
+            "HALT"
+          ],
+          "correct": 0,
+          "answer": "หน้า 40 วาง check หลัง execute",
+          "pages": "หน้า 40"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้า 39 แสดง transfer of control ระหว่างอะไร?",
+          "answer": "user program กับ interrupt handler แล้วกลับ user program",
+          "pages": "หน้า 39"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "หน้า 43 เพิ่มสถานะใดจาก state diagram แบบไม่มี interrupt?",
+          "answer": "Interrupt check และ Interrupt ก่อนวนกลับไป fetch next instruction",
+          "pages": "หน้า 15, 43"
+        }
+      ],
+      "figures": [
+        "control-flow",
+        "interrupt-cycle",
+        "state-with-interrupt"
+      ]
+    },
+    {
+      "id": "io-wait-timing",
+      "title": "Short และ Long I/O Wait กับ Interrupt",
+      "level": "important",
+      "pages": "หน้า 41–42",
+      "reason": "เป็นตัวอย่างหรือแผนภาพเปรียบเทียบที่ช่วยใช้แนวคิดหลัก",
+      "summary": "ภาพ timing หน้า 41 เทียบกรณี I/O wait สั้น: เมื่อไม่มี interrupt processor รอช่วง I/O; เมื่อมี interrupt processor ทำงานอื่นควบคู่ระหว่าง I/O แล้วรับการแจ้งกลับ. หน้า 42 กรณี wait ยาวแสดงว่าแม้มี interrupt ก็อาจใช้เวลาทำงานอื่นได้เพียงบางส่วน แล้ว processor ยังต้องรอจน I/O เสร็จ. จึงควรอ่านลำดับและช่อง waiting ในภาพ ไม่สรุปว่า interrupt ตัดการรอได้หมดเสมอ.",
+      "remember": [
+        "สองภาพเปรียบเทียบ without interrupts กับ with interrupts",
+        "short wait: ช่วง I/O อาจซ้อนกับ processor executing",
+        "long wait: หลังงานอื่นหมด processor ยังรอ I/O ต่อได้"
+      ],
+      "terms": [
+        "I/O wait = ช่วงรอ I/O ตามแกนเวลาในภาพหน้า 41–42",
+        "concurrent with processor executing เป็นคำกำกับในภาพ"
+      ],
+      "example": "เทียบช่องสีดำ processor waits และช่วง I/O operation ทั้งสองคอลัมน์ในหน้า 41 กับ 42",
+      "confusion": "อย่าพูดว่า interrupts ทำให้ไม่ต้องรอ I/O ทุกกรณี; หน้า 42 แสดงการรอที่เหลือชัดเจน",
+      "mnemonic": "สั้นอาจซ้อนพอดี; ยาวยังเหลือช่วงรอ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ภาพ Long I/O wait เมื่อมี interrupt แสดงผลใด?",
+          "options": [
+            "processor ทำงานอื่นแล้วอาจยังรอ",
+            "processor ไม่ต้องรอแน่นอน",
+            "I/O หยุดทำงานทันที",
+            "ไม่มีการกลับเข้าโปรแกรม"
+          ],
+          "correct": 0,
+          "answer": "หน้า 42 แสดงช่วง processor waits หลัง concurrent work",
+          "pages": "หน้า 42"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้า 41 เปรียบเทียบ timing สองแบบใด?",
+          "answer": "without interrupts กับ with interrupts ในกรณี short I/O wait",
+          "pages": "หน้า 41"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ทำไมจึงสรุปไม่ได้ว่า interrupt ลบเวลารอ I/O ทั้งหมด?",
+          "answer": "หน้า 42 กรณี long I/O wait ยังแสดง processor waits หลังจากทำงานอื่นช่วงหนึ่ง",
+          "pages": "หน้า 42"
+        }
+      ],
+      "figures": [
+        "short-wait",
+        "long-wait"
+      ],
+      "comparison": {
+        "headers": [
+          "กรณี",
+          "ผลที่ภาพ with interrupts แสดง"
+        ],
+        "rows": [
+          [
+            "Short I/O wait",
+            "processor ทำงานอื่นซ้อนช่วง I/O"
+          ],
+          [
+            "Long I/O wait",
+            "ซ้อนการทำงานได้บางช่วง แต่ยังมีช่วงรอ I/O"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "multiple-interrupts",
+      "title": "Multiple Interrupts: Sequential และ Nested",
+      "level": "core",
+      "pages": "หน้า 44–45",
+      "reason": "เป็นนิยาม โครงสร้าง ขั้นตอน หรือภาษาสัญลักษณ์หลักที่สไลด์อธิบายโดยตรง",
+      "summary": "หน้า 44 เปรียบเทียบ sequential interrupt processing ซึ่ง handler หนึ่งเสร็จแล้วจึงไปอีก handler กับ nested processing ซึ่ง interrupt ใหม่แทรกกลาง handler ที่ทำอยู่แล้วค่อยกลับ. หน้า 45 ยกเวลาในภาพ: user program ถูก printer interrupt ที่ t=10; communication แทรกที่ t=15; กลับ printer ที่ t=25; disk แทรกที่ t=25; กลับ printer ที่ t=35; กลับ user program ที่ t=40. ลำดับนี้เป็นตัวอย่างเฉพาะภาพ ไม่ใช่กฎเวลา interrupt ทั่วไป.",
+      "remember": [
+        "Sequential: ทำ handler ทีละตัว แล้วกลับลำดับตามภาพ",
+        "Nested: handler ใหม่อาจแทรก handler ปัจจุบัน",
+        "ตัวอย่างหน้า 45: printer → communication → printer → disk → printer → user program"
+      ],
+      "terms": [
+        "Sequential interrupt processing / Nested interrupt processing ตามหน้า 44",
+        "Printer, Communication, Disk ISR เป็นชื่อในภาพหน้า 45"
+      ],
+      "example": "ใช้นิ้วตามลูกศรเวลา t=10,15,25,25,35,40 ในหน้า 45 แล้วจับคู่กับรูป nested หน้า 44",
+      "confusion": "เวลา t ในหน้า 45 เป็นตัวอย่างจากภาพ; ไม่ใช่เวลามาตรฐานของระบบจริง และภาพไม่ได้กำหนดนโยบาย priority ทั่วไป",
+      "mnemonic": "Sequential ต่อคิว; Nested แทรกซ้อนแล้วกลับ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "รูปแบบใดให้ interrupt Y แทรกระหว่าง handler X?",
+          "options": [
+            "Nested",
+            "Sequential",
+            "Point-to-point bus",
+            "Stored program"
+          ],
+          "correct": 0,
+          "answer": "ภาพ (b) หน้า 44 เป็น nested interrupt processing",
+          "pages": "หน้า 44"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หน้า 45 ลำดับ handler หลัง printer เริ่มที่ t=10 เป็นอย่างไร?",
+          "answer": "communication แทรกที่ t=15; กลับ printer t=25; disk แทรก t=25; กลับ printer t=35; user program t=40",
+          "pages": "หน้า 45"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "Sequential กับ nested ต่างกันอย่างไรตามภาพหน้า 44?",
+          "answer": "Sequential ทำ handler ทีละตัว; nested อนุญาตให้ handler ใหม่แทรก handler ที่กำลังทำ",
+          "pages": "หน้า 44"
+        }
+      ],
+      "figures": [
+        "multiple-interrupts",
+        "multiple-timeline"
+      ],
+      "comparison": {
+        "headers": [
+          "รูปแบบ",
+          "การย้าย control"
+        ],
+        "rows": [
+          [
+            "Sequential",
+            "handler หนึ่งจบก่อนจึงทำอีก handler"
+          ],
+          [
+            "Nested",
+            "handler ใหม่แทรกกลาง handler ปัจจุบัน แล้วกลับมาทำต่อ"
+          ]
+        ]
+      }
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "ตั้งภาพระบบก่อน",
+      "text": "แยก Von Neumann/Harvard และเส้น bus ก่อนดู CPU",
+      "pages": "หน้า 3–7",
+      "topic": "computer-models"
+    },
+    {
+      "title": "ตามคำสั่งเข้า CPU",
+      "text": "ดู top-level, PC/IR, fetch/execute และ state diagram",
+      "pages": "หน้า 8–15",
+      "topic": "fetch-cycle"
+    },
+    {
+      "title": "วาง register ของ MARIE",
+      "text": "จำขนาด/หน้าที่ แล้วอ่าน architecture และ data path",
+      "pages": "หน้า 17–20",
+      "topic": "marie-registers"
+    },
+    {
+      "title": "อ่านคำสั่งเป็น microoperations",
+      "text": "ISA/bit pattern → RTL LOAD/ADD/SKIPCOND → fetch/decode/execute",
+      "pages": "หน้า 21–29",
+      "topic": "marie-isa"
+    },
+    {
+      "title": "ฝึก trace ต้นฉบับ",
+      "text": "ไล่ Load/Add/Store/Halt และตาราง ADD 105 โดยตรวจจุดขัดกัน",
+      "pages": "หน้า 35–36",
+      "topic": "marie-simple-program"
+    },
+    {
+      "title": "ต่อด้วย Interrupt",
+      "text": "เหตุและ ISR → class/masking → timing → sequential/nested",
+      "pages": "หน้า 30–34, 37–45",
+      "topic": "interrupt-entry"
+    }
+  ],
+  "plan": [
+    {
+      "title": "รอบ 1 · โมเดลและ Bus",
+      "task": "อ่านหน้า 3–11 พร้อมชี้แผนภาพและจับคู่หน้าที่เส้น/การชิง bus",
+      "check": "ตอบความต่าง Von Neumann/Harvard และ bus 3 เส้น/4 arbitration ได้",
+      "pages": "หน้า 3–11"
+    },
+    {
+      "title": "รอบ 2 · Instruction Cycle",
+      "task": "ไล่ PC→IR→execute และภาพเครื่องสมมติ โดยแยก ISA ออกจาก MARIE",
+      "check": "อธิบาย fetch/execute และค่าตัวอย่าง AC 0005 ได้",
+      "pages": "หน้า 12–15"
+    },
+    {
+      "title": "รอบ 3 · MARIE",
+      "task": "ท่อง register และอ่าน ISA/bit fields/RTL จากภาพ",
+      "check": "เขียน LOAD/ADD RTL ได้และชี้ความขัดกัน SKIPCOND ได้",
+      "pages": "หน้า 17–29"
+    },
+    {
+      "title": "รอบ 4 · Trace",
+      "task": "ทำตาราง ADD 105 โดยปิดเฉลยก่อน แล้วเทียบ register ทีละแถว",
+      "check": "ได้ AC 000C และอธิบาย PC/IR/MAR/MBR ตลอด trace ได้",
+      "pages": "หน้า 35–36"
+    },
+    {
+      "title": "รอบ 5 · Interrupt",
+      "task": "ฝึกแยกเหตุ/class, ISR, masking, timing และ nested ด้วยภาพ",
+      "check": "ไล่เส้นทาง interrupt และแยก long wait กับ short wait ได้",
+      "pages": "หน้า 30–34, 37–45"
+    },
+    {
+      "title": "รอบ 6 · ทดสอบรวม",
+      "task": "สุ่มคำถามทุกหัวข้อ ทำ Flashcard แล้วกลับไปดูภาพ/หน้าที่ตอบผิด",
+      "check": "ตอบแบบฝึกครบและทวนสองจุดที่ต้องตรวจสอบจากต้นฉบับ",
+      "pages": "หน้า 3–45"
+    }
+  ],
+  "cram": [
+    {
+      "title": "ถ้าเหลือ 3 วัน",
+      "text": "วัน 1 โมเดล/Bus/วงจรคำสั่ง หน้า 3–15; วัน 2 MARIE register/ISA/RTL/trace หน้า 17–29, 35–36; วัน 3 interrupt หน้า 30–34, 37–45 และทำแบบฝึก/ทวนจุดผิด"
+    },
+    {
+      "title": "ถ้าเหลือ 1 วัน",
+      "text": "เริ่ม MARIE register→ISA→RTL→trace หน้า 17–29, 35–36; ต่อ ISR/class/masking/nested หน้า 30–34, 37, 44–45; ปิดท้ายโมเดล/Bus หน้า 3–7 และ timing หน้า 41–42"
+    },
+    {
+      "title": "ถ้าเหลือ 3 ชั่วโมง",
+      "text": "0–25 นาที โมเดล/Bus หน้า 3–7; 25–55 นาที PC/IR/MARIE registers หน้า 10–20; 55–110 นาที ISA/RTL/trace หน้า 21–29, 35–36; 110–155 นาที ISR/class/timing/nested หน้า 30–34, 37–45; 155–180 นาทีสุ่มคำถามและทวนจุดผิด"
+    }
+  ],
+  "strategyIntro": "ให้เวลากับ register, ISA/RTL, trace และ interrupt ก่อน เพราะสไลด์ให้ขั้นตอน/ภาพ/ตารางละเอียด เป็นการประเมินเพื่อจัดเวลาอ่าน ไม่ใช่การทำนายข้อสอบจริง",
+  "strategy": [
+    {
+      "title": "ควรท่องจำ",
+      "text": "ชื่อ/หน้าที่ MAR, MBR, PC, IR, MARIE 7 registers, bus lines/arbitration, opcode ที่ตารางแสดง, class interrupt (หน้า 5–7, 10, 17, 22, 37)"
+    },
+    {
+      "title": "ควรเข้าใจแนวคิด",
+      "text": "ทางเดิน instruction/operand, ISR save–branch–restore, short/long wait และ sequential/nested (หน้า 12–15, 28–34, 38–45)"
+    },
+    {
+      "title": "ควรฝึกแก้โจทย์",
+      "text": "อ่าน bit fields/RTL และ trace ADD 105 ตามต้นฉบับ ระบุ PC/IR/MAR/MBR/AC ทีละขั้น; แยกจุดขัดกันก่อนใช้รหัส (หน้า 21–27, 35–36)"
+    },
+    {
+      "title": "เตรียมข้อสอบแบบผสม",
+      "text": "เลือกตอบจับคู่คำศัพท์/rules; อัตนัยอธิบายขั้น; วิเคราะห์ภาพและเปรียบเทียบ; คำนวณ/trace เฉพาะตัวอย่างที่อยู่ในสไลด์ ไม่อ้างว่าเป็นข้อสอบจริง"
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "Von Neumann: stored program",
+      "back": "Memory เก็บ program และ data; address ระบุตำแหน่ง ไม่ใช่ชนิดเนื้อหา",
+      "pages": "หน้า 3"
+    },
+    {
+      "front": "Harvard model",
+      "back": "แยก memory และ buses ของ instructions กับ data",
+      "pages": "หน้า 4"
+    },
+    {
+      "front": "Hybrid ในสไลด์",
+      "back": "Harvard-style ที่ L1 cache; Von Neumann ที่ main memory",
+      "pages": "หน้า 4"
+    },
+    {
+      "front": "Data lines",
+      "back": "ส่ง bits ระหว่างอุปกรณ์",
+      "pages": "หน้า 5"
+    },
+    {
+      "front": "Control lines",
+      "back": "กำหนดทิศทาง data และเวลา/สิทธิ์ที่ device ใช้ bus",
+      "pages": "หน้า 5"
+    },
+    {
+      "front": "Address lines",
+      "back": "ระบุตำแหน่ง source หรือ destination",
+      "pages": "หน้า 5"
+    },
+    {
+      "front": "Multipoint bus",
+      "back": "Shared resource; access ควบคุมด้วย hardware protocols",
+      "pages": "หน้า 6"
+    },
+    {
+      "front": "Self-detection",
+      "back": "อุปกรณ์ตัดสินกันเองว่าใครได้ bus",
+      "pages": "หน้า 7"
+    },
+    {
+      "front": "Collision-detection",
+      "back": "ลองใช้ bus; ถ้าข้อมูลชนกันให้ลองใหม่",
+      "pages": "หน้า 7"
+    },
+    {
+      "front": "Daisy chain",
+      "back": "ส่งสิทธิ์จาก priority สูงไปต่ำ",
+      "pages": "หน้า 7"
+    },
+    {
+      "front": "Centralized parallel",
+      "back": "แต่ละอุปกรณ์ต่อเข้าวงจร arbitration โดยตรง",
+      "pages": "หน้า 7"
+    },
+    {
+      "front": "Software ตามสไลด์",
+      "back": "ลำดับ codes/instructions ที่ hardware ส่วนหนึ่งตีความและสร้าง control signals",
+      "pages": "หน้า 9"
+    },
+    {
+      "front": "MAR",
+      "back": "Memory Address Register: address สำหรับ memory read/write",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "MBR",
+      "back": "Memory Buffer Register: data ที่อ่านจาก/จะเขียนไป memory",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "I/OAR",
+      "back": "I/O Address Register: ระบุ I/O device",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "I/OBR",
+      "back": "I/O Buffer Register: data ระหว่าง I/O module และ CPU",
+      "pages": "หน้า 10"
+    },
+    {
+      "front": "PC ใน Fetch Cycle",
+      "back": "เก็บ address ของ instruction ที่จะ fetch ถัดไป",
+      "pages": "หน้า 13"
+    },
+    {
+      "front": "IR ใน Fetch Cycle",
+      "back": "รับ fetched instruction",
+      "pages": "หน้า 13"
+    },
+    {
+      "front": "MARIE AC / MBR กี่บิต?",
+      "back": "อย่างละ 16-bit",
+      "pages": "หน้า 17"
+    },
+    {
+      "front": "MARIE MAR / PC กี่บิต?",
+      "back": "อย่างละ 12-bit",
+      "pages": "หน้า 17"
+    },
+    {
+      "front": "MARIE InREG / OutREG กี่บิต?",
+      "back": "อย่างละ 8-bit",
+      "pages": "หน้า 17"
+    },
+    {
+      "front": "MARIE IR",
+      "back": "ถือ instruction ทันทีก่อน execution; รายการหน้า 17 ไม่ให้ตัวเลขความกว้าง",
+      "pages": "หน้า 17"
+    },
+    {
+      "front": "ISA",
+      "back": "กำหนด instruction format และ primitive operations; interface hardware/software",
+      "pages": "หน้า 21"
+    },
+    {
+      "front": "MARIE instruction format",
+      "back": "16 bits: opcode bits 15–12; address bits 11–0",
+      "pages": "หน้า 22"
+    },
+    {
+      "front": "MARIE Load / Store / Add / Subt",
+      "back": "Hex opcode 1 / 2 / 3 / 4 ตามตาราง",
+      "pages": "หน้า 22"
+    },
+    {
+      "front": "MARIE Input / Output / Halt",
+      "back": "Hex opcode 5 / 6 / 7 ตามตาราง",
+      "pages": "หน้า 22"
+    },
+    {
+      "front": "MARIE Skipcond / Jump",
+      "back": "Hex opcode 8 / 9 ตามตาราง",
+      "pages": "หน้า 22"
+    },
+    {
+      "front": "LOAD bit pattern ตัวอย่าง",
+      "back": "Opcode 1, address 3",
+      "pages": "หน้า 23"
+    },
+    {
+      "front": "SKIPCOND AC > 0 field",
+      "back": "หน้า 24 ระบุ 10 แต่หน้า 27 ระบุ 11: ต้องตรวจสอบจากต้นฉบับ",
+      "pages": "หน้า 24, 27"
+    },
+    {
+      "front": "M[X] ใน RTL",
+      "back": "ค่าข้อมูลจริงที่ memory location X",
+      "pages": "หน้า 25"
+    },
+    {
+      "front": "← ใน RTL",
+      "back": "ย้ายค่าไป register หรือ memory location",
+      "pages": "หน้า 25"
+    },
+    {
+      "front": "LOAD X ใน RTL",
+      "back": "MAR ← X; MBR ← M[MAR]; AC ← MBR",
+      "pages": "หน้า 26"
+    },
+    {
+      "front": "ADD X ใน RTL",
+      "back": "MAR ← X; MBR ← M[MAR]; AC ← AC + MBR",
+      "pages": "หน้า 26"
+    },
+    {
+      "front": "SKIPCOND เมื่อเงื่อนไขจริง",
+      "back": "PC ← PC + 1 เพื่อข้ามคำสั่งถัดไป",
+      "pages": "หน้า 27"
+    },
+    {
+      "front": "Fetch–Decode–Execute",
+      "back": "fetch เข้า IR; decode; get operand เข้า MBR ถ้าต้องใช้; execute",
+      "pages": "หน้า 28–29"
+    },
+    {
+      "front": "ISR",
+      "back": "Interrupt Service Routine",
+      "pages": "หน้า 32"
+    },
+    {
+      "front": "Interrupt vector table",
+      "back": "ภาพใช้ค้นหา ISR address",
+      "pages": "หน้า 32"
+    },
+    {
+      "front": "Maskable interrupt",
+      "back": "ถูก ignore ได้เมื่อระบบปิด interrupts ระหว่างจัดการ interrupt",
+      "pages": "หน้า 33"
+    },
+    {
+      "front": "Nonmaskable interrupt",
+      "back": "ต้อง process เพื่อรักษาเสถียรภาพระบบ",
+      "pages": "หน้า 33"
+    },
+    {
+      "front": "MARIE input / output",
+      "back": "poll InREG แล้วรับเข้า AC / วาง output ใน OutREG",
+      "pages": "หน้า 34"
+    },
+    {
+      "front": "ADD 105 ในตัวอย่าง",
+      "back": "PC 101→102; IR 3105; MBR FFE9; AC 0023→000C",
+      "pages": "หน้า 35–36"
+    },
+    {
+      "front": "Store 106 จุดขัดกัน",
+      "back": "binary หน้า 35 เริ่ม 0100 แต่ hex 4106 และตารางหน้า 22 ให้ Store opcode 0010: ต้องตรวจสอบจากต้นฉบับ",
+      "pages": "หน้า 22, 35"
+    },
+    {
+      "front": "Interrupt class: Program",
+      "back": "เงื่อนไขจากการรัน instruction เช่น divide by zero",
+      "pages": "หน้า 37"
+    },
+    {
+      "front": "Interrupt class: Timer",
+      "back": "timer ใน processor เพื่อให้ OS ทำงานเป็นระยะ",
+      "pages": "หน้า 37"
+    },
+    {
+      "front": "Interrupt class: I/O",
+      "back": "I/O controller แจ้งเสร็จงาน/ขอ service/error",
+      "pages": "หน้า 37"
+    },
+    {
+      "front": "Interrupt class: Hardware failure",
+      "back": "เช่น power failure หรือ memory parity error",
+      "pages": "หน้า 37"
+    },
+    {
+      "front": "Interrupt cycle",
+      "back": "ตรวจ interrupt หลัง execute เมื่อเปิด interrupts",
+      "pages": "หน้า 40"
+    },
+    {
+      "front": "Long I/O wait",
+      "back": "แม้มี interrupt processor ยังอาจต้องรอหลังทำงานอื่นช่วงหนึ่ง",
+      "pages": "หน้า 42"
+    },
+    {
+      "front": "Sequential interrupt processing",
+      "back": "handler หนึ่งเสร็จก่อนจึงทำอีกตัว",
+      "pages": "หน้า 44"
+    },
+    {
+      "front": "Nested interrupt processing",
+      "back": "handler ใหม่แทรกกลาง handler ปัจจุบัน แล้วกลับ",
+      "pages": "หน้า 44"
+    }
+  ]
+}

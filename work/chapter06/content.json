@@ -1,0 +1,1889 @@
+{
+  "source": "itds-211_comp_arch_Chapter06.pdf",
+  "sourcePageCount": 45,
+  "course": "ITDS-211 · Computer Architecture & Operating System",
+  "instructor": "W. Suntiamorntut, Ph.D.",
+  "chapter": "Chapter06 · Storage Systems (External memory)",
+  "description": "magnetic disk, RAID 0–6, SSD, optical memory และ magnetic tape",
+  "notice": "เลขหน้าเป็นหน้า PDF 1–45; ข้อมูลรุ่น/ราคา/ความจุในตารางเป็นตัวอย่างตามสไลด์ และข้อความ RAID หน้า 16 กับ RAID 0 หน้า 17 ต้องตรวจสอบจากต้นฉบับ",
+  "purpose": "บทนี้เรียนเพื่อเข้าใจว่าสื่อจัดเก็บภายนอกบันทึก จัดตำแหน่ง เข้าถึง และป้องกันข้อมูลอย่างไร: เริ่มจาก disk layout และเวลา I/O แล้วเทียบ RAID, SSD, optical disk กับ magnetic tape ตามกลไกและข้อจำกัดในสไลด์",
+  "purposePages": "หน้า 3–44",
+  "objectiveNote": "วัตถุประสงค์รายบทที่ระบุโดยตรง: ต้องตรวจสอบจากต้นฉบับ; เป้าหมายต่อไปนี้สรุปจาก outline หน้า 3 และ summary หน้า 44",
+  "flashcardNote": "Flashcards ใช้ศัพท์ สูตร และโครงสร้างจากสไลด์; ตัวเลขตารางรุ่นเป็นตัวอย่างเฉพาะเอกสาร",
+  "goals": [
+    {
+      "text": "ระบุส่วนประกอบ magnetic disk, layout และคำนวณ access time ตามนิยามในสไลด์",
+      "pages": "หน้า 4–15"
+    },
+    {
+      "text": "แยก RAID 0–6 ตาม striping/mirror/parity, parallel/independent access และจำนวนดิสก์",
+      "pages": "หน้า 16–28"
+    },
+    {
+      "text": "อธิบาย SSD controller, flash erase/write และวิธีกระจายการสึกหรอ",
+      "pages": "หน้า 29–32"
+    },
+    {
+      "text": "เทียบชนิด optical disk/block format และลำดับบันทึกแบบ magnetic tape",
+      "pages": "หน้า 33–44"
+    }
+  ],
+  "limits": [
+    "อ่านและตรวจภาพครบ 45 หน้า: หน้า 1 ปก, หน้า 2 course outline, หน้า 3 chapter outline, หน้า 44 summary, หน้า 45 Q&A",
+    "สไลด์ไม่มีรายการ Chapter Objectives โดยตรงหรือข้อสอบเก่า: ต้องตรวจสอบจากต้นฉบับ; ระดับสีเป็นลำดับเวลาอ่าน ไม่ใช่สถิติการออกสอบ",
+    "หน้า 16 อธิบาย RAID แบบมี redundant parity ครบทุกระดับ แต่หน้า 17–18 ระบุ RAID 0 nonredundant: ต้องตรวจสอบจากต้นฉบับ",
+    "ตาราง HDD หน้า 13, SSD/HDD หน้า 30, optical หน้า 33 และ LTO หน้า 43 เป็นตัวอย่างจากช่วงเวลาของสไลด์ ไม่ใช่ข้อมูลราคา/สเปกปัจจุบัน",
+    "สไลด์หน้า 23 เขียน byte/word strips ในเนื้อหาและมีหมายเหตุภาษาไทยว่า bit-level; ระดับ strip ที่แน่ชัดของ RAID 2 ในบริบทนี้: ต้องตรวจสอบจากต้นฉบับ",
+    "คำถามคำนวณใช้เฉพาะสูตรและตัวเลขที่อยู่ในสไลด์; ไม่มีการอ้างว่าเป็นข้อสอบจริง"
+  ],
+  "figures": [
+    {
+      "id": "fig-4",
+      "page": 4,
+      "file": "slide-004.png",
+      "title": "Magnetic Disk · หน้า 4",
+      "caption": "ภาพสไลด์เรื่อง สื่อแม่เหล็กและหัวอ่าน/เขียน สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 4)"
+    },
+    {
+      "id": "fig-5",
+      "page": 5,
+      "file": "slide-005.png",
+      "title": "Read / Write Process · หน้า 5",
+      "caption": "ภาพสไลด์เรื่อง สื่อแม่เหล็กและหัวอ่าน/เขียน สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 5)"
+    },
+    {
+      "id": "fig-6",
+      "page": 6,
+      "file": "slide-006.png",
+      "title": "Track width · หน้า 6",
+      "caption": "ภาพสไลด์เรื่อง สื่อแม่เหล็กและหัวอ่าน/เขียน สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 6)"
+    },
+    {
+      "id": "fig-7",
+      "page": 7,
+      "file": "slide-007.png",
+      "title": "Figure 6.2  Disk Data Layout · หน้า 7",
+      "caption": "ผัง track, sector, cylinder, platter, head และ gaps (itds-211_comp_arch_Chapter06.pdf, หน้า 7)"
+    },
+    {
+      "id": "fig-8",
+      "page": 8,
+      "file": "slide-008.png",
+      "title": "(a) Constant angular velocity (b) Multiple zone recording · หน้า 8",
+      "caption": "ภาพสไลด์เรื่อง Track, sector, cylinder และรูปแบบ sector สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 8)"
+    },
+    {
+      "id": "fig-9",
+      "page": 9,
+      "file": "slide-009.png",
+      "title": "17 7 41 515 20 17 7 41 515 20 · หน้า 9",
+      "caption": "Winchester ST506: ส่วนประกอบ sector ตัวอย่าง 600 bytes (itds-211_comp_arch_Chapter06.pdf, หน้า 9)"
+    },
+    {
+      "id": "fig-10",
+      "page": 10,
+      "file": "slide-010.png",
+      "title": "Table 6.1 · หน้า 10",
+      "caption": "ภาพสไลด์เรื่อง ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 10)"
+    },
+    {
+      "id": "fig-11",
+      "page": 11,
+      "file": "slide-011.png",
+      "title": "Characteristics · หน้า 11",
+      "caption": "ภาพสไลด์เรื่อง ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 11)"
+    },
+    {
+      "id": "fig-12",
+      "page": 12,
+      "file": "slide-012.png",
+      "title": "Classification · หน้า 12",
+      "caption": "ภาพสไลด์เรื่อง ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 12)"
+    },
+    {
+      "id": "fig-13",
+      "page": 13,
+      "file": "slide-013.png",
+      "title": "Table 6.2 · หน้า 13",
+      "caption": "ภาพสไลด์เรื่อง ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 13)"
+    },
+    {
+      "id": "fig-14",
+      "page": 14,
+      "file": "slide-014.png",
+      "title": "Wait for · หน้า 14",
+      "caption": "ลำดับเวลา disk I/O: device/channel wait, seek, rotational delay, transfer (itds-211_comp_arch_Chapter06.pdf, หน้า 14)"
+    },
+    {
+      "id": "fig-15",
+      "page": 15,
+      "file": "slide-015.png",
+      "title": "Disk Performance Parameters · หน้า 15",
+      "caption": "ภาพสไลด์เรื่อง เวลา I/O ของ magnetic disk สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 15)"
+    },
+    {
+      "id": "fig-16",
+      "page": 16,
+      "file": "slide-016.png",
+      "title": "n Consists of 7 levels · หน้า 16",
+      "caption": "ภาพสไลด์เรื่อง RAID: ภาพรวมและจำนวนดิสก์ สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 16)"
+    },
+    {
+      "id": "fig-17",
+      "page": 17,
+      "file": "slide-017.png",
+      "title": "N= number of data disks;    mproportional to log N · หน้า 17",
+      "caption": "ตาราง RAID 0–6: redundancy, จำนวนดิสก์ และ performance (itds-211_comp_arch_Chapter06.pdf, หน้า 17)"
+    },
+    {
+      "id": "fig-18",
+      "page": 18,
+      "file": "slide-018.png",
+      "title": "strip 12 · หน้า 18",
+      "caption": "ภาพกระจายข้อมูล RAID 0, mirror RAID 1 และ Hamming RAID 2 (itds-211_comp_arch_Chapter06.pdf, หน้า 18)"
+    },
+    {
+      "id": "fig-19",
+      "page": 19,
+      "file": "slide-019.png",
+      "title": "block 12 · หน้า 19",
+      "caption": "ภาพ parity ของ RAID 3–6 รวม P/Q ของ RAID 6 (itds-211_comp_arch_Chapter06.pdf, หน้า 19)"
+    },
+    {
+      "id": "fig-20",
+      "page": 20,
+      "file": "slide-020.png",
+      "title": "strip 4 · หน้า 20",
+      "caption": "logical-to-physical strip mapping ของ RAID 0 (itds-211_comp_arch_Chapter06.pdf, หน้า 20)"
+    },
+    {
+      "id": "fig-21",
+      "page": 21,
+      "file": "slide-021.png",
+      "title": "Level 0 · หน้า 21",
+      "caption": "ภาพสไลด์เรื่อง RAID 0: striping ไม่มี redundancy สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 21)"
+    },
+    {
+      "id": "fig-22",
+      "page": 22,
+      "file": "slide-022.png",
+      "title": "Level 1 · หน้า 22",
+      "caption": "ภาพสไลด์เรื่อง RAID 1: mirroring สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 22)"
+    },
+    {
+      "id": "fig-23",
+      "page": 23,
+      "file": "slide-023.png",
+      "title": "Level 2 · หน้า 23",
+      "caption": "ภาพสไลด์เรื่อง RAID 2: Hamming code สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 23)"
+    },
+    {
+      "id": "fig-24",
+      "page": 24,
+      "file": "slide-024.png",
+      "title": "Level 3 · หน้า 24",
+      "caption": "ภาพสไลด์เรื่อง RAID 3: bit-interleaved parity สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 24)"
+    },
+    {
+      "id": "fig-25",
+      "page": 25,
+      "file": "slide-025.png",
+      "title": "Level 4 · หน้า 25",
+      "caption": "ภาพสไลด์เรื่อง RAID 4: block parity แยกดิสก์ สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 25)"
+    },
+    {
+      "id": "fig-26",
+      "page": 26,
+      "file": "slide-026.png",
+      "title": "Level 5 · หน้า 26",
+      "caption": "ภาพสไลด์เรื่อง RAID 5: distributed parity สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 26)"
+    },
+    {
+      "id": "fig-27",
+      "page": 27,
+      "file": "slide-027.png",
+      "title": "Table 6.4 · หน้า 27",
+      "caption": "ตารางเปรียบ RAID ตามสไลด์ (itds-211_comp_arch_Chapter06.pdf, หน้า 27)"
+    },
+    {
+      "id": "fig-28",
+      "page": 28,
+      "file": "slide-028.png",
+      "title": "Table 6.4 · หน้า 28",
+      "caption": "ตารางเปรียบ RAID และตัวอย่างงานตามสไลด์ (itds-211_comp_arch_Chapter06.pdf, หน้า 28)"
+    },
+    {
+      "id": "fig-29",
+      "page": 29,
+      "file": "slide-029.png",
+      "title": "SSD Compared to HDD · หน้า 29",
+      "caption": "ภาพสไลด์เรื่อง SSD เทียบ HDD ในสไลด์ สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 29)"
+    },
+    {
+      "id": "fig-30",
+      "page": 30,
+      "file": "slide-030.png",
+      "title": "NAND Flash Drives  Seagate Laptop Internal · หน้า 30",
+      "caption": "ตาราง SSD/HDD รุ่นตัวอย่างในช่วงเวลาของสไลด์ (itds-211_comp_arch_Chapter06.pdf, หน้า 30)"
+    },
+    {
+      "id": "fig-31",
+      "page": 31,
+      "file": "slide-031.png",
+      "title": "Figure 6.8  Solid State Drive Architecture · หน้า 31",
+      "caption": "แผนผัง host, SSD controller และ flash components (itds-211_comp_arch_Chapter06.pdf, หน้า 31)"
+    },
+    {
+      "id": "fig-32",
+      "page": 32,
+      "file": "slide-032.png",
+      "title": "Practical Issues · หน้า 32",
+      "caption": "ปัญหา write/erase ของ SSD และ wear leveling (itds-211_comp_arch_Chapter06.pdf, หน้า 32)"
+    },
+    {
+      "id": "fig-33",
+      "page": 33,
+      "file": "slide-033.png",
+      "title": "Table 6. 6 · หน้า 33",
+      "caption": "ตารางชนิด optical disk และรูปแบบ ROM/R/RW (itds-211_comp_arch_Chapter06.pdf, หน้า 33)"
+    },
+    {
+      "id": "fig-34",
+      "page": 34,
+      "file": "slide-034.png",
+      "title": "Compact Disk Read · หน้า 34",
+      "caption": "ภาพสไลด์เรื่อง CD-ROM: การผลิต การอ่าน และ block format สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 34)"
+    },
+    {
+      "id": "fig-35",
+      "page": 35,
+      "file": "slide-035.png",
+      "title": "Polycarbonate · หน้า 35",
+      "caption": "ภาพสไลด์เรื่อง CD-ROM: การผลิต การอ่าน และ block format สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 35)"
+    },
+    {
+      "id": "fig-36",
+      "page": 36,
+      "file": "slide-036.png",
+      "title": "00 00 Data · หน้า 36",
+      "caption": "CD-ROM block 2352 bytes และส่วนประกอบ (itds-211_comp_arch_Chapter06.pdf, หน้า 36)"
+    },
+    {
+      "id": "fig-37",
+      "page": 37,
+      "file": "slide-037.png",
+      "title": "ROM is appropriate for the distribution of large · หน้า 37",
+      "caption": "ภาพสไลด์เรื่อง CD-ROM: การผลิต การอ่าน และ block format สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 37)"
+    },
+    {
+      "id": "fig-38",
+      "page": 38,
+      "file": "slide-038.png",
+      "title": "CD Recordable · หน้า 38",
+      "caption": "ภาพสไลด์เรื่อง CD-R กับ CD-RW สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 38)"
+    },
+    {
+      "id": "fig-39",
+      "page": 39,
+      "file": "slide-039.png",
+      "title": "1.2 mm · หน้า 39",
+      "caption": "ชั้น CD-ROM เทียบ DVD-ROM แบบ double-sided, dual-layer (itds-211_comp_arch_Chapter06.pdf, หน้า 39)"
+    },
+    {
+      "id": "fig-40",
+      "page": 40,
+      "file": "slide-040.png",
+      "title": "Beam spot Land · หน้า 40",
+      "caption": "ความยาวคลื่นและ pit/track ของ CD, DVD, Blu-ray (itds-211_comp_arch_Chapter06.pdf, หน้า 40)"
+    },
+    {
+      "id": "fig-41",
+      "page": 41,
+      "file": "slide-041.png",
+      "title": "Magnetic Tape · หน้า 41",
+      "caption": "ภาพสไลด์เรื่อง Magnetic tape: serial และ serpentine สำหรับทบทวนตำแหน่งและรายละเอียด (itds-211_comp_arch_Chapter06.pdf, หน้า 41)"
+    },
+    {
+      "id": "fig-42",
+      "page": 42,
+      "file": "slide-042.png",
+      "title": "Bottom · หน้า 42",
+      "caption": "serpentine tape tracks และตัวอย่างอ่าน/เขียน 4 tracks (itds-211_comp_arch_Chapter06.pdf, หน้า 42)"
+    },
+    {
+      "id": "fig-43",
+      "page": 43,
+      "file": "slide-043.png",
+      "title": "Table 6.7 · หน้า 43",
+      "caption": "ตาราง LTO generations เป็นตัวอย่างตามสไลด์ (itds-211_comp_arch_Chapter06.pdf, หน้า 43)"
+    }
+  ],
+  "topics": [
+    {
+      "id": "magnetic-medium",
+      "title": "สื่อแม่เหล็กและหัวอ่าน/เขียน",
+      "level": "core",
+      "pages": "หน้า 4–6",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "Magnetic disk ใช้ platter ที่เคลือบวัสดุแม่เหล็กและเก็บบิตด้วยสภาพการเป็นแม่เหล็กของบริเวณเล็ก ๆ. สไลด์เทียบวัสดุฐานอะลูมิเนียมกับแก้ว และแสดงหัวเขียนแบบ inductive กับหัวอ่านแบบ magnetoresistive. การอ่านกับเขียนจึงเป็นกระบวนการคนละทิศของการแปลงสัญญาณและสภาพแม่เหล็ก.",
+      "remember": [
+        "Platter มี substrate และ magnetizable coating (หน้า 4)",
+        "ฐานแก้วช่วยผิวสม่ำเสมอ ลด defect และเอื้อ fly height ต่ำในสไลด์ (หน้า 4)",
+        "ภาพแยก inductive write กับ magnetoresistive read (หน้า 5–6)"
+      ],
+      "terms": [
+        "platter",
+        "substrate",
+        "magnetizable material",
+        "inductive write",
+        "magnetoresistive read",
+        "read/write head"
+      ],
+      "example": "อ่านภาพหน้า 5–6 โดยตามทิศสัญญาณจากหัวเขียนสู่สื่อ และจากสื่อกลับสู่หัวอ่าน",
+      "confusion": "อย่านำชนิดหัวอ่านไปเรียกว่าหัวเขียน; บิตในภาพสัมพันธ์กับสภาพแม่เหล็กบนสื่อ",
+      "mnemonic": "เขียนให้สื่อเปลี่ยน อ่านจากสื่อกลับมา",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตัวใดเป็นวัสดุฐาน platter ที่สไลด์กล่าวถึง?",
+          "options": [
+            "อะลูมิเนียมและแก้ว",
+            "กระดาษและไม้",
+            "ซิลิกอนล้วน",
+            "เทปโพลีเอสเตอร์"
+          ],
+          "correct": 0,
+          "answer": "อะลูมิเนียมและแก้ว",
+          "pages": "หน้า 4–6"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "หัวเขียนและหัวอ่านในภาพหน้า 6 ใช้หลักใด?",
+          "answer": "หัวเขียน inductive; หัวอ่าน magnetoresistive",
+          "pages": "หน้า 4–6"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดสไลด์กล่าวถึงฐานแก้ว?",
+          "answer": "ผิวสม่ำเสมอ defect น้อย เอื้อ fly height ต่ำ เพิ่มความแข็งและทนแรงกระแทก",
+          "pages": "หน้า 4–6"
+        }
+      ],
+      "figures": [
+        "fig-4",
+        "fig-5",
+        "fig-6"
+      ]
+    },
+    {
+      "id": "disk-layout",
+      "title": "Track, sector, cylinder และรูปแบบ sector",
+      "level": "core",
+      "pages": "หน้า 7–9",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "ผิว platter แบ่งเป็น tracks วงซ้อนและ sectors ตามส่วนโค้ง; cylinder คือ tracks ที่ตำแหน่งรัศมีเดียวกันของหลายผิว. ภาพยังแสดง inter-track/inter-sector gaps และหัวอ่านหนึ่งหัวต่อผิว. สไลด์เปรียบ constant angular velocity กับ multiple zone recording และยก Winchester ST506 เป็นตัวอย่าง sector ที่มี ID, data, CRC และ gaps.",
+      "remember": [
+        "Track เป็นวง; sector เป็นส่วนของ track; cylinder รวม track ที่รัศมีตรงกัน (หน้า 7)",
+        "Multiple zone recording แบ่ง track เป็น zones ให้จำนวน sectors/track ต่างกัน (หน้า 8)",
+        "ST506 เป็นตัวอย่าง 600 bytes/sector แต่ data จริง 512 bytes พร้อมข้อมูลจัดรูปแบบ (หน้า 9)"
+      ],
+      "terms": [
+        "track",
+        "sector",
+        "cylinder",
+        "constant angular velocity (CAV)",
+        "multiple zone recording",
+        "CRC",
+        "ID field"
+      ],
+      "example": "ตัวอย่างหน้า 9: 17+7+41+515+20 = 600 bytes/sector; data field 515 bytes มี synch 1, data 512 และ CRC 2",
+      "confusion": "600 bytes เป็นขนาด physical sector ในตัวอย่าง ST506 ไม่ใช่ 600 bytes ของ user data",
+      "mnemonic": "วง track–ชิ้น sector–ชั้น cylinder",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "หน่วยใดคือ track ที่รัศมีเดียวกันบนหลายผิว?",
+          "options": [
+            "Cylinder",
+            "Sector",
+            "Gap",
+            "Spindle"
+          ],
+          "correct": 0,
+          "answer": "Cylinder",
+          "pages": "หน้า 7–9"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "Multiple zone recording ต่างจากการแบ่ง sector แบบเดิมอย่างไร?",
+          "answer": "แบ่งเป็น zones เพื่อให้จำนวน sectors ต่อ track ต่างกันตามตำแหน่ง",
+          "pages": "หน้า 7–9"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณ overhead ใน sector ตัวอย่าง 600 bytes ที่มี data 512 bytes",
+          "answer": "600−512 = 88 bytes สำหรับ field/gap/ข้อมูลควบคุมตามภาพ",
+          "pages": "หน้า 7–9"
+        }
+      ],
+      "figures": [
+        "fig-7",
+        "fig-8",
+        "fig-9"
+      ],
+      "formulas": [
+        {
+          "expr": "600 − 512 = 88 bytes",
+          "description": "overhead ของ sector ST506 ในตัวอย่างหน้า 9; ไม่ใช่ค่าทั่วไปของดิสก์ทุกแบบ",
+          "pages": "หน้า 9"
+        }
+      ]
+    },
+    {
+      "id": "disk-types",
+      "title": "ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง",
+      "level": "important",
+      "pages": "หน้า 10–13",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "สไลด์จำแนก fixed-head/movable-head, removable/nonremovable, single-/double-sided, จำนวน platters และระยะสัมผัสหัวกับจาน. หัวที่แคบเพิ่มความหนาแน่นได้ แต่ต้องเข้าใกล้ผิวมากขึ้นและเสี่ยงต่อข้อผิดพลาด. Winchester ใช้ enclosure ปิดเพื่อลดสิ่งปนเปื้อน และหัวลอยเหนือผิวเมื่อหมุน; ตารางหน้า 13 เป็นสเปกอุปกรณ์ตัวอย่างของเอกสาร.",
+      "remember": [
+        "Fixed-head เลือกหัว; movable-head เคลื่อนหัวไป track (หน้า 10–11)",
+        "Removable media ถอดออกจาก drive ได้; double-sided ใช้สองผิว (หน้า 10–11)",
+        "Winchester ใช้หัวลอยตามอากาศเหนือผิวใน enclosure ปิด (หน้า 12)",
+        "ค่ารุ่นในตารางหน้า 13 เป็นตัวอย่างของช่วงเวลาสไลด์"
+      ],
+      "terms": [
+        "fixed-head",
+        "movable-head",
+        "removable disk",
+        "double-sided",
+        "Winchester disk",
+        "fly height"
+      ],
+      "example": "ใช้หัวตารางหน้า 13 อ่านความสัมพันธ์ capacity, rpm, seek และ transfer rate ของรุ่นที่ยก ไม่ใช้แทนสเปกปัจจุบัน",
+      "confusion": "fixed-head หมายถึงหัวประจำ track ไม่ใช่ platter หยุดหมุน; ตัวเลขตารางไม่ใช่มาตรฐานปัจจุบัน",
+      "mnemonic": "เลือกหัวหรือเลื่อนหัว; จานยังหมุน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แบบใดต้องเคลื่อนหัวไปยัง track?",
+          "options": [
+            "Movable-head",
+            "Fixed-head",
+            "Removable media",
+            "Double-sided"
+          ],
+          "correct": 0,
+          "answer": "Movable-head",
+          "pages": "หน้า 10–13"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใด Winchester จึงใช้ enclosure ปิด?",
+          "answer": "ลดสิ่งปนเปื้อนเพื่อให้หัวลอยใกล้ผิวได้ตามสไลด์",
+          "pages": "หน้า 10–13"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เมื่อหัวแคบลง ข้อดีและความเสี่ยงที่สไลด์กล่าวคืออะไร?",
+          "answer": "ความหนาแน่นเพิ่ม แต่ต้องอยู่ใกล้จานมากขึ้นและเสี่ยงข้อผิดพลาด",
+          "pages": "หน้า 10–13"
+        }
+      ],
+      "figures": [
+        "fig-10",
+        "fig-11",
+        "fig-12",
+        "fig-13"
+      ]
+    },
+    {
+      "id": "disk-timing",
+      "title": "เวลา I/O ของ magnetic disk",
+      "level": "core",
+      "pages": "หน้า 14–15",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "ภาพเวลา I/O แยกการรออุปกรณ์ รอ channel การ seek การรอจานหมุน และการ transfer. Seek time คือเวลาวางหัวที่ track เป้าหมายใน movable-head; rotational delay คือรอ sector มาถึงหัว. Access time ในสไลด์นิยามเป็น seek time + rotational delay แล้วจึงเกิด transfer time.",
+      "remember": [
+        "Seek time: วางหัวที่ track (หน้า 15)",
+        "Rotational delay: รอ sector หมุนมาถึงหัว (หน้า 15)",
+        "Access time = seek time + rotational delay; transfer time เกิดเมื่อหัวอยู่ตำแหน่งแล้ว (หน้า 15)",
+        "ภาพหน้า 14 ยังแยก device/channel wait"
+      ],
+      "terms": [
+        "seek time",
+        "rotational delay / rotational latency",
+        "access time",
+        "transfer time",
+        "device busy",
+        "wait for channel"
+      ],
+      "example": "จากนิยามหน้า 15 ให้รวม seek time กับ rotational delay เพื่อหา access time โดยแยก transfer time ไว้หลังจากนั้น",
+      "confusion": "อย่ารวม transfer หรือ device/channel wait เข้า access time ตามนิยามหน้า 15",
+      "mnemonic": "เข้าถึง = หา track + รอ sector; จากนั้นถ่ายข้อมูล",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "Access time ตามสไลด์ประกอบด้วยอะไร?",
+          "options": [
+            "Seek + rotational delay",
+            "Seek + transfer",
+            "Channel wait + transfer",
+            "Transfer เท่านั้น"
+          ],
+          "correct": 0,
+          "answer": "Seek + rotational delay",
+          "pages": "หน้า 14–15"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ลำดับ seek, rotational delay และ transfer เป็นอย่างไร?",
+          "answer": "วางหัวที่ track → รอ sector หมุนมาถึง → อ่าน/เขียนข้อมูล",
+          "pages": "หน้า 14–15"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "จงเขียนวิธีคำนวณ access time จาก seek time และ rotational delay",
+          "answer": "นำ seek time บวก rotational delay; ไม่รวม transfer time ตามนิยามหน้า 15",
+          "pages": "หน้า 14–15"
+        }
+      ],
+      "figures": [
+        "fig-14",
+        "fig-15"
+      ],
+      "formulas": [
+        {
+          "expr": "Access time = seek time + rotational delay",
+          "description": "นิยามในสไลด์ ไม่รวม transfer time หรือเวลา wait for device/channel",
+          "pages": "หน้า 15"
+        }
+      ]
+    },
+    {
+      "id": "raid-framework",
+      "title": "RAID: ภาพรวมและจำนวนดิสก์",
+      "level": "core",
+      "pages": "หน้า 16–19",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID (Redundant Array of Independent Disks) ทำให้หลาย physical disks ปรากฏเป็น logical drive และกระจายข้อมูลด้วย striping. ตารางแยก RAID 0–6 ตาม nonredundant, mirroring, Hamming และ parity รวมทั้ง parallel versus independent access. จำนวนดิสก์ในตารางคือ RAID 0 = N, RAID 1 = 2N, RAID 2 = N+m, RAID 3–5 = N+1 และ RAID 6 = N+2.",
+      "remember": [
+        "N คือจำนวน data disks; m แปรตาม log N ใน RAID 2 (หน้า 17)",
+        "RAID 2–3 เป็น parallel access; RAID 4–6 เป็น independent access (หน้า 17)",
+        "หน้า 16 กล่าวว่าทุกระดับมี redundancy แต่หน้า 17 ระบุ RAID 0 nonredundant: ต้องตรวจสอบจากต้นฉบับ"
+      ],
+      "terms": [
+        "RAID",
+        "logical drive",
+        "striping",
+        "mirroring",
+        "parity",
+        "N",
+        "m"
+      ],
+      "example": "ไล่ตารางหน้า 17 แล้วจับคู่ระดับกับวิธี redundancy และจำนวนดิสก์ ก่อนอ่านภาพการจัด strip หน้า 18–19",
+      "confusion": "ข้อความเหมารวมเรื่อง parity/redundancy หน้า 16 ขัดกับ RAID 0 หน้า 17–18; ต้องตรวจสอบจากต้นฉบับ",
+      "mnemonic": "0 ไม่มีสำรอง; 1 ทำคู่; 2–6 ต่างวิธีตรวจและกระจาย",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID ระดับใด nonredundant ตามตาราง?",
+          "options": [
+            "0",
+            "1",
+            "5",
+            "6"
+          ],
+          "correct": 0,
+          "answer": "0",
+          "pages": "หน้า 16–19"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "N และ m ในตาราง RAID หมายถึงอะไร?",
+          "answer": "N = จำนวน data disks; m = จำนวน redundant disks ของ RAID 2 ที่แปรตาม log N",
+          "pages": "หน้า 16–19"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ตารางต้องใช้กี่ดิสก์สำหรับ RAID 6 เมื่อ N=4?",
+          "answer": "N+2 = 6 ดิสก์ ตามตารางหน้า 17",
+          "pages": "หน้า 16–19"
+        }
+      ],
+      "figures": [
+        "fig-16",
+        "fig-17",
+        "fig-18",
+        "fig-19"
+      ],
+      "comparison": {
+        "headers": [
+          "ระดับ",
+          "รูปแบบ",
+          "จำนวนดิสก์"
+        ],
+        "rows": [
+          [
+            "0",
+            "nonredundant striping",
+            "N"
+          ],
+          [
+            "1",
+            "mirroring",
+            "2N"
+          ],
+          [
+            "2",
+            "Hamming code",
+            "N+m"
+          ],
+          [
+            "3/4/5",
+            "parity ต่างการจัดวาง",
+            "N+1"
+          ],
+          [
+            "6",
+            "dual distributed parity",
+            "N+2"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "raid0",
+      "title": "RAID 0: striping ไม่มี redundancy",
+      "level": "core",
+      "pages": "หน้า 18, 20–21",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 0 แบ่ง logical data เป็น strips กระจายบนดิสก์หลายตัวโดยไม่สำรอง. ภาพหน้า 20 แสดง logical strips 0–15 แมปไปสี่ physical disks. ความเร็วขึ้นกับทั้งทางเดินจาก host memory ไปดิสก์และรูปแบบ I/O request; small request มักถูก seek/rotational latency ครอบงำ ส่วนหลาย request กระจายภาระได้.",
+      "remember": [
+        "Nonredundant; ใช้ N ดิสก์ตามตาราง (หน้า 17–18)",
+        "logical strips กระจายลง physical disks (หน้า 20)",
+        "small request ถูก seek/rotation ครอบงำ; large strip อาจให้หลาย request ทำพร้อมกัน (หน้า 21)"
+      ],
+      "terms": [
+        "RAID 0",
+        "strip",
+        "striping",
+        "logical disk",
+        "physical disk",
+        "load balancing"
+      ],
+      "example": "ตาม strip 0,1,2,3 ในภาพหน้า 20 จะอยู่คนละ physical disk ก่อนวนกลับ",
+      "confusion": "RAID 0 ไม่มี parity หรือ mirror แม้หน้า 16 จะพูดถึงคุณลักษณะ RAID แบบรวม",
+      "mnemonic": "ศูนย์ = กระจาย แต่ไม่สำรอง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 0 เก็บข้อมูลสำรองแบบใด?",
+          "options": [
+            "ไม่มี",
+            "mirror",
+            "parity แยก",
+            "dual parity"
+          ],
+          "correct": 0,
+          "answer": "ไม่มี",
+          "pages": "หน้า 18, 20–21"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เงื่อนไขสองข้อของ high transfer capacity หน้า 21 คืออะไร?",
+          "answer": "ทางเดิน host–disk ต้องรองรับสูง และ application ออก request ที่ใช้อาร์เรย์ได้มีประสิทธิภาพ",
+          "pages": "หน้า 18, 20–21"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใด small I/O request จึงไม่ใช่การถ่ายข้อมูลอย่างเดียว?",
+          "answer": "เวลามักถูก seek และ rotational latency ครอบงำตามหน้า 21",
+          "pages": "หน้า 18, 20–21"
+        }
+      ],
+      "figures": [
+        "fig-20",
+        "fig-21"
+      ]
+    },
+    {
+      "id": "raid1",
+      "title": "RAID 1: mirroring",
+      "level": "core",
+      "pages": "หน้า 18, 22",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 1 ทำสำเนาข้อมูลทั้งชุด โดย logical strip หนึ่งแมปลงดิสก์สองตัวที่เป็น mirror กัน. อ่านจากตัวใดก็ได้ และเมื่อไดรฟ์เสียจะเข้าถึงจากสำเนาอีกตัวแล้วฟื้นระบบได้ง่าย. สไลด์ระบุว่าไม่มี “write penalty” ในความหมายของตน และข้อเสียหลักคือค่าใช้จ่ายของดิสก์ที่ซ้ำ.",
+      "remember": [
+        "Mirroring = duplicate all data; 2N disks (หน้า 17–18, 22)",
+        "อ่านจากดิสก์คู่ใดก็ได้และสำรองแบบ real time (หน้า 22)",
+        "สไลด์กล่าวไม่มี “write penalty”; ข้อเสียหลักคือ cost (หน้า 22)"
+      ],
+      "terms": [
+        "RAID 1",
+        "mirroring",
+        "mirror disk",
+        "logical strip",
+        "read request"
+      ],
+      "example": "ภาพหน้า 18 วาง strip ชุดเดียวกันซ้ำทั้งฝั่งซ้ายและขวา",
+      "confusion": "การเขียนยังต้องทำสำเนา แต่สไลด์ใช้คำว่าไม่มี “write penalty”; อย่าตีความเป็นเขียนดิสก์เดียว",
+      "mnemonic": "หนึ่ง = มีคู่สำเนา",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 1 ได้ redundancy โดยอะไร?",
+          "options": [
+            "Mirroring",
+            "Hamming",
+            "single parity",
+            "dual parity"
+          ],
+          "correct": 0,
+          "answer": "Mirroring",
+          "pages": "หน้า 18, 22"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใดอ่านข้อมูลได้เมื่อดิสก์ตัวหนึ่งเสีย?",
+          "answer": "มี mirror disk ที่เก็บข้อมูลเดียวกัน",
+          "pages": "หน้า 18, 22"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้า N=4 data disks ตารางหน้า 17 ให้ RAID 1 ใช้ทั้งหมดกี่ดิสก์?",
+          "answer": "2N = 8 ดิสก์",
+          "pages": "หน้า 18, 22"
+        }
+      ],
+      "figures": [
+        "fig-22"
+      ]
+    },
+    {
+      "id": "raid2",
+      "title": "RAID 2: Hamming code",
+      "level": "important",
+      "pages": "หน้า 18, 23",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "RAID 2 ใช้ parallel access ที่ดิสก์ทำงานร่วมกันทุก I/O request และกระจายข้อมูลเป็น strips เล็กระดับ byte/word. คำนวณ Hamming code ข้ามบิตจาก data disks แล้วเก็บ code บน redundant disks หลายตัว. ตามสไลด์ Hamming code แก้ single-bit error และตรวจ double-bit error ได้ โดยจำนวนดิสก์เสริมแปรตาม log N.",
+      "remember": [
+        "parallel access และ synchronized spindles (หน้า 23)",
+        "strips เล็กมากและ Hamming ECC เก็บบนหลายดิสก์ (หน้า 18, 23)",
+        "single-bit correction/double-bit detection ตามสไลด์ (หน้า 23)"
+      ],
+      "terms": [
+        "RAID 2",
+        "parallel access",
+        "Hamming code",
+        "ECC",
+        "N+m"
+      ],
+      "example": "ดูภาพหน้า 18: b0–b3 เป็นข้อมูล และ f0(b)–f2(b) เป็น code ที่แยกดิสก์",
+      "confusion": "Hamming code ของ RAID 2 ไม่ใช่ parity disk เดียวแบบ RAID 3",
+      "mnemonic": "สอง = code หลายดิสก์",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 2 ใช้รหัสใดตามสไลด์?",
+          "options": [
+            "Hamming",
+            "CRC อย่างเดียว",
+            "AES",
+            "NTFS"
+          ],
+          "correct": 0,
+          "answer": "Hamming",
+          "pages": "หน้า 18, 23"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "parallel access ใน RAID 2 หมายถึงอะไร?",
+          "answer": "member disks ร่วมทำทุก I/O request และ spindle synchronized",
+          "pages": "หน้า 18, 23"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "RAID 2 ต่าง RAID 3 ใน redundancy อย่างไร?",
+          "answer": "RAID 2 ใช้ Hamming code บนหลายดิสก์; RAID 3 ใช้ parity disk เดียว",
+          "pages": "หน้า 18, 23"
+        }
+      ],
+      "figures": [
+        "fig-23"
+      ]
+    },
+    {
+      "id": "raid3",
+      "title": "RAID 3: bit-interleaved parity",
+      "level": "core",
+      "pages": "หน้า 19, 24",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 3 ใช้ parallel access และ strips เล็ก โดยคำนวณ parity จากบิตตำแหน่งตรงกันบน data disks แล้วเก็บบนดิสก์สำรองหนึ่งตัว. สไลด์ยกอัตรา transfer สูงและการ reconstruct เมื่อดิสก์เสีย. ระหว่างซ่อมยังมีข้อมูลใน reduced mode แต่ workload แบบ transaction-oriented ทำงานด้อยลง.",
+      "remember": [
+        "parity disk เดียวไม่ว่าขนาดอาร์เรย์ (หน้า 24)",
+        "parallel access และ small strips (หน้า 24)",
+        "เสียหนึ่งตัว: reconstruct จากดิสก์ที่เหลือกับ parity และทำงาน reduced mode (หน้า 24)"
+      ],
+      "terms": [
+        "RAID 3",
+        "bit-interleaved parity",
+        "parallel access",
+        "reduced mode",
+        "parity disk"
+      ],
+      "example": "ดู P(b) บนดิสก์ขวาของ RAID 3 ในภาพหน้า 19",
+      "confusion": "RAID 3 เป็น parallel access; อย่าสลับกับ RAID 4 ที่เป็น independent access",
+      "mnemonic": "สาม = parity หนึ่งตัวและดิสก์ทำพร้อมกัน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 3 ใช้ redundant disks กี่ตัว?",
+          "options": [
+            "หนึ่ง",
+            "สอง",
+            "N",
+            "ไม่มี"
+          ],
+          "correct": 0,
+          "answer": "หนึ่ง",
+          "pages": "หน้า 19, 24"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "reduced mode หน้า 24 คืออะไร?",
+          "answer": "ยังเข้าถึงข้อมูลได้หลังดิสก์เสียโดย reconstruct จาก parity และดิสก์ที่เหลือ",
+          "pages": "หน้า 19, 24"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใด transaction-oriented workload จึงเป็นข้อเสียของ RAID 3 ตามสไลด์?",
+          "answer": "สไลด์ระบุ performance suffers สำหรับ workload นี้ ขณะที่ทุกดิสก์ร่วมกันต่อ I/O request",
+          "pages": "หน้า 19, 24"
+        }
+      ],
+      "figures": [
+        "fig-24"
+      ]
+    },
+    {
+      "id": "raid4",
+      "title": "RAID 4: block parity แยกดิสก์",
+      "level": "core",
+      "pages": "หน้า 19, 25",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 4 ใช้ independent access และ strips ค่อนข้างใหญ่ โดย parity ของแต่ละกลุ่มอยู่บนดิสก์เฉพาะ. การเขียน strip เล็กต้องอ่าน old user strip กับ old parity แล้วเขียน user strip และ parity ใหม่ จึงเป็น 2 reads + 2 writes. ดิสก์ parity กลายเป็นคอขวดของการเขียนที่สไลด์ชี้ให้เห็น.",
+      "remember": [
+        "independent access: ดิสก์รับ request แยกกันได้ (หน้า 25)",
+        "large strips และ dedicated parity disk (หน้า 19, 25)",
+        "small write = 2 reads + 2 writes (หน้า 25)"
+      ],
+      "terms": [
+        "RAID 4",
+        "independent access",
+        "block-interleaved parity",
+        "dedicated parity disk",
+        "write penalty"
+      ],
+      "example": "ติดตาม P(0–3), P(4–7) ในภาพหน้า 19: parity อยู่คอลัมน์เดิม",
+      "confusion": "อย่าสับสนกับ RAID 5 ที่ parity หมุนเวียนบนทุกดิสก์",
+      "mnemonic": "สี่ = parity ดิสก์เดียว; เขียนต้องแตะสี่ครั้ง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "small strip write ของ RAID 4 มี I/O กี่ครั้งตามสไลด์?",
+          "options": [
+            "2 reads + 2 writes",
+            "1 read + 1 write",
+            "4 reads",
+            "ไม่มี parity I/O"
+          ],
+          "correct": 0,
+          "answer": "2 reads + 2 writes",
+          "pages": "หน้า 19, 25"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใด dedicated parity disk อาจเป็นคอขวด?",
+          "answer": "ทุกการปรับ parity ต้องเข้าไปยังดิสก์เดียว",
+          "pages": "หน้า 19, 25"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้าเขียนหนึ่ง strip เล็ก จงนับ read/write ตามหน้า 25",
+          "answer": "อ่าน old user+old parity = 2; เขียน new user+new parity = 2",
+          "pages": "หน้า 19, 25"
+        }
+      ],
+      "figures": [
+        "fig-25"
+      ]
+    },
+    {
+      "id": "raid5",
+      "title": "RAID 5: distributed parity",
+      "level": "core",
+      "pages": "หน้า 19, 26",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 5 จัด block-level strips คล้าย RAID 4 แต่หมุนตำแหน่ง parity strips ไปตามดิสก์ทุกตัว มักเป็น round-robin. การกระจายนี้หลีกเลี่ยงคอขวด I/O บน dedicated parity disk ของ RAID 4. ตารางหน้า 17 จัดเป็น N+1 disks และ independent access.",
+      "remember": [
+        "distributed parity; ไม่ fix บนดิสก์เดียว (หน้า 19, 26)",
+        "typical allocation แบบ round-robin (หน้า 26)",
+        "หลีกเลี่ยง RAID 4 parity-disk bottleneck (หน้า 26)"
+      ],
+      "terms": [
+        "RAID 5",
+        "block-interleaved distributed parity",
+        "round-robin",
+        "independent access",
+        "N+1"
+      ],
+      "example": "ดูภาพหน้า 19: P(0–3), P(4–7), P(8–11) ย้ายตำแหน่งดิสก์",
+      "confusion": "หน้า 26 แบ่งสองคอลัมน์: dual parity เป็นของ RAID 6 ไม่ใช่ RAID 5",
+      "mnemonic": "ห้า = parity หมุนเวียน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 5 แก้ bottleneck RAID 4 ด้วยอะไร?",
+          "options": [
+            "กระจาย parity",
+            "เพิ่ม dedicated parity disk",
+            "เอา parity ออก",
+            "เปลี่ยนเป็น tape"
+          ],
+          "correct": 0,
+          "answer": "กระจาย parity",
+          "pages": "หน้า 19, 26"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "RAID 5 กับ RAID 4 ต่างกันตรงตำแหน่ง parity อย่างไร?",
+          "answer": "RAID 4 ใช้ดิสก์ parity เฉพาะ; RAID 5 กระจาย parity strips",
+          "pages": "หน้า 19, 26"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เมื่อ N=4 ตารางหน้า 17 ให้ RAID 5 รวมกี่ดิสก์?",
+          "answer": "N+1 = 5 ดิสก์",
+          "pages": "หน้า 19, 26"
+        }
+      ],
+      "figures": [
+        "fig-26"
+      ]
+    },
+    {
+      "id": "raid6",
+      "title": "RAID 6: dual distributed parity",
+      "level": "core",
+      "pages": "หน้า 19, 26",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "RAID 6 ใช้ parity สองชุดจากการคำนวณต่างกัน เก็บคนละ block บนคนละดิสก์. สไลด์อธิบาย data availability สูง: ต้องมีสามดิสก์เสียภายใน mean time to repair (MTTR) จึงทำข้อมูลหายตามเงื่อนไขที่กล่าว. แลกกับ write penalty เพราะการเขียนหนึ่งครั้งกระทบ parity สอง block; ตารางจัด N+2 ดิสก์.",
+      "remember": [
+        "dual distributed parity หรือ P และ Q ในภาพ (หน้า 19, 26)",
+        "parity สอง block กระทบเมื่อเขียน (หน้า 26)",
+        "ตารางให้ N+2 disks (หน้า 17)",
+        "คำอธิบายสามดิสก์เสียผูกกับช่วง MTTR ตามสไลด์ (หน้า 26)"
+      ],
+      "terms": [
+        "RAID 6",
+        "dual parity",
+        "P/Q",
+        "MTTR",
+        "N+2",
+        "write penalty"
+      ],
+      "example": "เทียบ P(0–3) และ Q(0–3) ในภาพหน้า 19 ซึ่งอยู่คนละดิสก์",
+      "confusion": "อย่าตีความประโยคสามดิสก์เสียโดยละคำว่า within MTTR interval ในสไลด์",
+      "mnemonic": "หก = parity สองชุด",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 6 เก็บ parity กี่ชุด?",
+          "options": [
+            "สอง",
+            "หนึ่ง",
+            "ไม่มี",
+            "N ชุด"
+          ],
+          "correct": 0,
+          "answer": "สอง",
+          "pages": "หน้า 19, 26"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใดสไลด์ระบุ write penalty ของ RAID 6?",
+          "answer": "การเขียนหนึ่งครั้งกระทบ parity สอง blocks",
+          "pages": "หน้า 19, 26"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ถ้า N=4 RAID 6 ใช้กี่ดิสก์ตามตาราง?",
+          "answer": "N+2 = 6 ดิสก์",
+          "pages": "หน้า 19, 26"
+        }
+      ],
+      "figures": []
+    },
+    {
+      "id": "raid-tables",
+      "title": "ตารางเปรียบเทียบ RAID และการเลือกอ่าน",
+      "level": "important",
+      "pages": "หน้า 17, 27–28",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "ตาราง RAID เปรียบ data availability, large transfer, small request และตัวอย่างการใช้งานของแต่ละระดับ. ใช้อ่านเชิงเปรียบเทียบกับภาพหน้า 18–19: RAID 0 เน้น striping แต่ไม่มี redundancy, RAID 1 ทำ mirror, RAID 2–3 ทำงานแบบ parallel และ RAID 4–6 เป็น independent access. ตารางหน้า 27–28 เป็นการจัดกลุ่มและตัวอย่างของเอกสาร ไม่ใช่คำรับรองความเหมาะสมของระบบปัจจุบัน.",
+      "remember": [
+        "จับคู่ level ↔ redundancy ↔ disks required จากหน้า 17",
+        "แยก parallel access (2–3) กับ independent access (4–6)",
+        "ตารางหน้า 27–28 มีตัวอย่าง application/use ในสไลด์"
+      ],
+      "terms": [
+        "data availability",
+        "large I/O data transfer capacity",
+        "small I/O request rate",
+        "parallel access",
+        "independent access"
+      ],
+      "example": "เมื่อเจอ workload ในตาราง ให้เริ่มจาก read/write/transfer pattern แล้วกลับไปดูคอลัมน์ระดับที่ตรง",
+      "confusion": "คอลัมน์ performance เป็นการเปรียบเทียบภายใต้เงื่อนไขของตาราง; ห้ามแปลงเป็นอันดับสากลโดยไม่ดูบริบท",
+      "mnemonic": "ดูวิธีสำรองก่อนดูความเร็ว",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "RAID 4–6 อยู่หมวด access ใดในตาราง?",
+          "options": [
+            "Independent",
+            "Parallel",
+            "Serial tape",
+            "Optical"
+          ],
+          "correct": 0,
+          "answer": "Independent",
+          "pages": "หน้า 17, 27–28"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "สามเกณฑ์เปรียบเทียบหลักในหน้า 17 คืออะไร?",
+          "answer": "data availability, large I/O data transfer capacity และ small I/O request rate",
+          "pages": "หน้า 17, 27–28"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดจึงไม่ควรใช้ตารางหน้า 27–28 เป็นคำแนะนำซื้ออุปกรณ์ปัจจุบัน?",
+          "answer": "เป็นตัวอย่างและการเปรียบเทียบตามสไลด์ ไม่ระบุข้อมูลสเปกหรือราคา ณ ปัจจุบัน",
+          "pages": "หน้า 17, 27–28"
+        }
+      ],
+      "figures": [
+        "fig-27",
+        "fig-28"
+      ]
+    },
+    {
+      "id": "ssd-contrast",
+      "title": "SSD เทียบ HDD ในสไลด์",
+      "level": "important",
+      "pages": "หน้า 29–30",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "สไลด์ยกข้อดีของ SSD ต่อ HDD เช่น IOPS สูง เวลาเข้าถึง/latency ต่ำ เสียงและพลังงานต่ำ ตลอดจนความทนทานเชิงกล. ตารางหน้า 30 เทียบ NAND SSD กับ Seagate laptop HDD ด้วยรุ่น ความเร็ว กำลังไฟ ความจุ และราคาในช่วงที่จัดทำสไลด์. จึงใช้เพื่อฝึกอ่านเกณฑ์เปรียบเทียบ ไม่ใช้ราคาหรือสเปกนั้นแทนปัจจุบัน.",
+      "remember": [
+        "SSD ไม่มีการรอหัว/จานแบบ HDD ตามภาพรวมข้อดีในหน้า 29",
+        "เกณฑ์หน้า 30: performance, power, capacity, cost",
+        "ตัวเลขและคำว่า current ในเอกสารเป็นข้อมูล ณ เวลาสไลด์"
+      ],
+      "terms": [
+        "SSD",
+        "HDD",
+        "NAND",
+        "IOPS",
+        "access time",
+        "latency"
+      ],
+      "example": "เลือกคอลัมน์หนึ่งในตารางหน้า 30 เช่น power แล้วเทียบเฉพาะรุ่นที่สไลด์ยก",
+      "confusion": "ข้อดีในสไลด์เป็นการเทียบตามบริบท ไม่ใช่คำรับรองว่า SSD ทุกรุ่นดีกว่า HDD ทุกด้านในปัจจุบัน",
+      "mnemonic": "SSD ดู latency และ IOPS; ตารางรุ่นให้อ่านเป็นตัวอย่าง",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตัวชี้วัดใดอยู่ในข้อดี SSD หน้า 29?",
+          "options": [
+            "IOPS",
+            "seek arm length",
+            "tape speed",
+            "optical pit depth"
+          ],
+          "correct": 0,
+          "answer": "IOPS",
+          "pages": "หน้า 29–30"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ตารางหน้า 30 ใช้เปรียบเทียบอะไร?",
+          "answer": "NAND SSD กับ laptop HDD ตัวอย่างตาม performance, power, capacity, cost",
+          "pages": "หน้า 29–30"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดไม่ควรจดจำราคาหน้า 30 เป็นราคาปัจจุบัน?",
+          "answer": "เป็นตารางรุ่นในสไลด์ ไม่ใช่ข้อมูลราคาปัจจุบัน",
+          "pages": "หน้า 29–30"
+        }
+      ],
+      "figures": [
+        "fig-29",
+        "fig-30"
+      ]
+    },
+    {
+      "id": "ssd-architecture",
+      "title": "โครงสร้าง SSD",
+      "level": "core",
+      "pages": "หน้า 31",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "ภาพ SSD architecture ต่อ host system ซึ่งมี OS, file system และ I/O driver ผ่าน interface ไปยัง controller ของ SSD. ภายใน controller มี addressing, data buffer/cache และ error correction ก่อนเชื่อม flash memory components. ภาพนี้ช่วยแยกส่วนซอฟต์แวร์ฝั่ง host ออกจากส่วนควบคุมและสื่อ flash ฝั่ง SSD.",
+      "remember": [
+        "host: OS/file system/I/O driver/interface",
+        "SSD: interface/controller/addressing/buffer-cache/error correction/flash components",
+        "controller เป็นจุดจัดการก่อนถึง flash"
+      ],
+      "terms": [
+        "host system",
+        "SSD interface",
+        "controller",
+        "addressing",
+        "data buffer/cache",
+        "error correction",
+        "flash memory"
+      ],
+      "example": "ไล่ภาพจาก I/O driver → host interface → SSD interface → controller → flash memory",
+      "confusion": "อย่าใส่ file system ไว้ใน SSD controller; ในภาพมันอยู่ฝั่ง host",
+      "mnemonic": "host สั่ง–controller จัด–flash เก็บ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ส่วนใดอยู่ฝั่ง host ในภาพ?",
+          "options": [
+            "File system software",
+            "Flash memory components",
+            "SSD controller",
+            "Error correction block"
+          ],
+          "correct": 0,
+          "answer": "File system software",
+          "pages": "หน้า 31"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "SSD controller ในภาพเชื่อมกับฟังก์ชันใด?",
+          "answer": "addressing, data buffer/cache, error correction และ flash components",
+          "pages": "หน้า 31"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ตามภาพข้อมูลจาก host ไป flash ผ่านส่วนใดบ้าง?",
+          "answer": "interfaces → controller/addressing/buffer-cache/error correction → flash components",
+          "pages": "หน้า 31"
+        }
+      ],
+      "figures": [
+        "fig-31"
+      ]
+    },
+    {
+      "id": "ssd-practical",
+      "title": "ปัญหาการเขียนและอายุใช้งาน SSD",
+      "level": "core",
+      "pages": "หน้า 32",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "สไลด์อธิบายว่า performance ของ SSD มีแนวโน้มช้าลงเมื่อใช้งาน เพราะแก้ข้อมูลใน flash block ต้องอ่าน block เข้า RAM buffer ลบทั้ง block แล้วเขียนกลับ. Flash มีจำนวนรอบเขียนจำกัด จึงใช้ cache เพื่อรวม writes, wear leveling เพื่อกระจายการเขียน และ bad-block management. อุปกรณ์ยังประเมิน remaining lifetime เพื่อให้ระบบเตรียมรับความเสียหาย.",
+      "remember": [
+        "read entire block → RAM buffer → erase entire block → write back (หน้า 32)",
+        "write endurance จำกัด; cache/group writes ช่วยลดภาระ (หน้า 32)",
+        "wear leveling กระจาย writes; bad-block management จัดการ block เสีย (หน้า 32)"
+      ],
+      "terms": [
+        "RAM buffer",
+        "erase block",
+        "write endurance",
+        "wear leveling",
+        "bad-block management",
+        "remaining lifetime"
+      ],
+      "example": "ไล่ขั้นตอนแก้ block ตามลำดับลูกศรในข้อความหน้า 32 ก่อนจำเทคนิคยืดอายุ",
+      "confusion": "wear leveling คือกระจายการเขียน ไม่ใช่การทำสำเนาข้อมูลแบบ RAID 1",
+      "mnemonic": "อ่าน–ลบทั้ง block–เขียนกลับ; กระจายรอบเขียน",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "วิธีใดกระจายจำนวนครั้งเขียนระหว่าง blocks?",
+          "options": [
+            "Wear leveling",
+            "Mirroring",
+            "Seek",
+            "Inter-record gap"
+          ],
+          "correct": 0,
+          "answer": "Wear leveling",
+          "pages": "หน้า 32"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "เหตุใดการแก้ข้อมูลใน flash block จึงต้องใช้ buffer ตามสไลด์?",
+          "answer": "ต้องอ่านทั้ง block เข้า RAM ก่อนลบทั้ง block และเขียนกลับ",
+          "pages": "หน้า 32"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "cache หน้า 32 ช่วยเรื่องอายุอย่างไร?",
+          "answer": "หน่วงและรวม write operations เพื่อลดการเขียนลง flash",
+          "pages": "หน้า 32"
+        }
+      ],
+      "figures": [
+        "fig-32"
+      ]
+    },
+    {
+      "id": "optical-families",
+      "title": "ตระกูล optical disk",
+      "level": "important",
+      "pages": "หน้า 33",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "ตาราง optical memory แยก CD, DVD และ Blu-Ray พร้อมรุ่น read-only, recordable และ rewritable. แกนสำคัญคือสื่อผลิตข้อมูลมาแล้วอ่านอย่างเดียว, ผู้ใช้เขียนครั้งเดียว หรือเขียนซ้ำได้. ความจุในตารางเป็นค่าของรูปแบบที่สไลด์ยก ไม่ควรถือเป็นคำอธิบายครบทุก variant.",
+      "remember": [
+        "CD-ROM/DVD-ROM เป็น read-only",
+        "CD-R/DVD-R เป็น recordable; CD-RW/DVD-RW เป็น rewritable",
+        "Blu-Ray ปรากฏในตารางเป็นตระกูล optical"
+      ],
+      "terms": [
+        "CD-ROM",
+        "CD-R",
+        "CD-RW",
+        "DVD-ROM",
+        "DVD-R",
+        "DVD-RW",
+        "Blu-Ray"
+      ],
+      "example": "จับคู่ suffix ROM/R/RW กับอ่านอย่างเดียว/บันทึกครั้งเดียว/เขียนซ้ำจากแถวตารางหน้า 33",
+      "confusion": "คำว่า recordable ไม่เท่ากับ rewritable; ตารางไม่ได้ครอบคลุมทุกมาตรฐานใหม่",
+      "mnemonic": "ROM อ่าน, R เขียนครั้ง, RW เขียนซ้ำ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "suffix ใดหมายถึงเขียนซ้ำในรายการสไลด์?",
+          "options": [
+            "RW",
+            "ROM",
+            "R",
+            "ECC"
+          ],
+          "correct": 0,
+          "answer": "RW",
+          "pages": "หน้า 33"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ตารางหน้า 33 แยก optical memory เป็นตระกูลใด?",
+          "answer": "CD, DVD และ Blu-Ray",
+          "pages": "หน้า 33"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "CD-R ต่าง CD-RW อย่างไรตามรายการ?",
+          "answer": "CD-R บันทึกครั้งเดียว; CD-RW เขียนซ้ำได้",
+          "pages": "หน้า 33"
+        }
+      ],
+      "figures": [
+        "fig-33"
+      ]
+    },
+    {
+      "id": "cdrom",
+      "title": "CD-ROM: การผลิต การอ่าน และ block format",
+      "level": "core",
+      "pages": "หน้า 34–37",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "CD-ROM ทำจาก polycarbonate ที่สร้าง pits ตาม master แล้วเคลือบชั้นสะท้อนและป้องกัน; laser อ่านความต่างระหว่าง pit/land ตามภาพ. Block format หน้า 36 มี 2352 bytes: sync 12, ID 4, user data 2048 และ layered ECC 288. สไลด์ยกการทำสำเนาจำนวนมากและสื่อถอดเก็บเป็นข้อดี แต่ read-only และการเข้าถึงช้ากว่า magnetic disk เป็นข้อจำกัด.",
+      "remember": [
+        "polycarbonate/pits/reflective layer/protective layer ในลำดับผลิต (หน้า 34–35)",
+        "12+4+2048+288 = 2352 bytes ต่อ block ในภาพ (หน้า 36)",
+        "ROM อ่านอย่างเดียวและใช้แจกจ่ายปริมาณมาก (หน้า 37)"
+      ],
+      "terms": [
+        "polycarbonate",
+        "pit",
+        "land",
+        "laser",
+        "sync",
+        "ID",
+        "L-ECC",
+        "CD-ROM"
+      ],
+      "example": "คำนวณ overhead ของ block หน้า 36: 2352−2048 = 304 bytes ซึ่งมาจาก sync 12 + ID 4 + ECC 288",
+      "confusion": "2352 bytes คือขนาด block รวม; user data คือ 2048 bytes ไม่ใช่ 2352",
+      "mnemonic": "12–4–2048–288 รวม 2352",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "user data ใน CD-ROM block หน้า 36 มีกี่ bytes?",
+          "options": [
+            "2048",
+            "2352",
+            "288",
+            "12"
+          ],
+          "correct": 0,
+          "answer": "2048",
+          "pages": "หน้า 34–37"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ชั้นหลักของแผ่น CD-ROM และหน้าที่ laser ในภาพคืออะไร?",
+          "answer": "polycarbonate มี pits, ชั้นสะท้อนและป้องกัน; laser อ่านรูปแบบ pit/land",
+          "pages": "หน้า 34–37"
+        },
+        {
+          "type": "คำนวณ",
+          "q": "คำนวณ overhead เมื่อ block 2352 bytes มี data 2048 bytes",
+          "answer": "2352−2048 = 304 bytes = sync 12 + ID 4 + ECC 288",
+          "pages": "หน้า 34–37"
+        }
+      ],
+      "figures": [
+        "fig-34",
+        "fig-35",
+        "fig-36",
+        "fig-37"
+      ],
+      "formulas": [
+        {
+          "expr": "2352 = 12 (SYNC) + 4 (ID) + 2048 (Data) + 288 (L-ECC) bytes",
+          "description": "block format ตามภาพ CD-ROM; overhead = 304 bytes",
+          "pages": "หน้า 36"
+        }
+      ]
+    },
+    {
+      "id": "cdr-cdrw",
+      "title": "CD-R กับ CD-RW",
+      "level": "important",
+      "pages": "หน้า 38",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "CD-R เป็นสื่อเขียนครั้งเดียวโดยใช้ dye layer ที่เปลี่ยนสภาพเมื่อบันทึก. CD-RW ใช้วัสดุ phase-change ระหว่าง amorphous/crystalline เพื่อให้ลบและเขียนซ้ำได้. สไลด์กล่าวถึงข้อจำกัดอายุการเขียนซ้ำของ CD-RW.",
+      "remember": [
+        "CD-R: write once ด้วย dye layer",
+        "CD-RW: phase-change และ rewritable",
+        "amorphous/crystalline เป็นสองสภาพของวัสดุ CD-RW"
+      ],
+      "terms": [
+        "CD-R",
+        "CD-RW",
+        "dye layer",
+        "phase-change",
+        "amorphous",
+        "crystalline"
+      ],
+      "example": "แยกคำถามว่า media ใช้ dye หรือ phase-change ก่อนสรุปว่าบันทึกซ้ำได้หรือไม่",
+      "confusion": "CD-R บันทึกครั้งเดียว แม้จะอ่านหลายครั้ง; CD-RW จึงเป็นตัวที่เขียนซ้ำ",
+      "mnemonic": "R ใช้ dye; RW เปลี่ยน phase",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ชนิดใดใช้ phase-change ตามสไลด์?",
+          "options": [
+            "CD-RW",
+            "CD-R",
+            "CD-ROM",
+            "magnetic tape"
+          ],
+          "correct": 0,
+          "answer": "CD-RW",
+          "pages": "หน้า 38"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "CD-R กับ CD-RW ต่างกันอย่างไร?",
+          "answer": "CD-R เขียนครั้งเดียวด้วย dye; CD-RW เปลี่ยนสภาพ amorphous/crystalline เพื่อเขียนซ้ำ",
+          "pages": "หน้า 38"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดจึงไม่ควรเรียก CD-R ว่า rewritable?",
+          "answer": "สไลด์จัด CD-R เป็น write once; กลไกเขียนซ้ำอยู่ใน CD-RW",
+          "pages": "หน้า 38"
+        }
+      ],
+      "figures": [
+        "fig-38"
+      ]
+    },
+    {
+      "id": "dvd-bluray",
+      "title": "DVD-ROM, Blu-Ray และความหนาแน่น optical",
+      "level": "important",
+      "pages": "หน้า 39–40",
+      "reason": "เป็นภาพเปรียบเทียบและการประยุกต์กลไกหลัก",
+      "summary": "ภาพเปรียบ CD-ROM ชั้นเดียวด้านเดียวกับ DVD-ROM แบบ double-sided, dual-layer ที่ laser โฟกัสชั้นข้อมูลต่างกันและต้องพลิกแผ่นเพื่ออ่านอีกด้าน. ตัวอย่างในภาพให้ 682 MB เทียบ 17 GB. ภาพ optical characteristics เทียบความยาวคลื่น CD 780 nm, DVD 650 nm และ Blu-ray 405 nm พร้อม track/pit spacing ต่างกัน.",
+      "remember": [
+        "DVD-ROM ในภาพเป็น double-sided, dual-layer (หน้า 39)",
+        "CD 780 nm, DVD 650 nm, Blu-ray 405 nm ตามภาพ (หน้า 40)",
+        "682 MB และ 17 GB เป็นตัวอย่างรูปแบบแผ่นในภาพหน้า 39"
+      ],
+      "terms": [
+        "DVD-ROM",
+        "double-sided",
+        "dual-layer",
+        "semireflective layer",
+        "Blu-ray",
+        "laser wavelength"
+      ],
+      "example": "ดูหน้า 39 จากชั้นสะท้อนของแต่ละด้าน แล้วหน้า 40 เทียบ beam spot/pit/track ตาม wavelength",
+      "confusion": "17 GB เป็นตัวอย่าง double-sided dual-layer ในภาพ ไม่ใช่ค่าของ DVD ทุกแผ่น",
+      "mnemonic": "CD 780 → DVD 650 → Blu-ray 405 nm",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "แสงของ Blu-ray ในภาพหน้า 40 ยาวคลื่นเท่าไร?",
+          "options": [
+            "405 nm",
+            "650 nm",
+            "780 nm",
+            "1.2 mm"
+          ],
+          "correct": 0,
+          "answer": "405 nm",
+          "pages": "หน้า 39–40"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ภาพ DVD-ROM หน้า 39 เพิ่มชั้น/ด้านอย่างไร?",
+          "answer": "double-sided และ dual-layer มีชั้นสะท้อน/กึ่งสะท้อนให้ laser โฟกัสต่างชั้น",
+          "pages": "หน้า 39–40"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เรียง wavelength จากยาวไปสั้นตามหน้า 40",
+          "answer": "CD 780 nm → DVD 650 nm → Blu-ray 405 nm",
+          "pages": "หน้า 39–40"
+        }
+      ],
+      "figures": [
+        "fig-39",
+        "fig-40"
+      ]
+    },
+    {
+      "id": "tape-layout",
+      "title": "Magnetic tape: serial และ serpentine",
+      "level": "core",
+      "pages": "หน้า 41–42",
+      "reason": "เป็นคำจำกัดความ โครงสร้าง กลไก หรือกฎที่สไลด์ใช้ต่อยอด",
+      "summary": "Magnetic tape เคลือบวัสดุแม่เหล็กบนแถบ polyester และบันทึกข้อมูลตามแนวยาวเป็น tracks แบบ serial. Physical records หรือ blocks คั่นด้วย inter-record gaps. ภาพหน้า 42 แสดง serpentine ที่ทิศอ่าน/เขียนสลับเมื่อเปลี่ยน track และตัวอย่างระบบอ่าน/เขียน 4 tracks พร้อมกัน.",
+      "remember": [
+        "polyester tape + magnetizable coating (หน้า 41)",
+        "serial recording, parallel longitudinal tracks และ inter-record gaps (หน้า 41)",
+        "serpentine สลับทิศระหว่าง tracks; ภาพล่างอ่าน/เขียน 4 tracks พร้อมกัน (หน้า 42)"
+      ],
+      "terms": [
+        "magnetic tape",
+        "serial recording",
+        "inter-record gap",
+        "serpentine",
+        "track",
+        "physical record"
+      ],
+      "example": "ตามลูกศร Track 0 → Track 1 → Track 2 ในภาพบนหน้า 42; อีกภาพแสดง block 1–4 อยู่คนละ track ในคอลัมน์แรก",
+      "confusion": "parallel tracks ในเทปหมายถึง tracks หลายแนว; ลำดับเข้าถึงสื่อยังเป็น serial ตามหน้า 41",
+      "mnemonic": "เทปวิ่งยาว–จบแถวกลับทิศ",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "สิ่งใดคั่น physical records บนเทป?",
+          "options": [
+            "Inter-record gaps",
+            "Sector ID",
+            "Parity disk",
+            "ECC controller"
+          ],
+          "correct": 0,
+          "answer": "Inter-record gaps",
+          "pages": "หน้า 41–42"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "serpentine ในภาพหมายถึงอะไร?",
+          "answer": "เมื่อเปลี่ยน track ทิศอ่าน/เขียนกลับด้านไปมา",
+          "pages": "หน้า 41–42"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "ภาพหน้า 42 ตัวอย่างอ่าน/เขียนพร้อมกันกี่ tracks?",
+          "answer": "4 tracks",
+          "pages": "หน้า 41–42"
+        }
+      ],
+      "figures": [
+        "fig-41",
+        "fig-42"
+      ]
+    },
+    {
+      "id": "lto-example",
+      "title": "ตาราง LTO เป็นตัวอย่างในสไลด์",
+      "level": "extra",
+      "pages": "หน้า 43",
+      "reason": "เป็นตารางรุ่นหรือรายละเอียดตัวอย่างตามช่วงเวลาของสไลด์",
+      "summary": "ตารางหน้า 43 เปรียบเทียบ LTO generations 1–8 ด้วย capacity และ transfer rate ของแต่ละรุ่น. ใช้ฝึกอ่านแนวโน้มภายในตารางและศัพท์ของเทปเท่านั้น. บางแถวมีค่าอนาคตหรือ TBA จากช่วงเวลาที่ทำสไลด์ จึงต้องตรวจสอบจากต้นฉบับก่อนนำไปอ้างเป็นสเปกปัจจุบัน.",
+      "remember": [
+        "LTO เป็นตาราง generations 1–8 ในเอกสาร",
+        "หัวตารางเทียบ capacity/transfer rate",
+        "ค่า TBA และแถวอนาคตไม่ใช่ข้อมูลยืนยันปัจจุบัน"
+      ],
+      "terms": [
+        "LTO",
+        "generation",
+        "native capacity",
+        "transfer rate",
+        "TBA"
+      ],
+      "example": "อ่านจากหัวแถว generation ไปยังค่าความจุและอัตราโอนของรุ่นเดียวกัน โดยระบุว่าเป็นค่าตามสไลด์",
+      "confusion": "อย่าคัดตัวเลขในตารางไปใช้เป็น specification ปัจจุบันโดยไม่มีแหล่งใหม่; งานนี้จำกัดเฉพาะสไลด์",
+      "mnemonic": "LTO ตารางรุ่น = ตัวอย่าง ไม่ใช่ราคาหรือสเปกวันนี้",
+      "questions": [
+        {
+          "type": "เลือกตอบ",
+          "q": "ตารางหน้า 43 ว่าด้วยอะไร?",
+          "options": [
+            "LTO generations",
+            "RAID levels",
+            "CD block",
+            "SSD controller"
+          ],
+          "correct": 0,
+          "answer": "LTO generations",
+          "pages": "หน้า 43"
+        },
+        {
+          "type": "อัตนัย",
+          "q": "ตาราง LTO มีวัตถุประสงค์ทบทวนอย่างไร?",
+          "answer": "เทียบรุ่นและอ่านเกณฑ์ capacity/transfer rate ตามเอกสาร",
+          "pages": "หน้า 43"
+        },
+        {
+          "type": "วิเคราะห์",
+          "q": "เหตุใดค่าที่ระบุ TBA ในตารางจึงใช้ตอบสเปกปัจจุบันไม่ได้?",
+          "answer": "สไลด์ไม่ได้ยืนยันค่าและอยู่ในบริบทเวลาเดิม; ต้องตรวจสอบจากต้นฉบับ",
+          "pages": "หน้า 43"
+        }
+      ],
+      "figures": [
+        "fig-43"
+      ]
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "1 · Magnetic disk",
+      "text": "เริ่มสื่อ/หัวอ่าน → track/sector/cylinder → seek/rotation/transfer",
+      "pages": "หน้า 4–15",
+      "topic": "magnetic-medium"
+    },
+    {
+      "title": "2 · RAID ภาพรวม",
+      "text": "จำ N, striping, redundancy และตาราง RAID 0–6 พร้อมข้อขัดกันหน้า 16–17",
+      "pages": "หน้า 16–19",
+      "topic": "raid-framework"
+    },
+    {
+      "title": "3 · RAID ทีละระดับ",
+      "text": "ไล่ 0/1 แล้ว 2/3 แบบ parallel ต่อด้วย 4/5/6 แบบ independent",
+      "pages": "หน้า 18–28",
+      "topic": "raid0"
+    },
+    {
+      "title": "4 · SSD",
+      "text": "เทียบ HDD, วาด controller→flash แล้วอธิบาย erase/write และ wear leveling",
+      "pages": "หน้า 29–32",
+      "topic": "ssd-contrast"
+    },
+    {
+      "title": "5 · Optical และ tape",
+      "text": "อ่าน ROM/R/RW, CD-ROM block, DVD/Blu-ray แล้วจบด้วย serial/serpentine tape",
+      "pages": "หน้า 33–43",
+      "topic": "optical-families"
+    }
+  ],
+  "plan": [
+    {
+      "title": "รอบ 1 · แผนที่สื่อและ layout",
+      "task": "ดูภาพหน้า 4–13; วาด platter/track/sector/cylinder และแยกชนิดหัว",
+      "check": "ระบุส่วนของ disk และอ่าน sector ST506 ได้โดยไม่สับสน data/overhead",
+      "pages": "หน้า 4–13"
+    },
+    {
+      "title": "รอบ 2 · เวลาและ RAID",
+      "task": "คำนวณ access time หน้า 15 แล้วทำตาราง RAID 0–6 จากความจำก่อนเปิดหน้า 17–28",
+      "check": "จำ seek+rotation, redundancy และจำนวนดิสก์แต่ละระดับได้",
+      "pages": "หน้า 14–28"
+    },
+    {
+      "title": "รอบ 3 · SSD",
+      "task": "ตามภาพ controller และเขียนลำดับ read–erase–write พร้อม wear leveling",
+      "check": "อธิบายปัญหา block erase และวิธีรับมือจากหน้า 32 ได้",
+      "pages": "หน้า 29–32"
+    },
+    {
+      "title": "รอบ 4 · Optical/tape",
+      "task": "ทวน ROM/R/RW, คิด 2352-byte block, เทียบ laser wavelengths และตาม serpentine",
+      "check": "แยก write-once/rewritable และบอก 12+4+2048+288 ได้",
+      "pages": "หน้า 33–43"
+    },
+    {
+      "title": "รอบ 5 · เว้นระยะและสุ่ม Quiz",
+      "task": "ตอบ 3 ข้อต่อหัวข้อ; ทวนข้อที่ผิดจากภาพต้นฉบับในวันถัดไป",
+      "check": "ตอบหัวข้อแดงครบและชี้ตารางเก่าหรือข้อขัดกันที่ต้องตรวจสอบได้",
+      "pages": "หน้า 4–43"
+    }
+  ],
+  "cram": [
+    {
+      "title": "ถ้าเหลือ 3 วัน",
+      "text": "วัน 1 disk หน้า 4–15; วัน 2 RAID หน้า 16–28; วัน 3 SSD/optical/tape หน้า 29–43 และทำ Quiz"
+    },
+    {
+      "title": "ถ้าเหลือ 1 วัน",
+      "text": "disk timing หน้า 14–15 → RAID table/levels หน้า 17–26 → SSD หน้า 31–32 → CD block/optical/tape หน้า 33–42"
+    },
+    {
+      "title": "ถ้าเหลือ 3 ชั่วโมง",
+      "text": "0–35 นาที layout/timing หน้า 7–15; 35–105 นาที RAID หน้า 16–26; 105–135 นาที SSD หน้า 29–32; 135–165 นาที optical/tape หน้า 33–42; 165–180 นาทีสุ่ม Quiz"
+    }
+  ],
+  "strategyIntro": "เน้นหัวข้อที่สไลด์ให้นิยาม กลไก ภาพและตารางซ้ำ เช่น disk timing, RAID 0–6, SSD block write และ CD-ROM block; ไม่มีข้อสอบเก่าจึงไม่ยืนยันโอกาสออกจริง",
+  "strategy": [
+    {
+      "title": "ควรท่องจำ",
+      "text": "track/sector/cylinder, access time, RAID 0–6 กับ N/2N/N+m/N+1/N+2, ROM/R/RW, CD-ROM block และศัพท์ tape (หน้า 7–9, 15–17, 33–42)"
+    },
+    {
+      "title": "ควรฝึกโจทย์",
+      "text": "บวก seek+rotational delay; คิด sector overhead 600−512; คิด CD block 2352−2048; นับ disk RAID และ read/write RAID 4 (หน้า 9, 15, 17, 25, 36)"
+    },
+    {
+      "title": "ควรเข้าใจแนวคิด",
+      "text": "RAID parity/mirror, เหตุ RAID 5 ลดคอขวด RAID 4, SSD erase/write/wear leveling และ optical/tape access (หน้า 16–32, 34–42)"
+    },
+    {
+      "title": "เตรียมข้อสอบแบบผสม",
+      "text": "เลือกตอบจับคู่คำศัพท์/level; อัตนัยอธิบายกลไก; คำนวณเฉพาะสูตร/ตัวเลขในสไลด์; วิเคราะห์ภาพ mapping, RAID parity, SSD controller และ tape (หน้า 7–42)"
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "สื่อแม่เหล็กและหัวอ่าน/เขียน",
+      "back": "Platter มี substrate และ magnetizable coating (หน้า 4)",
+      "pages": "หน้า 4–6"
+    },
+    {
+      "front": "Track, sector, cylinder และรูปแบบ sector",
+      "back": "Track เป็นวง; sector เป็นส่วนของ track; cylinder รวม track ที่รัศมีตรงกัน (หน้า 7)",
+      "pages": "หน้า 7–9"
+    },
+    {
+      "front": "ชนิดดิสก์ หัวอ่าน และตารางพารามิเตอร์ตัวอย่าง",
+      "back": "Fixed-head เลือกหัว; movable-head เคลื่อนหัวไป track (หน้า 10–11)",
+      "pages": "หน้า 10–13"
+    },
+    {
+      "front": "เวลา I/O ของ magnetic disk",
+      "back": "Seek time: วางหัวที่ track (หน้า 15)",
+      "pages": "หน้า 14–15"
+    },
+    {
+      "front": "RAID: ภาพรวมและจำนวนดิสก์",
+      "back": "N คือจำนวน data disks; m แปรตาม log N ใน RAID 2 (หน้า 17)",
+      "pages": "หน้า 16–19"
+    },
+    {
+      "front": "RAID 0: striping ไม่มี redundancy",
+      "back": "Nonredundant; ใช้ N ดิสก์ตามตาราง (หน้า 17–18)",
+      "pages": "หน้า 18, 20–21"
+    },
+    {
+      "front": "RAID 1: mirroring",
+      "back": "Mirroring = duplicate all data; 2N disks (หน้า 17–18, 22)",
+      "pages": "หน้า 18, 22"
+    },
+    {
+      "front": "RAID 2: Hamming code",
+      "back": "parallel access และ synchronized spindles (หน้า 23)",
+      "pages": "หน้า 18, 23"
+    },
+    {
+      "front": "RAID 3: bit-interleaved parity",
+      "back": "parity disk เดียวไม่ว่าขนาดอาร์เรย์ (หน้า 24)",
+      "pages": "หน้า 19, 24"
+    },
+    {
+      "front": "RAID 4: block parity แยกดิสก์",
+      "back": "independent access: ดิสก์รับ request แยกกันได้ (หน้า 25)",
+      "pages": "หน้า 19, 25"
+    },
+    {
+      "front": "RAID 5: distributed parity",
+      "back": "distributed parity; ไม่ fix บนดิสก์เดียว (หน้า 19, 26)",
+      "pages": "หน้า 19, 26"
+    },
+    {
+      "front": "RAID 6: dual distributed parity",
+      "back": "dual distributed parity หรือ P และ Q ในภาพ (หน้า 19, 26)",
+      "pages": "หน้า 19, 26"
+    },
+    {
+      "front": "ตารางเปรียบเทียบ RAID และการเลือกอ่าน",
+      "back": "จับคู่ level ↔ redundancy ↔ disks required จากหน้า 17",
+      "pages": "หน้า 17, 27–28"
+    },
+    {
+      "front": "SSD เทียบ HDD ในสไลด์",
+      "back": "SSD ไม่มีการรอหัว/จานแบบ HDD ตามภาพรวมข้อดีในหน้า 29",
+      "pages": "หน้า 29–30"
+    },
+    {
+      "front": "โครงสร้าง SSD",
+      "back": "host: OS/file system/I/O driver/interface",
+      "pages": "หน้า 31"
+    },
+    {
+      "front": "ปัญหาการเขียนและอายุใช้งาน SSD",
+      "back": "read entire block → RAM buffer → erase entire block → write back (หน้า 32)",
+      "pages": "หน้า 32"
+    },
+    {
+      "front": "ตระกูล optical disk",
+      "back": "CD-ROM/DVD-ROM เป็น read-only",
+      "pages": "หน้า 33"
+    },
+    {
+      "front": "CD-ROM: การผลิต การอ่าน และ block format",
+      "back": "polycarbonate/pits/reflective layer/protective layer ในลำดับผลิต (หน้า 34–35)",
+      "pages": "หน้า 34–37"
+    },
+    {
+      "front": "CD-R กับ CD-RW",
+      "back": "CD-R: write once ด้วย dye layer",
+      "pages": "หน้า 38"
+    },
+    {
+      "front": "DVD-ROM, Blu-Ray และความหนาแน่น optical",
+      "back": "DVD-ROM ในภาพเป็น double-sided, dual-layer (หน้า 39)",
+      "pages": "หน้า 39–40"
+    },
+    {
+      "front": "Magnetic tape: serial และ serpentine",
+      "back": "polyester tape + magnetizable coating (หน้า 41)",
+      "pages": "หน้า 41–42"
+    },
+    {
+      "front": "ตาราง LTO เป็นตัวอย่างในสไลด์",
+      "back": "LTO เป็นตาราง generations 1–8 ในเอกสาร",
+      "pages": "หน้า 43"
+    },
+    {
+      "front": "Track / Sector / Cylinder",
+      "back": "วงข้อมูล / ส่วนของ track / track ที่รัศมีตรงกันหลายผิว",
+      "pages": "หน้า 7"
+    },
+    {
+      "front": "ST506 sector",
+      "back": "600 bytes รวม overhead; data จริง 512 bytes ในตัวอย่าง",
+      "pages": "หน้า 9"
+    },
+    {
+      "front": "Seek time",
+      "back": "เวลาวางหัวที่ track ใน movable-head",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "Rotational delay",
+      "back": "เวลารอ sector หมุนมาถึงหัว",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "Access time",
+      "back": "seek time + rotational delay",
+      "pages": "หน้า 15"
+    },
+    {
+      "front": "RAID 0",
+      "back": "striping; nonredundant",
+      "pages": "หน้า 17–18"
+    },
+    {
+      "front": "RAID 1",
+      "back": "mirroring; 2N disks",
+      "pages": "หน้า 17–18, 22"
+    },
+    {
+      "front": "RAID 2",
+      "back": "parallel access; Hamming code",
+      "pages": "หน้า 17, 23"
+    },
+    {
+      "front": "RAID 3",
+      "back": "parallel access; one parity disk",
+      "pages": "หน้า 17, 24"
+    },
+    {
+      "front": "RAID 4",
+      "back": "independent access; dedicated parity disk",
+      "pages": "หน้า 17, 25"
+    },
+    {
+      "front": "RAID 5",
+      "back": "distributed parity แบบ round-robin",
+      "pages": "หน้า 17, 26"
+    },
+    {
+      "front": "RAID 6",
+      "back": "dual distributed parity; N+2 disks",
+      "pages": "หน้า 17, 26"
+    },
+    {
+      "front": "MTTR",
+      "back": "mean time to repair ที่สไลด์ใช้กับเงื่อนไข RAID 6",
+      "pages": "หน้า 26"
+    },
+    {
+      "front": "Wear leveling",
+      "back": "กระจายจำนวน writes ข้าม flash blocks",
+      "pages": "หน้า 32"
+    },
+    {
+      "front": "CD-ROM block",
+      "back": "12 sync + 4 ID + 2048 data + 288 ECC = 2352 bytes",
+      "pages": "หน้า 36"
+    },
+    {
+      "front": "CD-R / CD-RW",
+      "back": "dye write once / phase-change rewritable",
+      "pages": "หน้า 38"
+    },
+    {
+      "front": "Optical wavelengths",
+      "back": "CD 780 nm; DVD 650 nm; Blu-ray 405 nm",
+      "pages": "หน้า 40"
+    },
+    {
+      "front": "Inter-record gap",
+      "back": "ช่องว่างระหว่าง physical records บนเทป",
+      "pages": "หน้า 41"
+    },
+    {
+      "front": "Serpentine",
+      "back": "อ่าน/เขียนสลับทิศเมื่อเปลี่ยน track",
+      "pages": "หน้า 42"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+=== PDF PAGE 1 ===
+W.Suntiamorntut, Ph.D.
+Computer Architecture & OS
+ITDS_211
+
+
+=== PDF PAGE 2 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Information
+•Course materials placed at 
+•….MyCourse ITDS211 
+•Ofﬁce Hour (IT236) 
+•Thursday : 15:00 - 16:30pm. 
+•Grading (50) 
+•Examination - 30 (Midterm) 
+•Homework assignments - 15 
+•Quiz - 5
+2
+
+=== PDF PAGE 3 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Description
+The structure and architecture of the computer systems; basic components of computers; data 
+representations; the Assembly Language; memory system organization; the memory hierarchy; 
+the cache memory; input and output systems; storage systems; computing units; the 
+multiprocessor architecture; basic principles of operating systems; the computer resource 
+management; the process management and scheduling; synchronization; deadlocks; memory 
+management: segmentation and paging; the virtual memory; protection; sharing; the access control; ﬁle 
+and I/O systems
+โครงสร้างและสถาปัตยกรรมของระบบคอมพิวเตอร์ ส่วนประกอบพื้นฐานของเครื่องคอมพิวเตอร์การแทนข้อมูล 
+ภาษาแอสเซมบลี โครงสร้างระบบหน่วยความจำและการจัดลำดับชั้น หน่วยความจำแคชระบบการรับเข้าและส่ง
+ออกข้อมูล ระบบการเก็บข้อมูล สถาบัตยกรรมของหน่วยประมวลผลแบบหลายหน่วย หลักการพื้นฐานของระบบ
+ปฏิบัติการ การจัดการหน่วยประมวลผลงานและการจัดลำดับงาน การประสานเวลา การติดตาย การจัดการหน่วย
+ความจำ การป้องกันและการใช้ร่วมกัน ระบบแฟ้มข้อมูลระบบข้อมูลเข้า-ออก
+3
+
+=== PDF PAGE 4 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Outline - Half Semester 
+•The structure and architecture of the computer systems;  
+•basic components of computers;  
+•data representations;  
+•the Assembly Language;  
+•memory system organization;  
+•the memory hierarchy; the cache memory;  
+•input and output systems;  
+•storage systems;  
+•computing units;  
+•the multiprocessor architecture;
+4
+
+=== PDF PAGE 5 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Information
+•Textbook:  
+•Hennessy and Patterson, Computer Architecture: A Quantitative Approach, Pub. 
+Morgan Kauffman, 7th edition, 2026 
+•William Stallings, Computer Organisation and architecture, 11th edition, 2022 
+•David A. Patterson, John L. Hennessy, Computer Organisation and Design RISC-V 
+edition: The hardware software interface, Morgan Kaufmann Series, 2020.
+5
+
+=== PDF PAGE 6 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Computer Architecture - Course Objectives
+•Study the role of computer architecture in system/program performance  
+What aspects of architecture design affect performance of application 
+What are the key components of CA? 
+What is the architecture of today’s high performance processors? 
+What are the emerging trends in CA? 
+Take a quantitative approach to CA? 
+•What the course is not 
+Hardware design 
+Semiconductor technology details
+6
+
+=== PDF PAGE 7 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Computer Architecture - Course Objectives
+By the end of this course, students should be able to: 
+1. Understand the basic organisation of digital computer, pipelining and parallelism. 
+2. Explain instruction executions, ISA format and addressing mode.  
+3. Evaluate performance metrics,  
+4. Describe memory hierarchy 
+5. Explain I/O organisation, 
+6. Explain process management. 
+7. Understand concurrency and synchronisation. 
+8. Analyse deadlocks. 
+9. Understand memory management. 
+10. Explain ﬁle systems.
+7
+
+=== PDF PAGE 8 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Learning Outcomes (CLOs)
+By the end of this course, students should be able to: 
+CLO 1: Explain the basic organisation of a digital computer, including instruction execution, ISA formats, addressing 
+modes, pipelining, and parallelism. 
+CLO 2: Evaluate computer performance metrics and describe the memory hierarchy and I/O organisation. 
+CLO 3: Explain process management, concurrency, synchronisation, and analyse deadlocks in operating systems. 
+CLO 4: Understand memory management and ﬁle systems in operating systems. 
+CLO 1← Objectives 1, 2 (Architecture fundamentals)
+CLO 2← Objectives 3, 4, 5 (Performance & hardware resources)
+CLO 3← Objectives 6, 7, 8 (OS process/concurrency topics)
+CLO 4← Objectives 9, 10  (OS storage management)
+Architecture basics → performance/hardware → OS process handling → OS storage handling
+8
+
+=== PDF PAGE 9 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Learning Outcomes (CLOs)
+Section 01, 
+TUE, 09:00 - 11:00, IT311
+Section 02, 
+THURS, 09:00 - 11:00, IT304
+4 Aug 2026 6 Aug 2026
+11 Aug 2026 13 Aug 2026
+18 Aug 2026 20 Aug 2026
+25 Aug 2026 27 Aug 2026
+1 Sep 2026 3 Sep 2026
+8 Sep 2026 10 Sep 2026
+15 Sep 2026 17 Sep 2026
+22 Sep 2026 24 Sep 2026
+9

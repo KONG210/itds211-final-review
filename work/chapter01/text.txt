@@ -1,0 +1,355 @@
+=== PDF PAGE 1 ===
+W.Suntiamorntut, Ph.D.
+Computer Architecture & OS
+I: Basic Computer Components & 
+Introduction to Computer Architecture 
+
+
+=== PDF PAGE 2 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Outline
+•The structure and architecture of the computer systems;  
+•basic components of computers;  
+•data representations;  
+•the Assembly Language;  
+•memory system organization;  
+•the memory hierarchy; the cache memory;  
+•input and output systems;  
+•storage systems;  
+•computing units;  
+•the multiprocessor architecture;
+2
+
+=== PDF PAGE 3 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Deﬁnition
+Architecture (สถาปัตยกรรมคอมพิวเตอร์) refers to attributes of a system 
+that are visible to a programmer. These attributes have direct impact on 
+the logical execution of a program. (Instruction set, addressing modes, 
+data types) เกี่ยวข้องกับผู้ใช้ / โปรแกรมเมอร์เป็นหลัก
+Organization (โครงสร้างการจัดระบบคอมพิวเตอร์) refers to the operational 
+units and their interconnections that realise the architectural 
+speciﬁcations  (คําสั่งถูกทําให้เกิดขึ้นจริงอย่างไรในระดับวงจร, cache, pipeline, 
+design, bus width, clock speed) เกี่ยวข้องกับวิศวกรฮาร์ดแวร์ 
+WHAT
+HOW
+3
+
+=== PDF PAGE 4 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Deﬁning Computer Architecture
+■“Old” view of computer architecture: 
+■Instruction Set Architecture (ISA) design 
+■i.e. decisions regarding: 
+■ registers, memory addressing, addressing modes, instruction 
+operands, available operations, control flow instructions, 
+instruction encoding 
+■“Real” computer architecture: 
+■Specific requirements of the target machine 
+■Design to maximize performance within constraints: 
+cost, power, and availability 
+■Includes ISA, microarchitecture, hardware
+Copyright © 2019, Elsevier Inc. All rights reserved.
+Defining Computer Architecture
+4
+
+=== PDF PAGE 5 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Classes of Computers
+Supercomputers
+Embedded Computers
+High-end scientiﬁc and engineering calculations
+Highest capability but represent a small fraction of the 
+overall computer market
+Hidden as components of systems
+Stringent power/performance/cost constraints5
+
+=== PDF PAGE 6 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Cloud Computing
+Cloud Computing
+↭ Cloud Computing: a model for enabling ubiquitous,
+convenient, on demand network access to a shared pool of
+conﬁgurable computing resources
+↭ Cloud networking: refers to the networks and network
+management functionality that must be in place to enable
+cloud computing.
+↭ Cloud Storage: consists of database storage and
+database applications hosted remotely on cloud servers
+6
+
+=== PDF PAGE 7 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Cloud Services Models
+7
+
+=== PDF PAGE 8 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Cloud Computing Beneﬁts
+8
+
+=== PDF PAGE 9 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Understanding Performance
+9
+
+=== PDF PAGE 10 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Eight Great Ideas
+Great Ideas in Computer Architecture
+10
+
+=== PDF PAGE 11 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Below Your Program
+11
+
+=== PDF PAGE 12 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Levels of Program Code
+12
+
+
+=== PDF PAGE 13 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Components of Computers
+• Input Devices 
+• Central Processing Unit (CPU) 
+• Memory (RAM) 
+• Storage Devices 
+• Motherboard 
+• Output Devices 
+• Power Supply Unit 
+• Graphics Processing Unit (GPU)
+13
+
+=== PDF PAGE 14 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Inside the Processor (CPU)
+• Control Unit 
+• Controls the operation of the CPU 
+• Arithmetic and Logic Unit (ALU) 
+• Performs the computer’s data processing function 
+• Registers 
+• Provide storage internal to the CPU 
+• CPU interconnection 
+• Communication among the control unit, ALU and registers
+14
+
+=== PDF PAGE 15 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Machine Cycle
+15
+
+=== PDF PAGE 16 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Registers in CPU
+• Program counter (PC) 
+• Instruction Register (IR) 
+• Status register: status, ﬂags, 
+16
+
+=== PDF PAGE 17 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Cache Memory
+• Cache Level 
+• L1 cache: fastest and smallest 
+• L2 cache: next fastest and smallest
+17
+
+=== PDF PAGE 18 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Cache Memory
+•  Multiple layers of memory between the processor and main memory 
+• Is smaller and faster than main memory 
+• Used to speed up memory access by placing in the cache data from 
+main memory that is likely to used in the near future 
+• A greater performance improvement may be obtained by using 
+multiple levels of cache, with level 1 (L1) closest to the core and 
+additional levels (L2, L3, etc.) progressively farther from the core
+18
+
+=== PDF PAGE 19 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Multi-core VS Multi-thread
+มี hardware จริงทำงาน Virtual แบ่งการทำงาน
+Hyper-Threading ของ Intel หรือ SMT ของ AMD19
+
+=== PDF PAGE 20 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Multi-core VS Multi-thread
+• Hardware ทางกายภาพมีอยู่จริง 
+• รับงานชิ้นใหญ่มาประมวลผลแยกกัน
+แบบคู่ขนาน (parallel) 
+• Core = จํานวนเชฟทําอาหารในครัว
+• เสมือนจริง (เทคนิคแบ่งการทํางาน) 
+• จัดการงานเบื้องหลังและแบ่งงานย่อย
+ป้อนให้ core 
+• จํานวนแขนของเชฟแต่ละคน
+Multi-core Multi-thread
+20
+
+=== PDF PAGE 21 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Simpliﬁed view of major elements of a multicore computer
+21
+
+=== PDF PAGE 22 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Motherboard with Two Intel Quad-Core Xeon Processors
+22
+
+=== PDF PAGE 23 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Inside the Processor 
+23
+Apple A5
+
+=== PDF PAGE 24 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Manufacturing ICs
+24
+
+=== PDF PAGE 25 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Intel Core i7 Wafer
+25
+
+
+=== PDF PAGE 26 ===
+Copyright © 2019, Elsevier Inc. All rights reserved. 26
+Single Processor Performance
+Introduction
+
+
+=== PDF PAGE 27 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC vs CISC Architecture
+• RISC = Reduced Instruction Set Computing  
+• CISC = Complex Instruction Set Computing
+# mPC = microprogram counter, mPM = Microprocessor Mode
+27
+
+=== PDF PAGE 28 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Embedded Systems
+• The use of electronics and software within a product 
+• Billions of computer systems are produced each year that are embedded 
+within larger devices 
+• Many devices that use electric power have an embedded computing system 
+• Often embedded systems are tightly coupled to their environment  
+• Real-time constraints  
+• Multiple activities must managed simultaneously this imposes more 
+complex real-time constraints
+28
+
+=== PDF PAGE 29 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example of Embedded system (processor)
+29
+
+=== PDF PAGE 30 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ARM Products
+30
+
+=== PDF PAGE 31 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Microcontroller chip based on Cortex-M3
+• ARM : Cortex-M series processors - fast, highly 
+deterministic interrupt management, low power 
+consumption 
+• Cortex-M3 : 16, 32-bit applications, has debug 
+and trace features to enable software 
+developers to develop their applications quickly.
+31
+
+=== PDF PAGE 32 ===
+Copyright © 2019, Elsevier Inc. All rights reserved. 32
+Parallelism
+■Classes of parallelism in applications: 
+■Data-Level Parallelism (DLP) 
+■Task-Level Parallelism (TLP) 
+■Classes of architectural parallelism: 
+■Instruction-Level Parallelism (ILP) 
+■Vector architectures/Graphic Processor Units (GPUs) 
+■Thread-Level Parallelism 
+■Request-Level Parallelism
+Classes of Computers
+
+=== PDF PAGE 33 ===
+Copyright © 2019, Elsevier Inc. All rights reserved. 33
+Flynn’s Taxonomy
+■ Single instruction stream, single data stream (SISD) 
+■ Single instruction stream, multiple data streams (SIMD) 
+■ Vector architectures 
+■ Multimedia extensions 
+■ Graphics processor units 
+■ Multiple instruction streams, single data stream (MISD) 
+■ No commercial implementation 
+■ Multiple instruction streams, multiple data streams 
+(MIMD) 
+■ Tightly-coupled MIMD 
+■ Loosely-coupled MIMD
+Classes of Computers
+
+=== PDF PAGE 34 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+System Level Architecture Patterns
+• Monolithic - Single uniﬁed system 
+• Client-server - Split between requesting and serving machines 
+• Distributed systems - computation spread across networked machines 
+• Micro services - modular, independently deployable services (more of a 
+software architecture pattern)
+34
+
+=== PDF PAGE 35 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Performance
+
+
+=== PDF PAGE 36 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Relative Performance
+36
+
+
+=== PDF PAGE 37 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Measuring Execution Time
+37
+
+
+=== PDF PAGE 38 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Measuring Execution Time
+38
+
+
+=== PDF PAGE 39 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+CPU Time
+39
+
+
+=== PDF PAGE 40 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+CPU Time Example
+40
+
+
+=== PDF PAGE 41 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Count and CPI
+41
+
+
+=== PDF PAGE 42 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+CPI Example
+42
+
+
+=== PDF PAGE 43 ===
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Q & A

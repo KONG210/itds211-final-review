@@ -1,0 +1,695 @@
+
+
+===== PAGE 1 =====
+W.Suntiamorntut, Ph.D.
+Computer Architecture & OS
+V: I/O Systems
+
+
+===== PAGE 2 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Course Outline
+•The structure and architecture of the computer systems;  
+•basic components of computers;  
+•data representations;  
+•the Assembly Language;  
+•memory system organization;  
+•the memory hierarchy; the cache memory;  
+•input and output systems;  
+•storage systems;  
+•computing units;  
+•the multiprocessor architecture;
+
+===== PAGE 3 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Generic Model of an I/O Module
+3
+
+
+===== PAGE 4 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+External Devices
+• Exchanging data between the external environment and the computer 
+• Attach to the computer by a link to an I/O module 
+• Three categories of external devices: 
+Human readable 
+Machine readable : communicate with equipments 
+Communication : suitable for communicating with remote devices such as 
+a terminal or another computer
+
+===== PAGE 5 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Block Diagram of an External Device
+5
+ตัวแปลงสัญญาณ
+
+===== PAGE 6 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+The major functions for an I/O module fall into the 
+following categories:
+■
+Control and timing 
+•
+ Coordinates the flow of traffic between internal resources and external devices
+■
+Processor communication 
+•
+Involves command decoding, data, status reporting, address recognition
+■
+Device communication 
+•
+Involves commands, status information, and data
+■
+Data buffering 
+•
+Performs the needed buffering operation to balance device and memory speeds
+■
+Error detection 
+•
+Detects and reports transmission errors
+
+===== PAGE 7 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Block Diagram of an I/O Module
+7
+
+
+===== PAGE 8 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Programmed I/O
+Three techniques are possible for I/O operations: 
+1.Programmed I/O 
+■Data are exchanged between the processor and the I/O module 
+■Processor executes a program that gives it direct control of the I/O operation 
+■When the processor issues a command it must wait until the I/O operation is complete 
+■If the processor is faster than the I/O module this is wasteful of processor time 
+2.Interrupt-driven I/O 
+■Processor issues an I/O command, continues to execute other instructions, and is 
+interrupted by the I/O module when the latter has completed its work 
+3.Direct memory access (DMA) 
+■The I/O module and main memory exchange data directly without processor involvement
+
+===== PAGE 9 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Summary of I/O Techniques
+9
+ No Interrupts Use of Interrupts I/O-to-memory transfer through processor Programmed I/O Interrupt-driven I/O 
+Direct I/O-to-memory transfer  Direct memory access (DMA)  
+
+===== PAGE 10 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+I/O Commands
+■There are four types of I/O commands that an I/O module may receive when it 
+is addressed by a processor: 
+1) Control 
+- used to activate a peripheral and tell it what to do 
+2) Test 
+- used to test various status conditions associated with an I/O module and its peripherals 
+3) Read 
+- causes the I/O module to obtain an item of data from the peripheral and place it in an internal 
+buffer 
+4) Write 
+- causes the I/O module to take an item of data from the data bus and subsequently transmit that 
+data item to the peripheral
+
+===== PAGE 11 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Three Techniques for Input of a Block of Data
+
+===== PAGE 12 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+I/O Instructions
+■
+With programmed I/O there is a close correspondence between the I/O-
+related instructions that the processor fetches from memory and the I/O 
+commands that the processor issues to an I/O module to execute the 
+instructions
+■
+The form 
+of the 
+instruction 
+depends 
+on the way 
+in which 
+external 
+devices 
+are 
+addressed
+■
+Each I/O device connected through I/O modules is given a 
+unique identifier or address
+■
+ When the 
+processor issues 
+an I/O command, 
+the command 
+contains the 
+address of the 
+desired device
+■
+ Thus each I/O 
+module must 
+interpret the 
+address lines to 
+determine if the 
+command is for 
+itself
+■
+Memory-mapped I/O
+■
+ There is a single address 
+space for memory 
+locations and I/O devices
+■
+ A single read line and a 
+single write line are needed 
+on the bus
+
+===== PAGE 13 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+I/O Mapping Summary
+■ Memory mapped I/O 
+■ Devices and memory share an address space 
+■ I/O looks just like memory read/write 
+■ No special commands for I/O 
+■ Large selection of memory access commands available 
+■ Isolated I/O 
+■ Separate address spaces 
+■ Need I/O or memory select lines 
+■ Special commands for I/O 
+■ Limited set
+
+===== PAGE 14 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Memory-Mapped and Isolated I/O
+
+
+===== PAGE 15 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 16 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Simple Interrupt Processing
+เก็บค่า PC, PSW (Status register) ก่อน
+ไปเริ่มทํางานใน ISR
+เริ่มทํางานในส่วนของ interrupt
+
+===== PAGE 17 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Changes in Memory and Registers for an Interrupt
+
+===== PAGE 18 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Design Issues
+■ Two design 
+issues arise in 
+implementing 
+interrupt I/O:
+•Because there will be multiple I/O 
+modules how does the processor 
+determine which device issued the 
+interrupt? 
+•If multiple interrupts have occurred 
+how does the processor decide which 
+one to process?
+
+===== PAGE 19 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Device Identiﬁcation
+4. Bus arbitration (vectored) 
+■An I/O module must first gain control of the bus before it can 
+raise the interrupt request line 
+■When the processor detects the interrupt it responds on the 
+interrupt acknowledge line 
+■Then the requesting module places its vector on the data lines
+Four general categories of techniques are in common use:
+1. Multiple interrupt lines 
+■Between the processor and the I/O modules 
+■Most straightforward approach to the problem 
+■Consequently even if multiple lines are used, it is likely 
+that each line will have multiple I/O modules attached to 
+it
+3. Daisy chain (hardware poll, vectored) 
+■The interrupt acknowledge line is daisy chained through 
+the modules 
+■Vector – address of the I/O module or some other unique 
+identifier 
+■Vectored interrupt – processor uses the vector as a pointer 
+to the appropriate device-service routine, avoiding the 
+need to execute a general interrupt-service routine first
+2. Software poll 
+■When processor detects an interrupt it branches to an 
+interrupt-service routine whose job is to poll each I/O module 
+to determine which module caused the interrupt 
+■Time consuming
+I/O module ได้สิทธิ์ควบคุม BUS และจึงขอ 
+interrupt
+- Processor detects interrupt -
+Module ที่ร้องขอ ส่ง address of I/O ลงใน data line
+
+===== PAGE 20 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Use of the 82C59A Interrupt Controller
+
+===== PAGE 21 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Intel 8255A Programmable Peripheral Interface
+
+===== PAGE 22 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Intel 8255A Control Word
+
+===== PAGE 23 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Keyboard / Display Interface to 82C55A
+
+===== PAGE 24 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Drawbacks of Programmed and Interrupt-Driven I/O
+■ Both forms of I/O suffer from two inherent drawbacks: 
+1) The I/O transfer rate is limited by the speed with which the processor can test 
+and service a device 
+2) The processor is tied up in managing an I/O transfer; a number of instructions 
+must be executed for each I/O transfer 
+ 
+■ When large volumes of data are to be moved, a more efficient technique is direct 
+memory access (DMA)
+
+===== PAGE 25 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Typical DMA Block Diagram
+
+===== PAGE 26 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+DMA and Interrupt Breakpoints During an Instruction Cycle
+26
+จุดที่ Processor จะหยุดพักเพื่อตรวจสอบคําขอ (request) จาก DMA และ Interrupt
+DMA - แทรกเร็วและถี่กว่า เพราะเกี่ยวกับ hardware bus ตรง, Interrupt ต้องรอจนเสร็จคําสั่ง
+
+===== PAGE 27 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Alternative DMA Conﬁgurations
+
+===== PAGE 28 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+8237 DMA Usage of System Bus
+
+===== PAGE 29 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 30 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Table 7.2   
+ 
+Intel 
+ 8237A 
+Registers 
+E/D = enable/disable 
+TC = terminal count 
+Bit Command Status Mode Single Mask All Mask D0 Memory-to-memory E/D Channel 0 has reached TC Clear/set channel 0 mask bit D1 Channel 0 address hold E/D Channel 1 has reached TC Channel select Select channal mask bit Clear/set channel 1 mask bit D2 Controller E/D Channel 2 has reached TC Clear/set mask bit Clear/set channel 2 mask bit D3 Normal/compressed timing Channel 3 has reached TC Verify/write/ read transfer Clear/set channel 3 mask bit D4 Fixed/rotating priority Channel 0 request Auto-initialization E/D D5 Late/extended write selection Channel 0 request Address increment/ decrement select D6 DREQ sense active high/low Channel 0 request  D7 DACK sense active high/low Channel 0 request Demand/single/block/cascade mode select 
+Not used Not used 
+ 
+
+===== PAGE 31 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Direct Cache Access (DCA)
+■ DMA is not able to scale to meet the increased demand due to dramatic increases 
+in data rates for network I/O 
+■ Demand is coming primarily from the widespread deployment of 10-Gbps and 
+100-Gbps Ethernet switches to handle massive amounts of data transfer to and 
+from database servers and other high-performance systems 
+■ Another source of traffic comes from Wi-Fi in the gigabit range 
+■ Network Wi-Fi devices that handle 3.2 Gbps and 6.76 Gbps are becoming widely 
+available and producing demand on enterprise systems
+DMA ไม่ได้รองรับการ scale ในกรณีที่ต้องการ data rate มาก
+
+===== PAGE 32 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Xeon E5-2600/4600 Chip Architecture
+
+===== PAGE 33 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Cache-Related Performance Issues
+■Network traffic is transmitted in the form of a sequence of protocol blocks called 
+packets or protocol data units
+■ The lowest, or link, level protocol is typically Ethernet, so that each arriving and departing block of 
+data consists of an Ethernet packet containing as payload the higher-level protocol packet
+■ The higher-level protocols are usually the Internet Protocol (IP), operating on top of Ethernet 
+and the Transmission Control Protocol (TCP), operating on top of IP
+■The Ethernet payload consists of a block of data with a TCP header and an IP header
+■ For outgoing data, Ethernet packets are formed in a peripheral component, such as in I/O 
+controller or network interface controller (NIC)
+■For incoming traffic, the I/O controller strips off the Ethernet information and delivers the 
+TCP/IP packet to the host CPU
+
+===== PAGE 34 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Cache-Related Performance Issues
+■For both 
+outgoing and 
+incoming 
+traffic the core, 
+main memory, 
+and cache are 
+all involved
+■In a DMA scheme, when 
+an application wishes to 
+transmit data, it places that 
+data in an application-
+assigned buffer in main 
+memory 
+•The core transfers this to a system 
+buffer in main memory and creates 
+the necessary TCP and IP headers, 
+which are also buffered in system 
+memory 
+•The packet is then picked up via 
+DMA for transfer via the NIC 
+•This activity engages not only main 
+memory but also the cache 
+•Similar transfers between system 
+and application buffers are required 
+for incoming traffic
+
+===== PAGE 35 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Packet Traffic Steps:
+■Packet arrives 
+■DMA 
+■NIC interrupts host 
+■Retrieve descriptors and 
+headers 
+■Cache miss occurs 
+■Header is processed 
+■Payload transferred
+■Packet transfer requested 
+■Packet created 
+■Output operation invoked 
+■DMA transfer 
+■NIC signals completion 
+■Driver frees buffer
+Incoming Outgoing
+
+===== PAGE 36 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Direct Cache Access Strategies
+■ Much more substantial gains can be realized by 
+avoiding the system buffer in main memory altogether
+■ The packet and 
+packet descriptor 
+information are 
+accessed only 
+once in the system 
+buffer by the core
+■ For incoming 
+packets, the core 
+reads the data 
+from the buffer 
+and transfers the 
+packet payload to 
+an application 
+buffer
+■ It has no need to 
+access that data in 
+the system buffer 
+again
+■ Cache injection
+■ Implemented in 
+Intel’s Xeon 
+processor line, 
+referred to as 
+Direct Data I/O
+■Simplest strategy was implemented as a prototype on 
+a number of Intel Xeon processors between 2006 and 
+2010
+■ This form of DCA applies only to 
+incoming network traffic
+■ The DCA function in the memory 
+controller sends a prefetch hint to 
+the core as soon as the data is 
+available in system memory
+■ This enables the core to prefetch 
+the data packet from the system 
+buffer
+DCA เกี่ยวเฉพาะ “incoming network trafﬁc”,DCA function อยู่ใน mem. Controller. 
+Core จะ prefetch “data packet จาก system buffer”
+
+===== PAGE 37 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Comparison of DMA and DDIO
+
+===== PAGE 38 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Evolution of the I/O Function
+1.The CPU directly controls 
+a peripheral device.  
+2.A controller or I/O module 
+is added.  The CPU uses 
+programmed I/O without 
+interrupts. 
+3.Same configuration as in 
+step 2 is used, but now 
+interrupts are employed.  
+The CPU need not spend 
+time waiting for an I/O 
+operation to be 
+performed, thus 
+increasing efficiency.
+4.The I/O module is given direct 
+access to memory via DMA.  It 
+can now move a block of data to 
+or from memory without 
+involving the CPU, except at the 
+beginning and end of the 
+transfer. 
+5.The I/O module is enhanced to 
+become a processor in its own 
+right, with a specialized 
+instruction set tailored for I/O 
+6.The I/O module has a local 
+memory of its own and is, in fact, 
+a computer in its own right.  With 
+this architecture a large set of I/O 
+devices can be controlled with 
+minimal CPU involvement.
+
+===== PAGE 39 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+I/O Channel Architecture
+
+
+===== PAGE 40 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Assignment 
+กลุ่ม ละ 6-7 คน, จัดแบ่งให้ได้ 9 กลุ่ม  9 เรื่อง 
+จับฉลาก เรื่องที่จะต้องไป จัดรายงานกลุ่ม 
+สิ่งที่จะต้องส่งงาน 
+เอกสาร รายงานสรุป  - ใส่ชื่อสมาชิก - รหัส น.ศ. ให้ครบถ้วน 
+นําเสนอ กลุ่มละ 10-15 นาที ในชั้นเรียน ของคาบสัปดาห์ถัดไป (8, 10 กันยายน 2569)
+
+===== PAGE 41 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+1. Universal Serial Bus (USB)
+■Widely used for peripheral connections 
+■Is the default interface for slower speed devices 
+■Commonly used high-speed I/O 
+■Has gone through multiple generations 
+■USB 1.0 
+■Defined a Low Speed data rate of 1.5 Mbps and a Full Speed rate of 12 Mbps 
+■USB 2.0 
+■Provides a data rate of 480 Mbps 
+■USB 3.0 = USB3.1(Gen1) = USB3.2(Gen1) 
+■Higher speed bus called SuperSpeed in parallel with the USB 2.0 bus 
+■Signaling speed of SuperSpeed is 5 Gbps, but due to signaling overhead the 
+usable data rate is up to 4 Gbps 
+■USB 3.1 (Gen2) = USB3.2 (Gen2) 
+■Includes a faster transfer mode called SuperSpeed+ 
+■This transfer mode achieves a signaling rate of 10 Gbps and a theoretical 
+usable data rate of 9.7 Gbps 
+■USB3.2 (Gen2x2) = 20 Gbps 
+■Is controlled by a root host controller which attaches to devices to 
+create a local network with a hierarchical tree topology
+
+===== PAGE 42 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+2. FireWire Serial Bus (1999 - 2000) 
+■Was developed as an alternative to small computer system 
+interface (SCSI) to be used on smaller systems, such as personal 
+computers, workstations, and servers 
+■Objective was to meet the increasing demands for high I/O rates 
+while avoiding the bulky and expensive I/O channel technologies 
+developed for mainframe and supercomputer systems 
+■IEEE standard 1394, for a High Performance Serial Bus 
+■Uses a daisy chain configuration, with up to 63 devices connected 
+off a single port 
+■1022 FireWire buses can be interconnected using bridges 
+■Provides for hot plugging which makes it possible to connect and 
+disconnect peripherals without having to power the computer 
+system down or reconfigure the system 
+■Provides for automatic configuration 
+■No terminations and the system automatically performs a 
+configuration function to assign addresses
+
+
+===== PAGE 43 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+3. SCSI
+■Small Computer System Interface 
+■A once common standard for connecting peripheral devices to 
+small and medium-sized computers 
+■Has lost popularity to USB and FireWire in smaller systems 
+■High-speed versions remain popular for mass memory support 
+on enterprise systems 
+■Physical organization is a shared bus, which can support up       
+to 16 or 32 devices, depending on the generation of the   
+standard 
+■The bus provides for parallel transmission rather than serial,           
+with a bus width of 16 bits on earlier generations and 32 bits              on 
+later generations 
+■Speeds range from 5 Mbps on the original SCSI-1                
+specification to 160 Mbps on SCSI-3 U3
+
+
+===== PAGE 44 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+4. Thunderbolt
+Provides up to 10 Gbps throughput 
+in each direction and up to 10 Watts 
+of power to connected peripherals
+■Most recent and fastest 
+peripheral connection 
+technology to become 
+available for general-
+purpose use 
+■Developed by Intel with 
+collaboration from Apple 
+■The technology combines 
+data, video, audio, and 
+power into a single high-
+speed connection for 
+peripherals such as hard 
+drives, RAID arrays, video-
+capture boxes, and network 
+interfaces
+Thunderbolt
+
+===== PAGE 45 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+5. InfiniBand
+■I/O specification aimed at the high-end server market 
+■First version was released in early 2001 
+■Heavily relied on by IBM zEnterprise series of mainframes 
+■Standard describes an architecture and specifications for data 
+flow among processors and intelligent I/O devices 
+■Has become a popular interface for storage area networking 
+and other large storage configurations 
+■Enables servers, remote storage, and other network devices 
+to be attached in a central fabric of switches and links 
+■The switch-based architecture can connect up to 64,000 
+servers, storage systems, and networking devices
+
+
+===== PAGE 46 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+■High-speed bus system for 
+connecting peripherals of a 
+wide variety of types and 
+speeds
+■Serial Advanced 
+Technology Attachment 
+■An interface for disk 
+storage systems 
+■Provides data rates of up to 
+6 Gbps, with a maximum 
+per device of 300 Mbps 
+■Widely used in desktop 
+computers and in 
+industrial and embedded 
+applications
+PCI Express SATA
+6. PCI 7. SATA
+
+===== PAGE 47 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+8. Ethernet 
+■Predominant wired 
+networking technology 
+■Has evolved to support data 
+rates up to 100 Gbps and 
+distances from a few meters 
+to tens of km 
+■Has become essential for 
+supporting personal 
+computers, workstations, 
+servers, and massive data 
+storage devices in 
+organizations large and small 
+■Began as an experimental  
+bus-based 3-Mbps system
+■Has moved from bus-based 
+to switch-based 
+■Data rate has periodically 
+increased by an order of 
+magnitude 
+■There is a central switch 
+with all of the devices 
+connected directly to the 
+switch 
+■Ethernet systems are 
+currently available at 
+speeds up to 100 Gbps
+
+
+===== PAGE 48 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+9. Wi-Fi
+■Is the predominant wireless 
+Internet access technology 
+■Now connects computers, 
+tablets, smart phones, and 
+other electronic devices such 
+as video cameras TVs and 
+thermostats 
+■In the enterprise has become 
+an essential means of 
+enhancing worker 
+productivity and network 
+effectiveness 
+■Public hotspots have 
+expanded dramatically to 
+provide free Internet access in 
+most public places
+■As the technology of 
+antennas, wireless 
+transmission techniques, 
+and wireless protocol 
+design has evolved, the 
+IEEE 802.11 committee 
+has been able to introduce 
+standards for new 
+versions of Wi-Fi at higher 
+speeds 
+■Current version is 
+802.11ac (2014) with a 
+maximum data rate of 3.2 
+Gbps
+
+===== PAGE 49 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+IBM EC12 I/O Channel Subsystem Structure
+
+===== PAGE 50 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+Figure 7.20 
+IBM zEC12 I/O Frames-Front View
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+
+
+===== PAGE 51 =====
+© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.
+IBM EC12 I/O System Structure
+
+===== PAGE 52 =====
+Q & A

@@ -1,0 +1,182 @@
+[
+  {
+    "page": 1,
+    "text": "W.Suntiamorntut, Ph.D.\nComputer Architecture & OS\nVI: Storage Systems (External memory)\n"
+  },
+  {
+    "page": 2,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n•The structure and architecture of the computer systems;  \n•basic components of computers;  \n•data representations;  \n•the Assembly Language;  \n•memory system organization;  \n•the memory hierarchy; the cache memory;  \n•input and output systems;  \n•storage systems;  \n•computing units;  \n•the multiprocessor architecture;"
+  },
+  {
+    "page": 3,
+    "text": "ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.\nCourse Outline\n• Magnetic Disk \n• RAID \n• SSD \n• Practical Issues \n• Optical Memory \n3"
+  },
+  {
+    "page": 4,
+    "text": "+\nMagnetic Disk\nn A disk is a circular platter constructed of nonmagnetic \nmaterial, called the substrate, coated with a magnetizable \nmaterial\nn Traditionally the substrate has been an aluminium or aluminium \nalloy material \nn Recently glass substrates have been introduced\nn Benefits of the glass substrate:\nn Improvement in the uniformity of the magnetic film surface to \nincrease disk reliability\nn A significant reduction in overall surface defects to help reduce \nread -write errors\nn Ability to support lower fly heights\nn Better stiffness to reduce disk dynamics\nn Greater ability to withstand shock and damage\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 5,
+    "text": "Read / Write Process\n5\nทิศทางของอนุภาคแม่เหล็กบนผิวจาน จะแทนด้วยค่า “0” และ “1”"
+  },
+  {
+    "page": 6,
+    "text": "N\nS\nS\nN\nN\nS\nS\nN\nN\nS\nS\nN\nN\nS\nTrack width\nRecording\nmedium\nInductive\nwrite element\nShield\nMagnetization\nFigure 6.1   Inductive Write/Magnetoresistive Read Head\nMR\nsensor\nRead\ncurrent\nWrite current\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 7,
+    "text": "Figure 6.2  Disk Data Layout\nInter-sector gap\nInter-track gap\nSector\nPlatter\nRead-write head\n(1 per surface)\nTrack\nRotation\nCylinder Spindle Boom\nDirection of\narm motion\nTrack sector\nS4\nS4\nS4\nS3\nS3\nS3\nS2\nS2\nS2 S1\nS1\nS1\n• • •\n• • •\n• • •S5\nS5\nS5\nS6\nS6\nS6\nSN\nSN\nSN\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 8,
+    "text": "(a) Constant angular velocity (b) Multiple zone recording\nFigure 6.3   Comparison of Disk Layout Methods\nTrack\nSector\nZone\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\n"
+  },
+  {
+    "page": 9,
+    "text": "gap\n1\n17 7 41 515 20 17 7 41 515 20\n1 2 1 1 2 1 512 2\n17 7 41 515\n600 bytes/sector\n20\nphysical sector 0\nsector\nbytes\nbytes\nindex\nphysical sector 1\nFigure 6.4   Winchester Disk Format (Seagate ST506)\nphysical sector 29\nID\nfield\n0\ngap\n2\ndata\nfield\n0\ngap\n3\nsynch\nbyte\ntrack\n#\nhead\n#\nsector\n#\nCRC\nsynch\nbyte\ndata CRC\ngap\n1\nID\nfield\n1\ngap\n2\ndata\nfield\n1\ngap\n3\ngap\n1\nID\nfield\n29\ngap\n2\ndata\nfield\n29\ngap\n3\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nWinchester Disk Format (Seagate ST506)\n9"
+  },
+  {
+    "page": 10,
+    "text": "Table 6.1  \nPhysical Characteristics of Disk Systems \nHead Motion  \n Fixed head (one per track)  \n Movable head (one per surface)  \n \nDisk Portability  \n Nonremovable disk  \n Removable disk  \n \nSides  \n Single sided  \n Double sided  \nPlatters  \n Single platter  \n Multiple platter  \n \nHead Mechanism  \n Contact (floppy)  \n Fixed gap  \n Aerodynamic gap (Winchester)  \n \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 11,
+    "text": "+\n Characteristics\nn Fixed -head disk\nn One read -write head per \ntrack\nn Heads are mounted on a \nfixed ridged arm that \nextends across all tracks\nn Movable -head disk\nn One read -write head\nn Head is mounted on an arm\nn The arm can be extended \nor retracted\nn Non -removable disk\nn Permanently mounted in the \ndisk drive\nn The hard disk in a personal \ncomputer is a non -removable \ndisk\nn Removable disk\nn Can be removed and \nreplaced with another disk\nn Advantages:\nn Unlimited amounts of data are \navailable with a limited \nnumber of disk systems\nn A disk may be moved from \none computer system to \nanother\nn Floppy disks and ZIP \ncartridge disks are \nexamples of removable \ndisks\nn Double sided disk\nn Magnetizable \ncoating is applied \nto both sides of the \nplatter\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 12,
+    "text": "+\nDisk \nClassification\nn The head must generate or \nsense an electromagnetic field \nof sufficient magnitude to write \nand read properly\nn The narrower the head, the \ncloser it must be to the platter \nsurface to function\nn A narrower head means \nnarrower tracks and \ntherefore greater data \ndensity\nn The closer the head is to the \ndisk the greater the risk of \nerror from impurities or \nimperfections\nn Used in sealed drive assemblies that \nare almost free of contaminants \nn Designed to operate closer to the \ndisk’s surface than conventional rigid \ndisk heads, thus allowing greater \ndata density\nn Is actually an aerodynamic foil that \nrests lightly on the platter’s surface \nwhen the disk is motionless\nn The air pressure generated by a \nspinning disk is enough to make \nthe foil rise above the surface\nThe head mechanism provides \na classification of disks into \nthree types\nWinchester Heads\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 13,
+    "text": "Table 6.2  \nTypical Hard Disk Drive Parameters \nCharacteristics  Seagate  \nEnterprise  \nSeagate \nBarracuda XT  \nSeagate \nCheetah NS  \nSeagate Laptop \nHDD  \nApplication  Enterprise  Desktop  Network \nattached storage, \napplication \nservers  \nLaptop  \nCapacity  6 TB 3 TB  600 GB  2 TB  \nAverage seek \ntime  \n4.16 ms  N/A  3.9 ms read  \n4.2 ms write  \n13 ms  \nSpindle speed  7200 rpm  7200 rpm  10, 075 rpm  5400 rpm  \nAverage latency  4.16 ms  4.16 ms  2.98  5.6 ms  \nMaximum \nsustained \ntransfer rate  \n216 M B/s 149 MB/s  97 MB/s  300 MB/s  \nBytes per sector  512/4096  512 512 4096  \nTracks per \ncylinder (number \nof platter \nsurfaces)  \n8 10 8 4 \nCache  128 MB  64 MB  16 MB  8 MB  \n © 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 14,
+    "text": "Wait for\nDevice\nWait for\nChannel\nSeek Rotational\nDelay\nData\nTransfer\nDevice Busy\nFigure 6.5  Timing of a Disk I/O Transfer\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 15,
+    "text": "+\n Disk Performance Parameters\nn When the disk drive is operating the disk is rotating at constant speed\nn To read or write the head must be positioned at the desired track and at the beginning \nof the desired sector on the track\nn Track selection involves moving the head in a movable -head system or electronically \nselecting one head on a fixed -head system\nn Once the track is selected, the disk controller waits until the appropriate sector rotates to \nline up with the head\nn Seek time\nn On a movable –head system, the time it takes to position the head at the track\nn Rotational delay (rotational latency)\nn The time it takes for the beginning of the sector to reach the head \nn Access time\nn The sum of the seek time and the rotational delay\nn The time it takes to get into position to read or write\nn Transfer time\nn Once the head is in position, the read or write operation is then performed                                          \nas the sector moves under the head\nn This is the data transfer portion of the operation\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 16,
+    "text": "+\nRAID\nn Consists of 7 levels\nn Levels do not imply a hierarchical \nrelationship but designate different \ndesign architectures that share three \ncommon characteristics:\n1) Set of physical disk drives viewed \nby the operating system as a single \nlogical drive\n2) Data are distributed across the \nphysical drives of an array in a \nscheme known as striping\n3) Redundant disk capacity is used to \nstore parity information, which \nguarantees data recoverability in \ncase of a disk failure\nRedundant Array of \nIndependent Disks\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nเทคนิคการนํา HD หลายตัวมารวมกัน\nทํางานเป็นกลุ่มเดียว"
+  },
+  {
+    "page": 17,
+    "text": "N= number of data disks;    mproportional to log N\nCategory  Level  Description  \nDisks \nRequired  \nData Availability  \nLarge I/O Data \nTransfer \nCapacity  \nSmall I/O Request \nRate  \nStriping  0 Nonredundant  N \nLower than single \ndisk \nVery high  \nVery high for both \nread and write  \nMirroring  1 Mirrored  2N \nHigher than RAID \n2, 3, 4, or 5; lower \nthan RAID 6  \nHigher than single \ndisk for read; \nsimilar to single \ndisk for write  \nUp to twice that of a \nsingle disk for read; \nsimilar to single disk \nfor write  \n2 \nRedundant via Hamming \ncode  \nN + m \nMuch h igher than \nsingle disk; \ncomparable to \nRAID 3, 4, or 5  \nHighest of all \nlisted alternatives  \nApproximately twice \nthat of a single disk  \nParallel access  \n3 Bit-interleaved parity  N + 1 \nMuch higher than \nsingle disk; \ncomparable to \nRAID 2, 4, or 5  \nHighest of all \nlisted alternativ es \nApproximately twice \nthat of a single disk  \n4 Block -interleaved parity  N + 1 \nMuch higher than \nsingle disk; \ncomparable to \nRAID 2, 3, or 5  \nSimilar to RAID 0 \nfor read; \nsignificantly \nlower than single \ndisk for write  \nSimilar to RAID 0 for \nread; significantly \nlower than single disk \nfor write  \n5 \nBlock -interleaved \ndistributed parity  \nN + 1 \nMuch higher than \nsingle disk; \ncomparable to \nRAID 2, 3, or 4  \nSimilar to RAID 0 \nfor read; lower \nthan single disk \nfor write  \nSimilar to RAID 0 for \nread; generall y lower \nthan single disk for \nwrite  \nIndependent \naccess  \n6 \nBlock -interleaved dual \ndistributed parity  \nN + 2 \nHighest of all \nlisted alternatives  \nSimilar to RAID 0 \nfor read; lower \nthan RAID 5 for \nwrite  \nSimilar to RAID 0 for \nread; significantly \nlower than RAID 5 for \nwrite  \n \nTable 6.3  \nRAID Levels\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nแบ่งข้อมูลเป็นชิ้นเล็กๆ กระจายเขียนลงหลายดิสก์พร้อมกัน\nเขียนข้อมูลชุดเดียวกันซํ้าลงดิสก์สองตัว --> ปลอดภัยแต่เปลือง\nคํานวณค่าตรวจสอบ (partity bit)  เก็บแยกไว้ เพื่อใช้กู้คืน\nข้อมูลหากดิสก์ตัวใดตัวหนึ่งเสีย โดยไม่ต้องสํารองข้อมูลเต็มรูป\nแบบ"
+  },
+  {
+    "page": 18,
+    "text": "strip 12\n(a) RAID 0 (non-redundant)\nstrip 8\nstrip 4\nstrip 0\nstrip 13\nstrip 9\nstrip 5\nstrip 1\nstrip 14\nstrip 10\nstrip 6\nstrip 2\nstrip 15\nstrip 11\nstrip 7\nstrip 3\nstrip 12\n(b) RAID 1 (mirrored)\nstrip 8\nstrip 4\nstrip 0\nstrip 13\nstrip 9\nstrip 5\nstrip 1\nstrip 14\nstrip 10\nstrip 6\nstrip 2\nstrip 15\nstrip 11\nstrip 7\nstrip 3\nstrip 12\nstrip 8\nstrip 4\nstrip 0\nstrip 13\nstrip 9\nstrip 5\nstrip 1\nstrip 14\nstrip 10\nstrip 6\nstrip 2\n(c) RAID 2 (redundancy through Hamming code)\nb0 b1 b2 b3 f0(b) f1(b) f2(b)\nstrip 15\nstrip 11\nstrip 7\nstrip 3\nFigure 6.6  RAID Levels (page 1 of 2)\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 19,
+    "text": "block 12\n(e) RAID 4 (block-level parity)\nblock 8\nblock 4\nblock 0\nblock 13\nblock 9\nblock 5\nblock 1\nblock 14\nblock 10\nblock 6\nblock 2\nblock 15\nblock 7\nblock 3\nP(12-15)\nP(8-11)\nP(4-7)\nP(0-3)\nblock 12\nblock 8\nblock 4\nblock 0\nblock 9\nblock 5\nblock 1\nblock 13\nblock 6\nblock 2\nblock 14\nblock 10\nblock 3\nblock 15\nP(16-19)\nP(12-15)\nP(8-11)\nP(4-7)\nblock 16 block 17 block 18 block 19\nblock 11\nblock 7\n(f) RAID 5 (block-level distributed parity)\n(d) RAID 3 (bit-interleaved parity)\nb0 b1 b2 b3 P(b)\nFigure 6.6  RAID Levels (page 2 of 2)\nP(0-3)\nblock 11\nblock 12\n(g) RAID 6 (dual redundancy) \nblock 8\nblock 4\nblock 0\nP(12-15)\nblock 9\nblock 5\nblock 1\nQ(12-15)\nP(8-11)\nblock 6\nblock 2\nblock 13\nP(4-7)\nblock 3\nblock 14\nblock 10\nQ(4-7)\nP(0-3)\nQ(8-11)\nblock 15\nblock 7\nQ(0-3)\nblock 11\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\n"
+  },
+  {
+    "page": 20,
+    "text": "strip 4\nstrip 0\nstrip 3\nstrip 4\nstrip 5\nstrip 6\nstrip 7\nstrip 8\nstrip 9\nstrip 10\nstrip 11\nstrip 15\nstrip 2\nstrip 1\nstrip 0\nLogical Disk\nPhysical\nDisk 1\nPhysical\nDisk 3\nPhysical\nDisk 0\nPhysical\nDisk 2\nstrip 5\nstrip 1\nstrip 6\nstrip 2\nstrip 11strip 10strip 9strip 8\nstrip 15strip 14strip 13strip 12\nstrip 7\nstrip 3\nFigure 6.7  Data Mapping for a RAID Level 0 Array\nstrip 13\nstrip 12\nstrip 14\nArray\nManagement\nSoftware\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 21,
+    "text": "+\nRAID\nLevel 0\nn For applications to experience \na high transfer rate two \nrequirements must be met:\n1. A high transfer capacity must \nexist along the entire path \nbetween host memory and the \nindividual disk drives\n2. The application must make I/O \nrequests that drive the disk \narray efficiently\nRAID 0 for High Data Transfer \nCapacity\nRAID 0 for High I/O Request Rate\nn Addresses the issues of request patterns of \nthe host system and layout of the data\nn Impact of redundancy does not interfere \nwith analysis\nn For an individual I/O request for a \nsmall amount of data the I/O time \nis dominated by the seek time and \nrotational latency\nn A disk array can provide high I/O \nexecution rates by balancing the \nI/O load across multiple disks\nn If the strip size is relatively large \nmultiple waiting I/O requests can \nbe handled in parallel, reducing \nthe queuing time for each request\nR\na\ni\nd\n0\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 22,
+    "text": "+\nRAID \nLevel 1\nn Differs from RAID levels 2 through 6 \nin the way in which redundancy is \nachieved\nn Redundancy is achieved by the \nsimple expedient of duplicating all \nthe data\nn Data striping is used but each logical \nstrip is mapped to two separate \nphysical disks so that every disk in \nthe array has a mirror disk that \ncontains the same data\nn RAID 1 can also be implemented \nwithout data striping, although this is \nless common\nn A read request can be serviced by \neither of the two disks that contains \nthe requested data\nn There is no “write penalty”\nn Recovery from a failure is simple, \nwhen a drive fails the data can be \naccessed from the second drive\nn Provides real -time copy of all data\nn Can achieve high I/O request rates if \nthe bulk of the requests are reads\nn Principal disadvantage is the cost\nCharacteristics Positive Aspects\nR\na\ni\nd\n1\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nMirroring เขียนข้อมูลซํ้า"
+  },
+  {
+    "page": 23,
+    "text": "+\nRAID\nLevel 2\nn Makes use of a parallel access \ntechnique\nn In a parallel access array all \nmember disks participate in the \nexecution of every I/O request\nn Spindles of the individual drives \nare synchronized so that each \ndisk head is in the same position \non each disk at any given time\nn Data striping is used\nn Strips are very small, often as \nsmall as a single byte or word\nn An error -correcting code is \ncalculated across corresponding \nbits on each data disk and the bits \nof the code are stored in the \ncorresponding bit positions on \nmultiple parity disks\nn Typically a Hamming code is used, \nwhich is able to correct single -bit \nerrors and detect double -bit \nerrors\nn The number of redundant disks is \nproportional to the log of the \nnumber of data disks\nn Would only be an effective choice \nin an environment in which many \ndisk errors occur\nCharacteristics Performance\nR\na\ni\nd\n2\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nBit-level striping ร่วมกับการเข้ารหัสแก้ไขข้อ\nผิดพลาดแบบ Hamming code (Error-\nCorrecting Code - ECC) เก็บแยกไว้ในดิสก์\nต่างหาก\nซับซ้อนมากสุด และ \nแทบไม่มีการใช้งานจริง\nในปัจจุบันเลย"
+  },
+  {
+    "page": 24,
+    "text": "+\nRAID\nLevel 3\nn Requires only a single \nredundant disk, no matter how \nlarge the disk array\nn Employs parallel access, with \ndata distributed in small strips\nn Instead of an error correcting \ncode, a simple parity bit is \ncomputed for the set of \nindividual bits in the same \nposition on all of the data disks\nn Can achieve very high data \ntransfer rates\nn In the event of a drive failure, the \nparity drive is accessed and data is \nreconstructed from the remaining \ndevices\nn Once the failed drive is replaced, the \nmissing data can be restored on the \nnew drive and operation resumed\nn In the event of a disk failure, all of the \ndata are still available in what is \nreferred to as reduced mode\nn Return to full operation requires that \nthe failed disk be replaced and the \nentire contents of the failed disk be \nregenerated on the new disk\nn In a transaction -oriented environment \nperformance suffers\nRedundancy Performance\nR\na\ni\nd\n3\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nByte-level striping + Parity ดิสก์เดียว"
+  },
+  {
+    "page": 25,
+    "text": "+\n RAID\nLevel 4\nn Makes use of an independent \naccess technique\nn In an independent access array, \neach member disk operates \nindependently so that separate \nI/O requests can be satisfied in \nparallel\nn Data striping is used\nn Strips are relatively large\nn To calculate the new parity the \narray management software \nmust read the old user strip \nand the old parity strip\nn Involves a write penalty when \nan I/O write request of small \nsize is performed\nn Each time a write occurs the \narray management software \nmust update not only the user \ndata but also the corresponding \nparity bits\nn Thus each strip write involves \ntwo reads and two writes\nCharacteristics\nPerformance\nR\na\ni\nd\n4\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nBlock-level Striping ร่วมกับ Parity disk แยก\nต่างหากเฉพาะ  1 ตัว Parity disk เป็นคอขวด  \nRAID 5 จึงมาแก้ปัญหา"
+  },
+  {
+    "page": 26,
+    "text": "+\nRAID\nLevel 5\nn Organized in a similar fashion \nto RAID 4\nn Difference is distribution of \nthe parity strips across all \ndisks\nn A typical allocation is a round -\nrobin scheme\nn The distribution of parity \nstrips across all drives avoids \nthe potential I/O bottleneck \nfound in RAID 4\nn Two different parity calculations \nare carried out and stored in \nseparate blocks on different \ndisks\nn Advantage is that it provides \nextremely high data availability\nn Three disks would have to fail \nwithin the mean time to repair \n(MTTR) interval to cause data to \nbe lost\nn Incurs a substantial write \npenalty because each write \naffects two parity blocks\nCharacteristics Characteristics\nRAID \nLevel 6\nR\na\ni\nd\n5\n6\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved.\nBlock-level striping + Parity หมุนเวียน เหมือน RAID5 แต่ Parity 2 ชุด"
+  },
+  {
+    "page": 27,
+    "text": "Table 6.4  \nRAID \nComparison \n(page 1 of 2) \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 28,
+    "text": "Table 6.4  \nRAID \nComparison \n(page 2 of 2) \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 29,
+    "text": "+\nSSD Compared to HDD\nn SSDs have the following advantages over HDDs:\nn High -performance input/output operations per second \n(IOPS)\nn Durability\nn Longer lifespan\nn Lower power consumption\nn Quieter and cooler running capabilities\nn Lower access times and latency rates\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 30,
+    "text": " NAND Flash Drives  Seagate Laptop Internal \nHDD  \nFile copy/write speed  200—550 Mbps  50—120 Mbps  \nPower d raw/battery life  Less power draw, averages 2 –\n3 watts, resulting in 30+ \nminute battery boost  \nMore power draw, averages \n6–7 watts and therefore uses \nmore battery  \nStorage capacity  Typically not larger than 512  \nGB for notebook size drives; 1  \nTB max for deskto ps \nTypically around 500  GB and \n2 TB maximum for notebook \nsize drives; 4  TB max for \ndesktops  \nCost  Approx. $0.50 per GB for a 1 -\nTB drive  \nApprox $0.15 per GB for a 4 -\nTB drive  \n \nTable 6.5 \nComparison of Solid State Drives and Disk Drives \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 31,
+    "text": "Figure 6.8  Solid State Drive Architecture\nI/O Driver Software\nFile System Software\nOperating System\nSoftware\nHost System\nSSDInterface\nInterface\nController\nFlash\nmemory\ncomponents\nFlash\nmemory\ncomponents\nFlash\nmemory\ncomponents\nFlash\nmemory\ncomponents\nAddressing\nData buffer/\ncache\nError\ncorrection\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 32,
+    "text": "+\n Practical Issues\nn SDD performance has a \ntendency to slow down as the \ndevice is used\nn The entire block must be \nread from the flash memory \nand placed in a RAM buffer\nn Before the block can be \nwritten back to flash \nmemory, the entire block of \nflash memory must be \nerased\nn The entire block from the \nbuffer is now written back to \nthe flash memory\nn Flash memory becomes \nunusable after a certain \nnumber of writes\nn Techniques for prolonging \nlife: \nn Front -ending the flash with a \ncache to delay and group \nwrite operations\nn Using wear -leveling \nalgorithms that evenly \ndistribute writes across block \nof cells\nn Bad -block management \ntechniques\nn Most flash devices estimate \ntheir own remaining lifetimes \nso systems can anticipate \nfailure and take preemptive \naction\nThere are two practical issues peculiar to SSDs \nthat are not faced by HDDs:\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 33,
+    "text": "Table 6. 6 \nOptical \nDisk \nProducts \n \nCD \n Compact Disk. A nonerasable disk that stor es digitized audio information. The standard \nsystem uses 12 -cm disks and can record more than 60 minutes of uninterrupted playing time.  \n \nCD-ROM  \n Compact  Disk Read -Only Memory. A nonerasable disk used for storing computer data. \nThe standard system uses 12 -cm disks and can hold more than 650 Mbytes.  \n \nCD-R \n CD Recordable. Similar to a CD -ROM. The user can write to the disk only once.  \n \nCD-RW  \n CD Rewritable. Similar to a CD -ROM. The user can erase and rewrite to the disk \nmultiple times.  \n \nDVD  \n Digital Versatile Disk. A technology for producing digitized, compressed representation \nof video information, as well as large volumes of other digital data. Both 8 and 12 cm diameters \nare used, with a double -sided capacity of up to 17 Gbytes. The basic DVD is read -only (DV D-\nROM).  \n \nDVD -R \n DVD Recordable. Similar to a DVD -ROM. The user can write to the disk only once. \nOnly one -sided disks can be used.  \n \nDVD -RW  \n DVD Rewritable. Similar to a DVD -ROM. The user can erase and rewrite to the disk \nmultiple times. Only one -sided disks  can be used.  \n \nBlu-Ray  DVD  \n High definition video disk. Provides considerably greater data storage density than DVD, \nusing a 405 -nm (blue -violet) laser. A single layer on a single side can store 25 Gbytes.  \n  © 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 34,
+    "text": "+\nCompact Disk Read\n -\nOnly Memory\n(CD\n -\nROM)\nn Audio CD and the CD -ROM share a similar technology\nn The main difference is that CD -ROM players are more rugged and                 \nhave error correction devices to ensure that data are properly transferred\nn Production:\nn The disk is formed from a resin such as polycarbonate\nn Digitally recorded information is imprinted as a series of microscopic pits on \nthe surface of the polycarbonate\nn This is done with a finely focused, high intensity laser to create a master disk\nn The master is used, in turn, to make a die to stamp out copies onto \npolycarbonate\nn The pitted surface is then coated with a highly reflective surface, usually  \naluminum or gold\nn This shiny surface is protected against dust and scratches by a top                      \ncoat of clear acrylic\nn Finally a label can be silkscreened onto the acrylic\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 35,
+    "text": "Polycarbonate\nplastic\nProtective\nacrylic\nAluminum\nLaser transmit/\nreceive\nFigure 6.9  CD Operation\nPit\nLand\nLabel\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 36,
+    "text": "00 00 Data\n12 bytes\nSYNC\n4 bytes\nID\n2048 bytes\nData\n288 bytes\nL-ECC\nLayered\nECC\nMIN\nSEC\nSector\nMode\nFF . . . FF\n2352 bytes\nFigure 6.10 CD-ROM Block Format\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 37,
+    "text": "+\nn\n CD\n-\nROM is appropriate for the distribution of large \namounts of data to a large number of users\nn\n Because the expense of the initial writing process it \nis not appropriate for individualized applications\nn\n The CD\n -\nROM has two advantages:\nn\n The optical disk together with the information stored \non it can be mass replicated inexpensively\nn\n The optical disk is removable, allowing the disk itself \nto be used for archival storage\nn\n The CD\n -\nROM disadvantages:\nn\n It is read\n -\nonly and cannot be updated\nn\n It has an access time much longer than that of a \nmagnetic disk drive\nCD\n-\nROM\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 38,
+    "text": "+\nCD Recordable\n CD Rewritable\n(CD\n -\nR)\n (CD\n -\nRW)\nn Write -once read -many\nn Accommodates applications in \nwhich only one or a small \nnumber of copies of a set of data \nis needed\nn Disk is prepared in such a way \nthat it can be subsequently \nwritten once with a laser beam \nof modest -intensity\nn Medium includes a dye layer \nwhich is used to change \nreflectivity and is activated by a \nhigh -intensity laser\nn Provides a permanent record of \nlarge volumes of user data \nn Can be repeatedly written and \noverwritten\nn Phase change disk uses a material that \nhas two significantly different \nreflectivities in two different phase states\nn Amorphous state\nn Molecules exhibit a random \norientation that reflects light poorly \nn Crystalline state\nn Has a smooth surface that reflects light \nwell\nn A beam of laser light can change the \nmaterial from one phase to the other\nn Disadvantage is that the material \neventually and permanently loses its \ndesirable properties\nn Advantage is that it can be rewritten\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 39,
+    "text": "1.2 mm\nthick\n1.2 mm\nthick\nLabel\nProtective layer\n(acrylic)\nReflective layer\n(aluminum)\nPolycarbonate substrate\n(plastic)\nPolycarbonate substrate, side 2\nSemireflective layer, side 2\nPolycarbonate layer, side 2\nFully reflective layer, side 2\nFully reflective layer, side 1\nPolycarbonate layer, side 1\nSemireflective layer, side 1\nPolycarbonate substrate, side 1\nLaser focuses on polycarbonate\npits in front of reflective layer.\n(a) CD-ROM - Capacity 682 MB\n(b) DVD-ROM, double-sided, dual-layer - Capacity 17 GB\nFigure 6.11   CD-ROM and DVD-ROM\nLaser focuses on pits in one layer\non one side at a time. Disk must\nbe flipped to read other side.\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 40,
+    "text": "Beam spot Land\nData layer\nlaser wavelength\n= 780 nm\n650 nm\n405 nm\nFigure 6.12  Optical Memory Characteristics\nCD 2.11 µm\nDVD   \nBlu-ray\n1.2 µmPit\nTrack\n0.6 µm\n0.1 µm\n1.32 µm\n0.58 µm\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 41,
+    "text": "+\n Magnetic Tape\nn Tape systems use the same reading and recording techniques \nas disk systems\nn Medium is flexible polyester tape coated with magnetizable \nmaterial\nn Coating may consist of particles of pure metal in special \nbinders or vapor -plated metal films\nn Data on the tape are structured as a number of  parallel tracks \nrunning lengthwise\nn Serial recording\nn Data are laid out as a sequence of bits along each track\nn Data are read and written in contiguous blocks called physical \nrecords\nn Blocks on the tape are separated by gaps referred                      \nto as inter -record gaps\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 42,
+    "text": "Bottom\nedge of tape\nDirection of\nread/write \nDirection of\ntape motion\n(a) Serpentine reading and writing\n(b) Block layout for system that reads/writes four tracks simultaneously\nFigure 6.13  Typical Magnetic Tape Features\nTrack 0\nTrack 0\nTrack 1\nTrack 2\nTrack 3\nTrack 1\nTrack 2\n4 8 12 16 20\n3 7 11 15 19\n2 6 10 14 18\n1 5 9 13 17\n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 43,
+    "text": "Table 6.7  \nLTO Tape Drives \n LTO -1 LTO -2 LTO -3 LTO -4 LTO -5 LTO -6 LTO -7 LTO -8 \nRelease date  2000  2003  2005  2007  2010  TBA  TBA  TBA  \nCompressed \ncapacity  \n200 GB  400 GB  800 GB  1600 GB  3.2 TB  8 TB  16 TB  32 TB  \nComp ressed \ntransfer rate \n(MB/s)  \n40 MB/s  80 MB/s  160 MB/s  240 MB/s  280 MB/s  525 MB/s  788 MB/s  1.18 GB/s  \nLinear density \n(bits/mm)  \n4880  7398  9638  13250  15142     \nTape tracks  384 512 704 896 1280     \nTape length  609 m  609 m  680 m  820 m  846 m     \nTape width (cm)  1.27  1.27  1.27  1.27  1.27     \nWrite elements  8 8 16 16 16    \nWORM?  No No Yes Yes Yes Yes Yes Yes \nEncryption \nCapable?  \nNo No No Yes Yes Yes Yes Yes \nPartitioning?  No No No No Yes Yes Yes Yes \n \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 44,
+    "text": "+ Summary\nn Magnetic disk\nn Magnetic read and write \nmechanisms\nn Data organization and \nformatting\nn Physical characteristics\nn Disk performance parameters\nn Solid state drives\nn SSD compared to HDD\nn SSD organization\nn Practical issues\nn Magnetic tape\nn RAID\nn RAID level 0\nn RAID level 1\nn RAID level 2\nn RAID level 3\nn RAID level 4\nn RAID level 5\nn RAID level 6\nn Optical memory\nn Compact disk\nn Digital versatile disk\nn High -definition optical disks\nChapter 6     \nExternal Memory  \n© 2016 Pearson Education, Inc., Hoboken, NJ. All rights reserved."
+  },
+  {
+    "page": 45,
+    "text": "Q & A"
+  }
+]

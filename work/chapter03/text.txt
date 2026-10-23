@@ -1,0 +1,1166 @@
+
+
+===== PAGE 1 =====
+W.Suntiamorntut, Ph.D.
+Computer Architecture & OS
+III: Data Representation, ISA & Assembly Language 
+
+
+===== PAGE 2 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Course Outline
+•The structure and architecture of the computer systems;  
+•basic components of computers;  
+•data representations;  
+•the Assembly Language;  
+•memory system organization;  
+•the memory hierarchy; the cache memory;  
+•input and output systems;  
+•storage systems;  
+•computing units;  
+•the multiprocessor architecture;
+
+===== PAGE 3 =====
+ Data Representation
+
+
+===== PAGE 4 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Data Representation Outline
+Representing numbers
+Representing characters & Symbols
+Unsigned 
+Signed 
+Floating point
+ASCII
+Unicode
+
+===== PAGE 5 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Data Representation in Computers
+Registers are limited in number & size
+Data are stored in Registers
+
+
+===== PAGE 6 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Data Representation (Cont.)
+
+
+===== PAGE 7 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Number Systems
+
+
+===== PAGE 8 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Quantitative Numbers
+
+
+===== PAGE 9 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Signed Integers
+We need a way to represent negative values
+3 representations
+Sign & Magnitude representation (S&M)
+Complement method
+Bias notation or Excess notation
+
+===== PAGE 10 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+1. Sign & Magnitude Representation
+
+
+===== PAGE 11 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example — Sign & Magnitude
+
+
+===== PAGE 12 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Sign & Magnitude (Cont.)
+
+
+===== PAGE 13 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+2. Complement Method
+
+
+===== PAGE 14 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Complement Method - Deﬁnition
+
+
+===== PAGE 15 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example - Complement Method
+•n = 3 แสดงว่า มี 3 หลัก 
+•Number m ในที่นี้คือ 382
+1’ complement (-382) = 617
+2’ complement (-382) = 618
+
+===== PAGE 16 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+1’s complement
+
+
+===== PAGE 17 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Addition with 1’s Complement
+
+
+===== PAGE 18 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+2’s Complement
+
+
+===== PAGE 19 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example - 2’s Complement
+
+
+===== PAGE 20 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example - 2’s Complement (Cont.)
+
+
+===== PAGE 21 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+1’s vs. 2’s Complement
+
+
+===== PAGE 22 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+S & M, 1’s, & 2’s
+
+
+===== PAGE 23 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+3. Bias Notation
+
+
+===== PAGE 24 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Bias Notation (Cont.)
+
+
+===== PAGE 25 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Floating Point Numbers
+
+
+===== PAGE 26 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Floating Point Numbers (Cont.)
+
+
+===== PAGE 27 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+IEEE Floating Point Standard (FPS)
+
+
+===== PAGE 28 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+IEEE Floating Point Standard (Cont.)
+
+
+===== PAGE 29 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Single Precision
+
+
+===== PAGE 30 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Review - Binary Fractions
+
+
+===== PAGE 31 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Example - Single Precision
+
+
+===== PAGE 32 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Character Representation
+
+
+===== PAGE 33 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Character Representation (Cont.)
+
+
+===== PAGE 34 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ASCII
+
+
+===== PAGE 35 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ASCII Table
+
+
+===== PAGE 36 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ASCII Table (Cont.)
+
+
+===== PAGE 37 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ASCII - Things to Note
+
+
+===== PAGE 38 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Assignment 2  (ใบงานที่ 2)
+1.งานกลุ่ม กลุ่มละ 2 คน  
+2.ใช้ตัวเลขฐาน 2 กําหนดให้มี 16 บิต ในการแทนตัวเลข  
+3.ทีม สามารถกําหนด ตัวเลขที่เป็น ตัวตั้ง และ ตัวกระทําได้เอง  
+4.ให้แสดงขั้นตอนของการคํานวณ “add” และ “sub” ของ data representation 2 
+แบบ คือ  1) sign magnitude และ 2) two’s complement
+Upload งานทุกคน ส่งใน MyCourse    
+Section 1 = — DEADLINE = 23.59 pm. —  วันอาทิตย์ที่ 23 สิงหาคม 2569 
+Section 2 = — DEADLINE = 23.59 pm. — วันอังคารที่ 25 สิงหาคม 2569
+
+===== PAGE 39 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instructions: Language of the Computer
+Instruction Set Architecture & Assembly Language
+
+===== PAGE 40 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+PART I : Assembly & ISA (RISC - V)
+
+===== PAGE 41 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Set Overview 
+•  Different Computers have different instruction sets 
+• Early computers had very simple instruction sets 
+• Simpliﬁed implementation  
+• Many modern computers also have simple instruction sets
+
+===== PAGE 42 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V Instruction Set
+ Developed at UC Berkeley as open ISA 
+ Now managed by the RISC-V Foundation {riscv(dot)org} 
+Typical of many modern ISAs 
+See RISC-V Reference Data tear-out card 
+Similar ISAs have a large share of embedded core market 
+Applications in consumer electronics, network/storage equipment, 
+cameras, printers, …
+
+===== PAGE 43 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Arithmetic Operations
+
+
+===== PAGE 44 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Arithmetic Example
+
+
+===== PAGE 45 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Register Operands
+
+
+===== PAGE 46 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V Registers
+
+
+===== PAGE 47 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Register Operand Example
+
+
+===== PAGE 48 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Endian Support - Word Load/Store with E-bit
+•Big-endian address mapping 
+•Little-endian address mapping
+
+
+===== PAGE 49 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Memory Operands
+
+
+===== PAGE 50 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Memory Operand Example
+
+
+===== PAGE 51 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Registers vs. Memory
+
+
+===== PAGE 52 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Immediate Operands
+
+
+===== PAGE 53 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V : Numbers
+ Unsigned Binary Integers, Range : 0 to + 2^n - 1 
+ 2s-Complement Signed Integers, Range : -2^n-1 to + 2^n-1 - 1 
+ Signed Negation (Complement and add 1) 
+Sign Extension
+
+
+===== PAGE 54 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Representing Instructions
+
+
+===== PAGE 55 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V R-format Instructions
+
+
+===== PAGE 56 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+R-format Example
+
+
+===== PAGE 57 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V I-format Instructions
+
+
+===== PAGE 58 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V S-format Instructions
+
+
+===== PAGE 59 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Stored Program Computers
+
+
+===== PAGE 60 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Logical Operations
+
+
+===== PAGE 61 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Shift Operations
+
+
+===== PAGE 62 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+AND Operations
+
+
+===== PAGE 63 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+OR Operations
+
+
+===== PAGE 64 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+XOR Operations
+
+
+===== PAGE 65 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Conditional Operations
+
+
+===== PAGE 66 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+
+
+===== PAGE 67 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Compiling Loop Statements
+
+
+===== PAGE 68 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Basic Blocks
+
+
+===== PAGE 69 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+More Conditional Operations
+
+
+===== PAGE 70 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Signed vs Unsigned
+
+
+===== PAGE 71 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 36
+Procedure Calling
+ Steps required
+1. Place parameters in registers x10 to x17
+2. Transfer control to procedure
+3. Acquire storage for procedure
+4. Perform procedure’s operations
+5. Place result in register for caller
+6. Return to place of call (address in x1)
+§2.8 Supporting Procedures in Computer Hardware
+
+===== PAGE 72 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 37
+Procedure Call Instructions
+ Procedure call: jump and link
+jal x1, ProcedureLabel
+ Address of following instruction put in x1
+ Jumps to target address
+ Procedure return: jump and link register
+jalr x0, 0(x1)
+ Like jal, but jumps to 0 + address in x1
+ Use x0 as rd (x0 cannot be changed)
+ Can also be used for computed jumps
+ e.g., for case/switch statements
+
+===== PAGE 73 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 38
+Leaf Procedure Example
+ C code:
+long long int leaf_example (
+long long int g, long long int h,
+long long int i, long long int j) {
+long long int f;
+f = (g + h) - (i + j);
+return f;
+}
+ Arguments g, …, j in x10, …, x13
+ f in x20
+ temporaries x5, x6
+ Need to save x5, x6, x20 on stack
+ฟังก์ชันที่ไม่มีการ call 
+เรียก ออกไปหาฟังก์ชันอื่น
+
+===== PAGE 74 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ RISC-V code:
+leaf_example:
+addi sp,sp,-24
+sd   x5,16(sp)
+sd   x6,8(sp)
+sd   x20,0(sp
+add  x5,x10,x11
+add  x6,x12,x1
+sub  x20,x5,x6
+addi x10,x20,0
+ld   x20,0(sp)
+ld   x6,8(sp)
+ld   x5,16(sp)
+addi sp,sp,24
+jalr x0,0(x1)
+Chapter 2 — Instructions: La nguage of the Computer — 39
+Leaf Procedure Example
+Save x5, x6, x20 on stack
+x5 = g + h
+x6 = i + j
+f = x5 – x6
+copy f to return register
+Resore x5, x6, x20 from stack
+Return to caller
+
+===== PAGE 75 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Local Data on the Stack
+Chapter 2 — Instructions: La nguage of the Computer — 40
+
+
+===== PAGE 76 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Register Usage
+ x5 – x7, x28 – x31:  temporary registers
+ Not preserved by the callee
+ x8 – x9, x18 – x27:  saved registers
+ If used, the callee saves and restores them
+Chapter 2 — Instructions: La nguage of the Computer — 41
+
+===== PAGE 77 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 42
+Non-Leaf Procedures
+ Procedures that call other procedures
+ For nested call, caller needs to save on the 
+stack:
+ Its return address
+ Any arguments and temporaries needed after 
+the call
+ Restore from the stack after the call
+
+===== PAGE 78 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 43
+Non-Leaf Procedure Example
+ C code:
+long long int fact (long long int n)
+{ 
+if (n < 1) return f;
+else return n * fact(n - 1);
+}
+ Argument n in x10
+ Result in x10
+
+===== PAGE 79 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ RISC-V code:
+fact:
+addi sp,sp,-16
+sd   x1,8(sp)
+sd   x10,0(sp)
+addi x5,x10,-1
+bge  x5,x0,L1
+addi x10,x0,1
+addi sp,sp,16
+jalr x0,0(x1)
+L1: addi x10,x10,-1
+jal  x1,fact
+addi x6,x10,0
+ld   x10,0(sp)
+ld   x1,8(sp)
+addi sp,sp,16
+mul  x10,x10,x6
+jalr x0,0(x1)
+Chapter 2 — Instructions: La nguage of the Computer — 44
+Leaf Procedure Example
+Save return address and n on stack
+x5 = n - 1
+Else, set return value to 1
+n = n - 1
+if n >= 1, go to L1
+call fact(n-1)
+Pop stack, don’t bother restoring values
+Return
+Restore caller’s n
+Restore caller’s return address
+Pop stack
+return n * fact(n-1)
+return
+move result of fact(n - 1) to x6
+
+===== PAGE 80 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 45
+Memory Layout
+ Text: program code
+ Static data: global 
+variables
+ e.g., static variables in C, 
+constant arrays and strings
+ x3 (global pointer) 
+initialized to address 
+allowing ±offsets into this 
+segment
+ Dynamic data: heap
+ E.g., malloc in C, new in 
+Java
+ Stack: automatic storage
+
+
+===== PAGE 81 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 46
+Local Data on the Stack
+ Local data allocated by callee
+ e.g., C automatic variables
+ Procedure frame (activation record)
+ Used by some compilers to manage stack storage
+
+
+===== PAGE 82 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 47
+Character Data
+ Byte-encoded character sets
+ ASCII: 128 characters
+ 95 graphic, 33 control
+ Latin-1: 256 characters
+ ASCII, +96 more graphic characters
+ Unicode: 32-bit character set
+ Used in Java, C++ wide characters, …
+ Most of the world’s alphabets, plus symbols
+ UTF-8, UTF-16: variable-length encodings
+§2.9 Communicating with People
+
+===== PAGE 83 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 48
+Byte/Halfword/Word Operations
+ RISC-V byte/halfword/word load/store
+ Load byte/halfword/word: Sign extend to 64 bits in rd
+ lb rd, offset(rs1)
+ lh rd, offset(rs1)
+ lw rd, offset(rs1)
+ Load byte/halfword/word unsigned: Zero extend to 64 bits in rd
+ lbu rd, offset(rs1)
+ lhu rd, offset(rs1)
+ lwu rd, offset(rs1)
+ Store byte/halfword/word: Store rightmost 8/16/32 bits
+ sb rs2, offset(rs1)
+ sh rs2, offset(rs1)
+ sw rs2, offset(rs1)
+
+===== PAGE 84 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V in details: Students can explore by themselves 
+PART II : Self-study
+
+===== PAGE 85 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 49
+String Copy Example
+ C code:
+ Null-terminated string
+void strcpy (char x[], char y[])
+{ size_t i;
+i = 0;
+while ((x[i]=y[i])!='\0')
+i += 1;
+}
+
+===== PAGE 86 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ RISC-V code:
+strcpy:
+addi sp,sp,-8 // adjust stack for 1 doubleword
+sd   x19,0(sp)      // push x19
+add  x19,x0,x0 // i=0
+L1: add  x5,x19,x10 // x5 = addr of y[i]
+lbu  x6,0(x5) // x6 = y[i]
+add  x7,x19,x10 // x7 = addr of x[i]
+sb   x6,0(x7) // x[i] = y[i]
+beq  x6,x0,L2 // if y[i] == 0 then exit
+addi x19,x19,1 // i = i + 1
+jal  x0,L1 // next iteration of loop
+L2: ld   x19,0(sp) // restore saved x19
+addi sp,sp,8 // pop 1 doubleword from stack
+jalr x0,0(x1) // and return
+Chapter 2 — Instructions: La nguage of the Computer — 50
+String Copy Example
+
+===== PAGE 87 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ Most constants are small
+ 12-bit immediate is sufficient
+ For the occasional 32-bit constant
+lui rd, constant
+ Copies 20-bit constant to bits [31:12] of rd
+ Extends bit 31 to bits [63:32]
+ Clears bits [11:0] of rd to 0
+Chapter 2 — Instructions: La nguage of the Computer — 51
+0000 0000 0011 1101 00000000 0000 0000 0000
+32-bit Constants
+lui x19, 976  // 0x003D0
+§2.10 RISC-V Addressing for Wide Immediates and Addresses
+addi x19,x19,128  // 0x500
+0000 0000 0000 0000 0000 0000 0000
+0000 0000 0011 1101 00000000 0000 0000 0000 0000 0000 0000 0000 0101 0000 0000
+
+===== PAGE 88 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 52
+Branch Addressing
+ Branch instructions specify
+ Opcode, two registers, target address
+ Most branch targets are near branch
+ Forward or backward
+ SB format:
+ PC-relative addressing
+ Target address = PC + immediate × 2
+rs2 rs1 funct3 opcode
+imm
+[10:5]
+imm
+[4:1]
+imm[12] imm[11]
+
+===== PAGE 89 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 53
+Jump Addressing
+ Jump and link ( jal ) target uses 20-bit 
+immediate for larger range
+ UJ format:
+ For long jumps, eg, to 32-bit absolute 
+address
+ lui: load address[31:12] to temp register
+ jalr: add address[11:0] and jump to target
+rd opcode
+7 bits5 bits
+imm[11]imm[20]
+imm[10:1] imm[19:12]
+
+===== PAGE 90 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V Addressing Summary
+Chapter 2 — Instructions: La nguage of the Computer — 54
+
+
+===== PAGE 91 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+RISC-V Encoding Summary
+Chapter 2 — Instructions: La nguage of the Computer — 55
+
+
+===== PAGE 92 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 56
+Synchronization
+ Two processors sharing an area of memory
+ P1 writes, then P2 reads
+ Data race if P1 and P2 don’t synchronize
+ Result depends of order of accesses
+ Hardware support required
+ Atomic read/write memory operation
+ No other access to the location allowed between the 
+read and write
+ Could be a single instruction
+ E.g., atomic swap of register ļ memory
+ Or an atomic pair of instructions
+§2.11 Parallelism and Instructions: Synchronization
+
+===== PAGE 93 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 57
+Synchronization in RISC-V
+ Load reserved: lr.d rd,(rs1)
+ Load from address in rs1 to rd
+ Place reservation on memory address
+ Store conditional: sc.d rd,(rs1),rs2
+ Store from rs2 to address in rs1
+ Succeeds if location not changed since the lr.d
+ Returns 0 in rd
+ Fails if location is changed
+ Returns non-zero value in rd
+
+===== PAGE 94 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Synchronization in RISC-V
+ Example 1: atomic swap (to test/set lock variable)
+again: lr.d x10,(x20)
+sc.d x11,(x20),x23 // X11 = status
+bne  x11,x0,again  // branch if store failed
+addi x23,x10,0     // X23 = loaded value
+ Example 2:  lock
+addi x12,x0,1 // copy locked value
+again: lr.d x10,(x20) // read lock
+bne  x10,x0,again // check if it is 0 yet
+sc.d x11,(x20),x12 // attempt to store
+bne  x11,x0,again // branch if fails
+ Unlock:
+sd   x0,0(x20) // free lock
+Chapter 2 — Instructions: La nguage of the Computer — 58
+
+===== PAGE 95 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 59
+Translation and Startup
+Many compilers produce 
+object modules directly
+Static linking
+§2.12 Translating and Starting a Program
+
+
+===== PAGE 96 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 60
+Producing an Object Module
+ Assembler (or compiler) translates program into 
+machine instructions
+ Provides information for building a complete 
+program from the pieces
+ Header: described contents of object module
+ Text segment: translated instructions
+ Static data segment: data allocated for the life of the 
+program
+ Relocation info: for contents that depend on absolute 
+location of loaded program
+ Symbol table: global definitions and external refs
+ Debug info: for associating with source code
+
+===== PAGE 97 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 61
+Linking Object Modules
+ Produces an executable image
+1.Merges segments
+2.Resolve labels (determine their addresses)
+3.Patch location-dependent and external refs
+ Could leave location dependencies for 
+fixing by a relocating loader
+ But with virtual memory, no need to do this
+ Program can be loaded into absolute location 
+in virtual memory space
+
+===== PAGE 98 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 62
+Loading a Program
+ Load from image file on disk into memory
+1.Read header to determine segment sizes
+2.Create virtual address space
+3.Copy text and initialized data into memory
+ Or set page table entries so  they can be faulted in
+4.Set up arguments on stack
+5.Initialize registers (including sp, fp, gp)
+6.Jump to startup routine
+ Copies arguments to x10, … and calls main
+ When main returns, do exit syscall
+
+===== PAGE 99 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 63
+Dynamic Linking
+ Only link/load library procedure when it is 
+called
+ Requires procedure code to be relocatable
+ Avoids image bloat caused by static linking of 
+all (transitively) referenced libraries
+ Automatically picks up new library versions
+
+===== PAGE 100 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 64
+Lazy Linkage
+Indirection table
+Stub: Loads routine ID,
+Jump to linker/loader
+Linker/loader code
+Dynamically
+mapped code
+
+
+===== PAGE 101 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 65
+Starting Java Applications
+Simple portable 
+instruction set for 
+the JVM
+Interprets 
+bytecodes
+Compiles 
+bytecodes of 
+“hot” methods 
+into native 
+code for host 
+machine
+
+===== PAGE 102 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 66
+C Sort Example
+ Illustrates use of assembly instructions 
+for a C bubble sort function
+ Swap procedure (leaf)
+void swap(long long int v[],
+long long int k)
+{
+long long int temp;
+temp = v[k];
+v[k] = v[k+1];
+v[k+1] = temp;
+}
+ v in x10, k in x11, temp in x5
+§2.13 A C Sort Example to Put It All Together
+
+===== PAGE 103 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+swap:
+slli x6,x11,3    // reg x6 = k * 8
+add  x6,x10,x6   // reg x6 = v + (k * 8)
+ld   x5,0(x6)    // reg x5 (temp) = v[k]
+ld   x7,8(x6)    // reg x7 = v[k + 1]
+sd   x7,0(x6)    // v[k] = reg x7
+sd   x5,8(x6)    // v[k+1] = reg x5 (temp)
+jalr x0,0(x1)    // return to calling routine
+Chapter 2 — Instructions: La nguage of the Computer — 67
+The Procedure Swap
+
+===== PAGE 104 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 68
+The Sort Procedure in C
+ Non-leaf (calls swap)
+void sort (long long int v[], size_t n)
+{
+size_t i, j;
+for (i = 0; i < n; i += 1) {
+for (j = i – 1;
+j >= 0 && v[j] > v[j + 1];
+j -= 1) {
+swap(v,j);
+}
+}
+}
+ v in x10, n in x11, i in x19, j in x20
+
+===== PAGE 105 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ Skeleton of outer loop:
+ for (i = 0; i <n; i += 1) {
+li   x19,0 // i = 0
+for1tst:
+bge  x19,x11,exit1   // go to exit1 if x19 ≥ x11 (i≥n)
+(body of outer for-loop)
+addi x19,x19,1 // i += 1
+j    for1tst // branch to test of outer loop
+exit1:
+Chapter 2 — Instructions: La nguage of the Computer — 69
+The Outer Loop
+
+===== PAGE 106 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ Skeleton of inner loop:
+ for (j = i í 1; j >= 0 && v[j] > v[j + 1]; j í = 1) {
+addi x20,x19,-1    // j = i −1
+for2tst: 
+blt  x20,x0,exit2  // go to exit2 if X20 < 0 (j < 0)
+slli x5,x20,3      // reg x5 = j * 8
+add  x5,x10,x5     //  reg x5 = v + (j * 8)
+ld   x6,0(x5)      // reg x6 = v[j]
+ld   x7,8(x5)      // reg x7 = v[j + 1]
+ble  x6,x7,exit2   // go to exit2 if x6 ≤ x7
+mv   x21, x10      // copy paramet er x10 into x21
+mv   x22, x11      // copy paramet er x11 into x22
+mv   x10, x21      // first swap parameter is v
+mv   x11, x20      // second swap parameter is j
+jal  x1,swap // call swap
+addi x20,x20,-1 // j –= 1
+j    for2tst // branc h to test of inner loop
+exit2:
+Chapter 2 — Instructions: La nguage of the Computer — 70
+The Inner Loop
+
+===== PAGE 107 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+ Preserve saved registers:
+addi sp,sp,-40  // make ro om on stack for 5 regs
+sd   x1,32(sp)  //  save x1 on stack
+sd   x22,24(sp) //  save x22 on stack
+sd   x21,16(sp) //  save x21 on stack
+sd   x20,8(sp)  //  save x20 on stack
+sd   x19,0(sp)  //  save x19 on stack
+ Restore saved registers:
+exit1:
+sd   x19,0(sp) // r estore x19 from stack
+sd   x20,8(sp)  // restore x20 from stack
+sd   x21,16(sp) // restore x21 from stack
+sd   x22,24(sp) // restore x22 from stack
+sd   x1,32(sp)  // restore x1 from stack
+addi sp,sp, 40  // restore stack pointer
+jalr x0,0(x1)
+Chapter 2 — Instructions: La nguage of the Computer — 71
+Preserving Registers
+
+===== PAGE 108 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 72
+Effect of Compiler Optimization
+0
+0.5
+1
+1.5
+2
+2.5
+3
+none O1 O2 O3
+Relative Performance
+0
+20000
+40000
+60000
+80000
+100000
+120000
+140000
+160000
+180000
+none O1 O2 O3
+Clock Cycles
+0
+20000
+40000
+60000
+80000
+100000
+120000
+140000
+none O1 O2 O3
+Instruction count
+0
+0.5
+1
+1.5
+2
+none O1 O2 O3
+CPI
+Compiled with gcc for Pentium 4 under Linux
+
+===== PAGE 109 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 73
+Effect of Language and Algorithm
+0
+0.5
+1
+1.5
+2
+2.5
+3
+C/none C/O1 C/O2 C/O3 Java/int Java/JIT
+Bubblesort Relative Performance
+0
+0.5
+1
+1.5
+2
+2.5
+C/none C/O1 C/O2 C/O3 Java/int Java/JIT
+Quicksort Relative Performance
+0
+500
+1000
+1500
+2000
+2500
+3000
+C/none C/O1 C/O2 C/O3 Java/int Java/JIT
+Quicksort vs. Bubblesort Speedup
+
+===== PAGE 110 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 74
+Lessons Learnt
+ Instruction count and CPI are not good 
+performance indicators in isolation
+ Compiler optimizations are sensitive to the 
+algorithm
+ Java/JIT compiled code is significantly 
+faster than JVM interpreted
+ Comparable to optimized C in some cases
+ Nothing can fix a dumb algorithm!
+
+===== PAGE 111 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 75
+Arrays vs. Pointers
+ Array indexing involves
+ Multiplying index by element size
+ Adding to array base address
+ Pointers correspond directly to memory 
+addresses
+ Can avoid indexing complexity
+§2.14 Arrays versus Pointers
+
+===== PAGE 112 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 76
+Example: Clearing an Array
+clear1(int array[], int size) {
+int i;
+for (i = 0; i < size; i += 1)
+array[i] = 0;
+}
+clear2(int *array, int size) {
+int *p;
+for (p = &array[0 ]; p < &array[size];
+p = p + 1)
+*p = 0;
+}
+li   x5,0       // i = 0
+loop1:
+slli x6,x5,3    // x6 = i * 8
+add  x7,x10,x6  // x7 = address
+// of array[i]
+sd x0,0(x7)   // array[i] = 0
+addi x5,x5,1    // i = i + 1
+blt x5,x11,loop1  // if (i<size)
+// go to loop1
+mv x5,x10      // p = address
+// of array[0]
+slli x6,x11,3  //  x6 = size * 8
+add x7,x10,x6  // x7 = address
+// of array[size]
+loop2:
+sd x0,0(x5)    // Memory[p] = 0
+addi x5,x5,8   // p = p + 8
+bltu x5,x7,loop2
+// if (p<&array[size])
+// go to loop2
+
+===== PAGE 113 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 77
+Comparison of Array vs. Ptr
+ Multiply “strength reduced” to shift
+ Array version requires shift to be inside 
+loop
+ Part of index calculation for incremented i
+ c.f. incrementing pointer
+ Compiler can achieve same effect as 
+manual use of pointers
+ Induction variable elimination
+ Better to make program clearer and safer
+
+===== PAGE 114 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+MIPS Instructions
+ MIPS: commercial predecessor to RISC-V
+ Similar basic set of instructions
+ 32-bit instructions
+ 32 general purpose registers, register 0 is always 0
+ 32 floating-point registers
+ Memory accessed only by load/store instructions
+ Consistent use of addressing modes for all data sizes
+ Different conditional branches
+ For <, <=, >, >=
+ RISC-V: blt, bge, bltu, bgeu
+ MIPS: slt, sltu (set less than, result is 0 or 1)
+ Then use beq, bne to complete the branch
+Chapter 2 — Instructions: La nguage of the Computer — 78
+§2.16 Real Stuff: MIPS Instructions
+
+===== PAGE 115 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Chapter 2 — Instructions: La nguage of the Computer — 79
+Instruction Encoding
+
+
+===== PAGE 116 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Other RISC-V Instructions
+ Base integer instructions (RV64I)
+ Those previously described, plus
+ auipc rd, immed  // rd = (imm<<12) + pc
+ follow by jalr (adds 12-bit immed) for long jump
+ slt, sltu, slti, sltui: set less than (like MIPS)
+ addw, subw, addiw: 32-bit add/sub
+ sllw, srlw, srlw, slliw, srliw, sraiw: 32-bit shift
+ 32-bit variant: RV32I
+ registers are 32-bits wide, 32-bit operations
+Chapter 2 — Instructions: La nguage of the Computer — 87
+§2.18 The Rest of the RISC-V Instruction Set
+
+===== PAGE 117 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Instruction Set Extensions
+ M: integer multiply, divide, remainder
+ A: atomic memory operations
+ F: single-precision floating point
+ D: double-precision floating point
+ C: compressed instructions
+ 16-bit encoding for frequently used 
+instructions
+Chapter 2 — Instructions: La nguage of the Computer — 88
+
+===== PAGE 118 =====
+ITDS-211: Computer Architecture & Operating System W.Suntiamorntut, Ph.D.
+Q & A
